@@ -46,8 +46,6 @@
     </style>
 </head>
 <body>
-    <h3>LPS Marks Calculator</h3>
-
     <!-- Input fields for HS, B.Ed., Graduation, and CTET -->
     <label for="hsMarks">HS Percentage ⬇️</label>
     <input type="number" id="hsMarks" placeholder="Enter HS Percentage" /><br>
@@ -55,14 +53,12 @@
     <label for="bedMarks">D.El.Ed./B.El.Ed./Diploma In Education (Spl. Education) Percentage ⬇️</label>
     <input type="number" id="bedMarks" placeholder="Enter Percentage" /><br>
 
-
-    <label for="ctetOption">ATET/CTET Marks or Percentage (for LPS) ⬇️</label>
+    <label for="ctetOption">ATET/CTET Marks or Percentage (<b>LP</b>) ⬇️</label>
     <select id="ctetOption" onchange="updateCTETInput()">
         <option value="Marks">Marks</option>
         <option value="Percentage">Percentage</option>
     </select>
     <input type="number" id="ctetMarks" placeholder="ATET/CTET Marks" /><br>
-<br>
     <!-- Radio buttons for NCC C, NCC B, SPORTS, CULTURAL, and None -->
     <label>Select, only if you have ⬇️</label>
     <input type="radio" name="additionalOption" id="nccC" onclick="calculateTotal()"> NCC "C" Certificate<br>
