@@ -12,6 +12,8 @@
 
         h3 {
             color: #333;
+			margin-block-start: 0.2em;
+			margin-block-end: .3em;
         }
 
         label {
@@ -23,19 +25,20 @@
             margin-bottom: 10px;
             padding: 5px;
         }
-
-        button {
+		button {
             padding: 10px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+			font-size: 1.2em;
         }
 
         #total {
-            margin-top: 20px;
-            font-size: 1.2em;
+			display: inline-block;
+            font-size: 1.5em;
+			font-weight:bold;
             color: #333;
         }
     </style>
@@ -69,14 +72,11 @@
     <input type="radio" name="additionalOption" id="none" onclick="calculateTotal()"> None<br>
 
     <!-- Calculate Total button -->
-    <button onclick="calculateTotal()">Calculate Total</button>
-
-    <!-- Display total -->
-    <h2 id="total">Total:</h2>
+    <button onclick="calculateTotal()">Calculate</button>
+	<p id="total">Total:</p><br>
 	<small><a href="./lps.html"><b>Click here for LP School Marks Calculator</a>
 <br><a href="mailto:kymarkslpup@gmail.com">Contact Me</b></a></small>
 <br>
-    <a href="https://hits.sh/lpupmarks.github.io/ups.html/"><img alt="Hits" src="https://hits.sh/lpupmarks.github.io/ups.html.svg?label=pageHits"/></a>
 	<script>
         function calculateTotal() {
             const hsMarks = parseFloat(document.getElementById("hsMarks").value) || 0;
