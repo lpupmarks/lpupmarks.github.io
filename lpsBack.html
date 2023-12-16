@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marks Calculator (UPS)</title>
+    <title>CTET Back-calculator (LPS)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,8 +37,7 @@
 
         #total {
 			display: inline-block;
-            font-size: 1.5em;
-			font-weight:bold;
+            font-size: 1.2em;
             color: #333;
         }
     </style>
@@ -50,65 +49,44 @@
 
     <label for="bedMarks">B.Ed./D.El.Ed./Diploma In Education (Spl. Education)/B.Ed. (Spl. Education) Percentage ⬇️</label>
     <input type="number" id="bedMarks" placeholder="Enter Percentage" /><br>
+	
+	<label for="desiredTotal">Desired Total ⬇️</label>
+    <input type="number" id="desiredTotal" placeholder="Enter Desired Total" /><br>
 
-    <label for="graduationMarks">Graduation Percentage ⬇️</label>
-    <input type="number" id="graduationMarks" placeholder="Enter Graduation Percentage" /><br>
-
-    <label for="ctetOption">ATET/CTET Marks or Percentage (<b>UP</b>) ⬇️</label>
-    <select id="ctetOption" onchange="updateCTETInput()">
-        <option value="Marks">Marks</option>
-        <option value="Percentage">Percentage</option>
-    </select>
-    <input type="number" id="ctetMarks" placeholder="ATET/CTET Marks" /><br>
-    <!-- Radio buttons for NCC C, NCC B, SPORTS, CULTURAL, and None -->
+<!-- Radio buttons for NCC C, NCC B, SPORTS, CULTURAL, and None -->
     <label>Select, only if you have ⬇️</label>
     <input type="radio" name="additionalOption" id="nccC" onclick="calculateTotal()"> NCC "C" Certificate<br>
     <input type="radio" name="additionalOption" id="nccB" onclick="calculateTotal()"> NCC "B" Certificate<br>
     <input type="radio" name="additionalOption" id="sports" onclick="calculateTotal()"> Participation/Achievement in recognized sports at National Level or Beyond representing Assam <br>
     <input type="radio" name="additionalOption" id="cultural" onclick="calculateTotal()"> Participation/Achievements in Fine Arts and Cultural Activities representing Assam at National Level or Beyond (organized by recognized institutions)<br>
-    <input type="radio" name="additionalOption" id="none" onclick="calculateTotal()"> None<br>
+    <input type="radio" name="additionalOption" id="none" onclick="calculateTotal()"> None<br>   
+   
 
     <!-- Calculate Total button -->
     <button onclick="calculateTotal()">Calculate</button>
-	<p id="total">Total:</p><br>
-	<small><a href="./lps.html"><b>Click here for LP School Marks Calculator</a>
-<br><a href="./lpsBack.html"><b>Click here for LP School CTET Marks <i>Back-calculator</i></b></a><br>
-<a href="./upsBack.html"><b>Click here for UP School CTET Marks <i>Back-calculator</i></b></a><br>
-<a href="mailto:kymarkslpup@gmail.com">Contact Me</b></a></small>
-<br>
-	<script>
+    <p id="total">You will need:</p><br>
+    <small><a href="./lps.html"><b>Click here for LP School Marks Calculator</b></a><br>
+	<a href="./ups.html"><b>Click here for UP School CTET Marks Calculator</b></a><br>
+	<a href="./upsBack.html"><b>Click here for UP School CTET Marks <i>Back-calculator</i></b></a><br>
+	<a href="mailto:kymarkslpup@gmail.com">Contact Me</a></small>
+
+    <script>
         function calculateTotal() {
             const hsMarks = parseFloat(document.getElementById("hsMarks").value) || 0;
             const bedMarks = parseFloat(document.getElementById("bedMarks").value) || 0;
-            const graduationMarks = parseFloat(document.getElementById("graduationMarks").value) || 0;
+            const desiredTotal = parseFloat(document.getElementById("desiredTotal").value) || 0;
 
-            const ctetOption = document.getElementById("ctetOption").value;
-            let ctetMarks;
-
-            if (ctetOption === "Percentage") {
-                ctetMarks = parseFloat(document.getElementById("ctetMarks").value) || 0;
-            } else {
-                ctetMarks = (parseFloat(document.getElementById("ctetMarks").value) || 0) / 1.5;
-            }
-
-            // Calculate additional options (NCC C, NCC B, SPORTS, CULTURAL, None)
+          // Calculate additional options (NCC C, NCC B, SPORTS, CULTURAL, None)
             const nccC = document.getElementById("nccC").checked ? 5.0 : 0;
             const nccB = document.getElementById("nccB").checked ? 3.0 : 0;
             const sports = document.getElementById("sports").checked ? 5.0 : 0;
             const cultural = document.getElementById("cultural").checked ? 5.0 : 0;
             const none = document.getElementById("none").checked ? 0 : 0;
 
-            const total = (0.05 * hsMarks) + (0.05 * bedMarks) + (0.05 * graduationMarks) + (0.80 * ctetMarks) +
-                          nccC + nccB + sports + cultural + none;
+            const total = desiredTotal - (0.05 * hsMarks + 0.05 * bedMarks + nccC + nccB + sports + cultural + none );
 
-            document.getElementById("total").textContent = `Total: ${total.toFixed(3)}`;
-        }
+			document.getElementById("total").innerHTML = `You will need: <strong><u>${1.1764 * total.toFixed(1)} Percentage </u></strong> or <strong><u>${1.7646 * total.toFixed(1)} Marks</u></strong> in <strong><u>CTET</u></strong>.`;
 
-        function updateCTETInput() {
-            const ctetOption = document.getElementById("ctetOption").value;
-            const ctetMarksInput = document.getElementById("ctetMarks");
-
-            ctetMarksInput.placeholder = `ATET/CTET ${ctetOption}`;
         }
     </script>   
 </body>
