@@ -1,97 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CTET Back-calculator (UPS)</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
+   body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
 
-        h3 {
-            color: #333;
-			margin-block-start: 0.2em;
-			margin-block-end: .3em;
-        }
+h3 {
+    color: #333;
+    margin-block-start: 0.2em;
+    margin-block-end: .3em;
+}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
+.card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    display: none;
+}
 
-        input, select {
-            margin-bottom: 10px;
-            padding: 5px;
-        }
-		button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-			font-size: 1.2em;
-        }
+.card.active {
+    display: block;
+}
 
-        #total {
-			display: inline-block;
-            font-size: 1.2em;
-            color: #333;
-        }
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input,
+select {
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+#total {
+    display: block;
+    font-size: 1.2em;
+    color: #333;
+}
+
+
+#slider-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px; 
+	}
+
+
+#slider-value {
+    margin-left: 10px; 
+    display: inline-block; 
+	}
+
+
+#total-slider {
+    margin-top: 10px;
+}
+
+/* Navigation buttons */
+.nav-buttons {
+    margin-top: 20px;
+}
+
+.nav-buttons button {
+    margin-right: 10px;
+}
+
     </style>
 </head>
+
 <body>
-    <!-- Input fields for HS, B.Ed., Graduation, and CTET -->
-    <label for="hsMarks">HS Percentage ⬇️</label>
-    <input type="number" id="hsMarks" placeholder="Enter HS Percentage" /><br>
+    <div class="card active" id="hsCard">
+        <!-- Input fields for HS -->
+        <label for="hsMarks">HS Percentage ⬇️</label>
+        <input type="number" id="hsMarks" placeholder="Enter HS Percentage" /><br>
 
-    <label for="bedMarks">B.Ed./D.El.Ed./Diploma In Education (Spl. Education)/B.Ed. (Spl. Education) Percentage ⬇️</label>
-    <input type="number" id="bedMarks" placeholder="Enter Percentage" /><br>
+        <button onclick="nextCard('hsCard')">Next</button>
+    </div>
 
-    <label for="graduationMarks">Graduation Percentage ⬇️</label>
-    <input type="number" id="graduationMarks" placeholder="Enter Graduation Percentage" /><br>
+    <div class="card" id="bedCard">
+        <!-- Input fields for B.Ed. -->
+        <label for="bedMarks">B.Ed./D.El.Ed./Diploma In Education (Spl. Education)/B.Ed. (Spl. Education) Percentage
+            ⬇️</label>
+        <input type="number" id="bedMarks" placeholder="Enter Percentage" /><br>
+
+        <button onclick="prevCard('bedCard')">Previous</button>
+        <button onclick="nextCard('bedCard')">Next</button>
+    </div>
+
+    <div class="card" id="graduationCard">
+        <!-- Input fields for Graduation -->
+        <label for="graduationMarks">Graduation Percentage ⬇️</label>
+        <input type="number" id="graduationMarks" placeholder="Enter Graduation Percentage" /><br>
+
+        <button onclick="prevCard('graduationCard')">Previous</button>
+        <button onclick="nextCard('graduationCard')">Next</button>
+    </div>
+
+    
+<div class="card" id="optionsCard">    
+    <!-- Radio buttons for NCC C, NCC B, SPORTS, CULTURAL, and None -->
+        <label>Select, only if you have ⬇️</label>
+        <input type="radio" name="additionalOption" id="nccC" onclick="calculateTotal()"> NCC "C" Certificate<br>
+        <input type="radio" name="additionalOption" id="nccB" onclick="calculateTotal()"> NCC "B" Certificate<br>
+        <input type="radio" name="additionalOption" id="sports" onclick="calculateTotal()"> Participation/Achievement in
+        recognized sports at National Level or Beyond representing Assam <br>
+        <input type="radio" name="additionalOption" id="cultural" onclick="calculateTotal()"> Participation/Achievements
+        in Fine Arts and Cultural Activities representing Assam at National Level or Beyond (organized by recognized
+        institutions)<br>
+        <input type="radio" name="additionalOption" id="none" onclick="calculateTotal()"> None<br>
+ <!-- Navigation buttons -->
+    <div class="nav-buttons">
+        <button onclick="prevCard('optionsCard')">Previous</button>
+        <button onclick="nextCard('optionsCard')">Next</button>
+       
+    </div>
+	</div>
 	
-	<label for="desiredTotal">Desired Total ⬇️</label>
-    <input type="number" id="desiredTotal" placeholder="Enter Desired Total" /><br>
+<div class="card" id="desiredTotalCard">
+        <!-- Input fields for Additional Options -->
+        <label for="desiredTotal">Desired Total ⬇️</label>
+        <input type="number" id="desiredTotal" placeholder="Enter Desired Total" /><br>
+    
 
-<!-- Radio buttons for NCC C, NCC B, SPORTS, CULTURAL, and None -->
-    <label>Select, only if you have ⬇️</label>
-    <input type="radio" name="additionalOption" id="nccC" onclick="calculateTotal()"> NCC "C" Certificate<br>
-    <input type="radio" name="additionalOption" id="nccB" onclick="calculateTotal()"> NCC "B" Certificate<br>
-    <input type="radio" name="additionalOption" id="sports" onclick="calculateTotal()"> Participation/Achievement in recognized sports at National Level or Beyond representing Assam <br>
-    <input type="radio" name="additionalOption" id="cultural" onclick="calculateTotal()"> Participation/Achievements in Fine Arts and Cultural Activities representing Assam at National Level or Beyond (organized by recognized institutions)<br>
-    <input type="radio" name="additionalOption" id="none" onclick="calculateTotal()"> None<br>   
-   
+    <!-- Navigation buttons -->
+    <div class="nav-buttons">
+        <button onclick="prevCard('desiredTotalCard')">Previous</button>
+        <button onclick="calculateTotal()">Calculate</button>
+		<p id="total">You will need:</p>
+		
+<!-- Slider for adjusting Desired Total -->
+<div id="slider-container">
+    <label for="total-slider"><b>Adjust Your Desired Total:</b></label>
+    <input type="range" id="total-slider" min="0" max="100" step=".1" value="45" oninput="updateDesiredTotal()">
+    <span id="slider-value">45</span>
+</div>
 
-    <!-- Calculate Total button -->
-    <button onclick="calculateTotal()">Calculate</button>
-    <p id="total">You will need:</p><br>
+		</div>
+
     <small><a href="./lps.html"><b>Click here for LP School Marks Calculator</b></a><br>
-	<a href="./ups.html"><b>Click here for UP School Marks Calculator</b></a><br>
-	<a href="./lpsBack.html"><b>Click here for LP School CTET Marks <i>Back-calculator</i></b></a><br>
-	<a href="mailto:kymarkslpup@gmail.com">Contact Me</a></small>
+        <a href="./ups.html"><b>Click here for UP School Marks Calculator</b></a><br>
+        <a href="./lpsBack.html"><b>Click here for LP School CTET Marks <i>Back-calculator</i></b></a><br>
+        <a href="mailto:kymarkslpup@gmail.com">Contact Me</a></small>
+		</div>
 
     <script>
-        function calculateTotal() {
-            const hsMarks = parseFloat(document.getElementById("hsMarks").value) || 0;
-            const bedMarks = parseFloat(document.getElementById("bedMarks").value) || 0;
-            const graduationMarks = parseFloat(document.getElementById("graduationMarks").value) || 0;
-            const desiredTotal = parseFloat(document.getElementById("desiredTotal").value) || 0;
+function calculateTotal() {
+    const hsMarks = parseFloat(document.getElementById("hsMarks").value) || 0;
+    const bedMarks = parseFloat(document.getElementById("bedMarks").value) || 0;
+    const graduationMarks = parseFloat(document.getElementById("graduationMarks").value) || 0;
+    const desiredTotal = parseFloat(document.getElementById("desiredTotal").value) || 0;
 
-          // Calculate additional options (NCC C, NCC B, SPORTS, CULTURAL, None)
-            const nccC = document.getElementById("nccC").checked ? 5.0 : 0;
-            const nccB = document.getElementById("nccB").checked ? 3.0 : 0;
-            const sports = document.getElementById("sports").checked ? 5.0 : 0;
-            const cultural = document.getElementById("cultural").checked ? 5.0 : 0;
-            const none = document.getElementById("none").checked ? 0 : 0;
+    // Calculate additional options (NCC C, NCC B, SPORTS, CULTURAL, None)
+    const nccC = document.getElementById("nccC").checked ? 5.0 : 0;
+    const nccB = document.getElementById("nccB").checked ? 3.0 : 0;
+    const sports = document.getElementById("sports").checked ? 5.0 : 0;
+    const cultural = document.getElementById("cultural").checked ? 5.0 : 0;
+    const none = document.getElementById("none").checked ? 0 : 0;
 
-            const total = desiredTotal - (0.05 * hsMarks + 0.05 * bedMarks + 0.05 * graduationMarks + nccC + nccB + sports + cultural + none );
+    const total = desiredTotal - (0.05 * hsMarks + 0.05 * bedMarks + 0.05 * graduationMarks + nccC + nccB + sports +
+        cultural + none);
 
-			document.getElementById("total").innerHTML = `You will need: <strong><u>${1.25 * total.toFixed(1)} Percentage </u></strong> or <strong><u>${1.875 * total.toFixed(1)} Marks</u></strong> in <strong><u>CTET</u></strong>.`;
+    const requiredMarks = 1.25 * total.toFixed(1);
 
-        }
-    </script>   
+    let comment = "";
+
+    if (requiredMarks > 100) {
+        const comments = [
+            "Breaking the laws of mathematics, I see. Well done!",
+			"Are you sure you're not aiming for a world record in percentages?",
+			"100%? Only for the amateurs! You're going for the 110% club!",
+			"Did you invent a new marking system or something?",
+			"Looks like someone's trying to outdo Einstein. Good luck with that!",
+			"When life gives you percentages, make it go over 100%!",
+			"Who needs limits? Certainly not you!",
+			"Congratulations on reaching the mythical realm of percentages!",
+			"Newsflash: Total marks now in three digits! Take a bow!",
+			"They said it couldn't be done. You are going to prove them wrong.",
+			"Oh, aiming for the stars, aren't we?",
+            "Congratulations, you've officially broken the percentage scale!",
+            "Well, aren't you dreaming to be an overachiever!",
+            "Breaking news: Total marks exceeded 100%! Genius alert!",
+            "Someone call ISRO, we have a student reaching for the moon!",
+            "100% is too mainstream, go for it all!",
+			"Breaking records: first person to go beyond 100% in real life!",
+			"When your grades are so high, they need a telescope to see them.",
+			"100% is for mere mortals. You, my friend, aim for the stars!",
+			"Congratulations! You've unlocked the secret level of education!",
+			"Is your CTET score a phone number? Because it sure looks like one!",
+			"Forget 100%, you're playing the game of life on expert mode!",
+			"Are you sure you're not a wizard? Because these marks are magical!",
+			"Warning: May cause envy in classmates. Proceed with caution!",
+			"When life hands you lemons, make sure they're 110% organic!",
+			"The laws of mathematics just sent you a friend request!",
+			"You didn't break the scale; you shattered it into a million pieces!",
+			"Next stop: Academic Hall of Fame. Prepare your acceptance speech!",
+        ];
+
+        const randomIndex = Math.floor(Math.random() * comments.length);
+        comment = comments[randomIndex];
+    }
+
+    document.getElementById("total").innerHTML = `You will need: <strong><u>${requiredMarks} Percentage </u></strong> or <strong><u>${1.875 * total.toFixed(1)} Marks</u></strong> in <strong><u>CTET</u></strong>. <br/> <br/><b>${comment}</b>`;
+
+    // Update slider value to match Desired Total
+    document.getElementById("total-slider").value = desiredTotal;
+    document.getElementById("slider-value").innerHTML = desiredTotal;
+}
+
+function updateDesiredTotal() {
+    const sliderValue = document.getElementById("total-slider").value;
+    document.getElementById("slider-value").innerHTML = sliderValue;
+
+    // Update Desired Total based on the slider value
+    document.getElementById("desiredTotal").value = sliderValue;
+
+    // Recalculate total based on the updated Desired Total
+    calculateTotal();
+}
+
+function nextCard(currentCardId) {
+    document.getElementById(currentCardId).classList.remove("active");
+    const nextCardId = getNextCardId(currentCardId);
+    document.getElementById(nextCardId).classList.add("active");
+}
+
+function prevCard(currentCardId) {
+    document.getElementById(currentCardId).classList.remove("active");
+    const prevCardId = getPrevCardId(currentCardId);
+    document.getElementById(prevCardId).classList.add("active");
+}
+
+function getNextCardId(currentCardId) {
+    const cardIds = ["hsCard", "bedCard", "graduationCard", "optionsCard", "desiredTotalCard"];
+    const currentIndex = cardIds.indexOf(currentCardId);
+    return cardIds[currentIndex + 1];
+}
+
+function getPrevCardId(currentCardId) {
+    const cardIds = ["hsCard", "bedCard", "graduationCard", "optionsCard", "desiredTotalCard"];
+    const currentIndex = cardIds.indexOf(currentCardId);
+    return cardIds[currentIndex - 1];
+}
+
+    </script>
 </body>
+
 </html>
