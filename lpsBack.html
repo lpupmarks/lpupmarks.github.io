@@ -51,7 +51,7 @@ button {
 }
 
 #total {
-    display: block;
+    display: none;
     font-size: 1.2em;
     color: #333;
 }
@@ -60,7 +60,7 @@ button {
 #slider-container {
     display: flex;
     align-items: center;
-    margin-top: 10px; 
+    margin-top: 2px; 
 	}
 
 
@@ -71,7 +71,7 @@ button {
 
 
 #total-slider {
-    margin-top: 10px;
+    margin-top: 1px;
 }
 
 /* Navigation buttons */
@@ -206,9 +206,11 @@ function calculateTotal() {
 
         const randomIndex = Math.floor(Math.random() * comments.length);
         comment = comments[randomIndex];
+		
     }
 
-    document.getElementById("total").innerHTML = `You will need: <strong><u>${requiredMarks} Percentage </u></strong> or <strong><u>${1.7646 * total.toFixed(1)} Marks</u></strong> in <strong><u>CTET</u></strong>. <br/> <br/><b>${comment}</b>`;
+    document.getElementById("total").style.display = "block";
+    document.getElementById("total").innerHTML = `You will need: <strong><u>${requiredMarks} Percentage </u></strong> or <strong><u>${1.7646 * total.toFixed(1)} Marks</u></strong> in <strong><u>CTET</u></strong>. <br/> <br/><b><small>${comment}</small></b>`;
 
     // Update slider value to match Desired Total
     document.getElementById("total-slider").value = desiredTotal;
