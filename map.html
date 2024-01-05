@@ -17,11 +17,14 @@ body {
             justify-content: center;
             height: 100vh;
             margin: 0;
-        }
+            overflow: hidden; /* Prevent body from scrolling */
+}
 
-        #svg-container {
-    max-width: 100%;
-    height: auto;
+#svg-container {
+    width: 100%; /* Make the SVG container take 100% of the parent width */
+    height: 100%;
+    overflow: auto; /* Allow scrolling for the SVG container */
+}
 }
 
 	.str2 {stroke:black;stroke-width:10;stroke-opacity:0.501961;}
