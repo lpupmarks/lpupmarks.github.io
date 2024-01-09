@@ -630,14 +630,20 @@ function updateColorsAndText(districtPath, event) {
 
     let color = '';
 
-   if (selectedPostType === "Assistant Teacher") {
-    color = totalPosts >= 50 ? 'red' : (totalPosts >= 20 ? 'blue' : 'yellow');
-} else if (selectedPostType === "Science Teacher") {
-    if (totalPosts >= 10) {
+if (selectedPostType === "Assistant Teacher") {
+    if (totalPosts >= 50 && totalPosts <= 99) {
         color = 'red';
-    } else if (totalPosts >= 5) {
+    } else if (totalPosts >= 20 && totalPosts <= 49) {
         color = 'blue';
-    } else {
+    } else if (totalPosts >= 0 && totalPosts <= 19) {
+        color = 'yellow';
+    }
+} else if (selectedPostType === "Science Teacher") {
+    if (totalPosts >= 10 && totalPosts <= 99) {
+        color = 'red';
+    } else if (totalPosts >= 5 && totalPosts <= 8) {
+        color = 'blue';
+    } else if (totalPosts >= 0 && totalPosts <= 4) {
         color = 'yellow';
     }
 }
