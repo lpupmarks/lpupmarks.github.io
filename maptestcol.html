@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Map</title>
 </head>
-<body>
+<body><P><b>Note:For Assamese Medium Schools Only<b></p>
 <button id="assistantTeacherBtn">Assistant Teacher</button>
 <button id="scienceTeacherBtn">Science Teacher</button>
 <svg
@@ -491,85 +491,107 @@
 </svg>
 
 <script>
- const jsonData = {
-        "dis3": [
-            {
-                "post": "Assistant Teacher",
-                "district": "Golaghat",
-                "UR": 25,
-                "OBC_MOBC": 0,
-                "total": 25
-            },
-            {
-                "post": "Science Teacher",
-                "district": "Golaghat",
-                "UR": 1,
-                "OBC_MOBC": 0,
-                "total": 1
-            }
-        ],
-        "dis21": [
-            {
-                "post": "Assistant Teacher",
-                "district": "Jorhat",
-                "UR": 92,
-                "OBC_MOBC": 7,
-                "total": 99
-            },
-            {
-                "post": "Science Teacher",
-                "district": "Jorhat",
-                "UR": 9,
-                "OBC_MOBC": 8,
-                "total": 17
-            }
-        ]
-        // Add more districts as needed
-    };
+const jsonData = {
+    "dis3": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Golaghat",
+            "UR": 21,
+            "OBC_MOBC": 0,
+			"SC": 1,
+			"ST(P)": 1,
+			"ST(H)": 4,
+			"PwD": 2,
+			"Tea Tribes": 2,
+            "total": 31
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Golaghat",
+            "UR": 7,
+            "OBC_MOBC": 0,
+			"SC": 0,
+			"ST(P)": 0,
+			"ST(H)": 2,
+			"PwD": 2,
+			"Tea Tribes": 2,
+            "total": 13
+        }
+    ],
+    "dis21": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Bongaigaon",
+            "UR": 11,
+            "OBC_MOBC": 0,
+			"SC": 1,
+			"ST(P)": 4,
+			"ST(H)": 5,
+			"PwD": 5,
+			"Tea Tribes": 5,
+            "total": 19
+			},
+        {
+            "post": "Science Teacher",
+            "district": "Bongaigaon",
+            "UR": 0,
+            "OBC_MOBC": 0,
+			"SC": 1,
+			"ST(P)": 1,
+			"ST(H)": 2,
+			"PwD": 1,
+			"Tea Tribes": 1,
+            "total": 6
+			}
+    ]
+    // Add more districts as needed
+};
 
+let selectedPostType = "Assistant Teacher";
 
-    // Selected post type
-    let selectedPostType = "Assistant Teacher";
-
-    // Function to update map colors based on selected post type
-    function updateMapColors() {
-        // Iterate through each district path
-        svgPaths.forEach(svgPath => {
-            updateColorsAndText(svgPath.id, null);
-        });
-    }
-
-    // To these lines
 const assistantTeacherBtn = document.getElementById('assistantTeacherBtn');
 const scienceTeacherBtn = document.getElementById('scienceTeacherBtn');
 
-    assistantTeacherBtn.addEventListener('click', function () {
-        selectedPostType = "Assistant Teacher";
-        updateMapColors();
+assistantTeacherBtn.addEventListener('click', function () {
+    selectedPostType = "Assistant Teacher";
+    updateMapColors();
+});
+
+scienceTeacherBtn.addEventListener('click', function () {
+    selectedPostType = "Science Teacher";
+    updateMapColors();
+});
+
+const svgPaths = document.querySelectorAll('svg path');
+
+svgPaths.forEach(svgPath => {
+    svgPath.addEventListener('click', function (event) {
+        updateColorsAndText(svgPath.id, event);
     });
 
-    scienceTeacherBtn.addEventListener('click', function () {
-        selectedPostType = "Science Teacher";
-        updateMapColors();
+    svgPath.addEventListener('mousemove', function (event) {
+        updateColorsAndText(svgPath.id, event);
     });
+});
 
-    // Add event listeners for each district path
-    const svgPaths = document.querySelectorAll('svg path');
-
-    svgPaths.forEach(svgPath => {
-        svgPath.addEventListener('click', function (event) {
-            updateColorsAndText(svgPath.id, event);
-        });
-
-        svgPath.addEventListener('mousemove', function (event) {
-            updateColorsAndText(svgPath.id, event);
-        });
-    });
-
-// Keep track of the created table
 let districtTable = null;
 
-// Function to update colors and text for a specific district
+function updateMapColors() {
+    svgPaths.forEach(svgPath => {
+        updateColorsAndText(svgPath.id, null);
+    });
+}
+
+document.addEventListener('click', function (event) {
+    if (!districtTable || districtTable.contains(event.target)) {
+        // Click was inside the table or there is no table, do nothing
+        return;
+    }
+
+    // Click was outside the table, remove the table
+    districtTable.remove();
+});
+
 function updateColorsAndText(districtPath, event) {
     console.log(`Updating colors and text for ${districtPath}`);
     const districtData = jsonData[districtPath];
@@ -579,108 +601,120 @@ function updateColorsAndText(districtPath, event) {
         return;
     }
 
-    let totalAssistantTeacherPosts = 0;
-    let totalScienceTeacherPosts = 0;
+    let totalPosts = 0;
+
+    // Initialize category counts
+    let categoryCounts = {};
 
     districtData.forEach(post => {
-        if (post.post === "Assistant Teacher") {
-            totalAssistantTeacherPosts += post.total;
-        } else if (post.post === "Science Teacher") {
-            totalScienceTeacherPosts += post.total;
+        totalPosts += post.total;
+
+        // Count category-wise posts
+        if (!categoryCounts[post.post]) {
+            categoryCounts[post.post] = {};
         }
+
+        categoryCounts[post.post][post.UR] = (categoryCounts[post.post][post.UR] || 0) + post.total;
+        categoryCounts[post.post][post.OBC_MOBC] = (categoryCounts[post.post][post.OBC_MOBC] || 0) + post.total;
+        // Add more categories as needed
+        categoryCounts[post.post]["SC"] = (categoryCounts[post.post]["SC"] || 0) + post.SC;
+        categoryCounts[post.post]["ST(P)"] = (categoryCounts[post.post]["ST(P)"] || 0) + post["ST(P)"];
+        categoryCounts[post.post]["ST(H)"] = (categoryCounts[post.post]["ST(H)"] || 0) + post["ST(H)"];
+        categoryCounts[post.post]["PwD"] = (categoryCounts[post.post]["PwD"] || 0) + post.PwD;
+        categoryCounts[post.post]["Tea Tribes"] = (categoryCounts[post.post]["Tea Tribes"] || 0) + post["Tea Tribes"];
+        
     });
 
-    console.log(`Total Assistant Teacher Posts: ${totalAssistantTeacherPosts}`);
-    console.log(`Total Science Teacher Posts: ${totalScienceTeacherPosts}`);
+    console.log(`Total Posts: ${totalPosts}`);
+    console.log(`Category Counts:`, categoryCounts);
 
     let color = '';
-    if (selectedPostType === "Assistant Teacher") {
-        color = totalAssistantTeacherPosts >= 50 ? 'red' : (totalAssistantTeacherPosts >= 2 ? 'green' : 'orange');
-    } else if (selectedPostType === "Science Teacher") {
-        color = totalScienceTeacherPosts >= 50 ? 'white' : (totalScienceTeacherPosts >= 2 ? 'yellow' : 'red');
+
+   if (selectedPostType === "Assistant Teacher") {
+    color = totalPosts >= 50 ? 'red' : (totalPosts >= 20 ? 'blue' : 'yellow');
+} else if (selectedPostType === "Science Teacher") {
+    if (totalPosts >= 10) {
+        color = 'red';
+    } else if (totalPosts >= 5) {
+        color = 'blue';
+    } else {
+        color = 'yellow';
     }
+}
 
     console.log(`Setting color for ${districtPath} to ${color}`);
     document.getElementById(districtPath).style.fill = color;
 
-    // Remove existing text elements within the SVG path
     const svgPath = document.getElementById(districtPath);
     const existingTextElements = Array.from(svgPath.getElementsByTagName('text'));
     existingTextElements.forEach(textElement => {
         textElement.remove();
     });
 
-    // Remove the existing table if it exists
     if (districtTable) {
         districtTable.remove();
     }
 
-    // Create a new table
     districtTable = document.createElement('table');
     districtTable.border = '1';
 
-    // Add new text elements based on the selected post type
-    districtData.forEach(post => {
-        if (post.post === selectedPostType) {
-            const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            textElement.setAttribute('x', '3651.2771');
-            textElement.setAttribute('y', '12129.666');
-            textElement.setAttribute('style', 'font-size: 12px; fill: #0000ff;');
-            textElement.innerHTML = `<tspan x="3651.2771" y="12129.666">${post.district}</tspan><tspan x="3651.2771" y="12369.666">${post.post}</tspan>`;
-            svgPath.appendChild(textElement);
-        }
-    });
+    const tbody = document.createElement('tbody');
+    districtTable.appendChild(tbody);
 
-    // Check if a click event occurred
-if (event) {
-    // Create a table and append it to the body
-    districtTable = document.createElement('table');
-    districtTable.border = '1';
-
-    // Create table header
-    const headerRow = districtTable.insertRow(0);
+    const headerRow = tbody.insertRow(0);
     const headerCell1 = headerRow.insertCell(0);
     const headerCell2 = headerRow.insertCell(1);
     const headerCell3 = headerRow.insertCell(2);
-    headerCell1.innerHTML = '<b>Post</b>';
-    headerCell2.innerHTML = '<b>District</b>';
-    headerCell3.innerHTML = '<b>Total</b>';
+    const headerCell4 = headerRow.insertCell(3);
+    headerCell1.innerHTML = '<b>District</b>';
+    headerCell2.innerHTML = '<b>Type Of Posts</b>';
+    headerCell3.innerHTML = '<b>Category</b>';
+    headerCell4.innerHTML = '<b>Total</b>';
 
-    // Create table rows
     districtData.forEach(post => {
-        const row = districtTable.insertRow(-1);
-        const cell1 = row.insertCell(0);
-        const cell2 = row.insertCell(1);
-        const cell3 = row.insertCell(2);
-        cell1.innerHTML = post.post;
-        cell2.innerHTML = post.district;
-        cell3.innerHTML = post.total;
+        if (post.post === selectedPostType) {
+            const row = tbody.insertRow(-1);
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            cell1.innerHTML = post.district;
+            cell2.innerHTML = post.post;
+
+            // Create a cell for category information
+            const categoryCell = document.createElement('td');
+            const categoryHtml = `<p>UR:${post.UR}</p><p>OBC/MOBC:${post.OBC_MOBC}</p>
+                                  <p>SC:${post.SC}</p><p>ST(P):${post["ST(P)"]}</p>
+                                  <p>ST(H):${post["ST(H)"]}</p><p>PwD:${post.PwD}</p>
+                                  <p>Tea Tribes:${post["Tea Tribes"]}</p>`;
+            categoryCell.innerHTML = categoryHtml;
+            cell3.appendChild(categoryCell);
+
+            cell4.innerHTML = post.total;
+        }
     });
 
-        // Position the table near the clicked district
-    districtTable.style.position = 'absolute';
-    districtTable.style.left = event.clientX + 'px';
-    districtTable.style.top = event.clientY + 'px';
-	districtTable.style.backgroundColor = 'white';
+    if (event) {
+        districtTable.style.position = 'absolute';
+        districtTable.style.left = event.clientX + 'px';
+        districtTable.style.top = event.clientY + 'px';
+        districtTable.style.backgroundColor = 'white';
 
-    // Append the table to the body
-    document.body.appendChild(districtTable);
+        document.body.appendChild(districtTable);
+    }
 }
+
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(context, args);
+        }, wait);
+    };
 }
-      
-    // Debounce utility function
-    function debounce(func, wait) {
-        let timeout;
-        return function (...args) {
-            const context = this;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                func.apply(context, args);
-            }, wait);
-        };
-    
-	
-}
+
 </script>
 
 </body>
