@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Map</title>
+    <title>Interactive Posts Map</title>
 </head>
 <body><P><b>Note:For Assamese Medium Schools Only<b></p>
 <button id="assistantTeacherBtn">Assistant Teacher</button>
@@ -498,11 +498,11 @@ const jsonData = {
             "district": "Golaghat",
             "UR": 21,
             "OBC_MOBC": 0,
-			"SC": 1,
-			"ST(P)": 1,
-			"ST(H)": 4,
-			"PwD": 2,
-			"Tea Tribes": 2,
+            "SC": 1,
+            "ST(P)": 1,
+            "ST(H)": 4,
+            "PwD": 2,
+            "Tea Tribes": 2,
             "total": 31
         },
         {
@@ -510,11 +510,11 @@ const jsonData = {
             "district": "Golaghat",
             "UR": 7,
             "OBC_MOBC": 0,
-			"SC": 0,
-			"ST(P)": 0,
-			"ST(H)": 2,
-			"PwD": 2,
-			"Tea Tribes": 2,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 2,
+            "PwD": 2,
+            "Tea Tribes": 2,
             "total": 13
         }
     ],
@@ -524,30 +524,48 @@ const jsonData = {
             "district": "Bongaigaon",
             "UR": 11,
             "OBC_MOBC": 0,
-			"SC": 1,
-			"ST(P)": 4,
-			"ST(H)": 5,
-			"PwD": 5,
-			"Tea Tribes": 5,
+            "SC": 1,
+            "ST(P)": 4,
+            "ST(H)": 5,
+            "PwD": 5,
+            "Tea Tribes": 5,
             "total": 19
-			},
+        },
         {
             "post": "Science Teacher",
             "district": "Bongaigaon",
             "UR": 0,
             "OBC_MOBC": 0,
-			"SC": 1,
-			"ST(P)": 1,
-			"ST(H)": 2,
-			"PwD": 1,
-			"Tea Tribes": 1,
+            "SC": 1,
+            "ST(P)": 1,
+            "ST(H)": 2,
+            "PwD": 1,
+            "Tea Tribes": 1,
             "total": 6
-			}
+        }
     ]
     // Add more districts as needed
 };
 
 let selectedPostType = "Assistant Teacher";
+
+const colorThresholds = {
+    "Assistant Teacher": {
+        red: 100,
+        green: 50,
+        yellow: 20,
+        orange: 1,
+		white: 0,
+    },
+    "Science Teacher": {
+        red: {min: 10, max: 20},
+        green: { min: 7, max: 9 },
+        yellow: { min: 3, max: 6 },
+        orange: { min: 1, max: 2 },
+        white: 0,
+    },
+    // Add more post types as needed
+};
 
 const assistantTeacherBtn = document.getElementById('assistantTeacherBtn');
 const scienceTeacherBtn = document.getElementById('scienceTeacherBtn');
@@ -576,23 +594,56 @@ svgPaths.forEach(svgPath => {
 
 let districtTable = null;
 
+function getColor(totalPosts, thresholds) {
+    for (const color in thresholds) {
+        const range = thresholds[color];
+
+        if (typeof range === 'number') {
+            if (totalPosts >= range) {
+                return color;
+            }
+        } else if (typeof range === 'object') {
+            const { min, max } = range;
+            if (totalPosts >= min && totalPosts <= max) {
+                return color;
+            }
+        }
+    }
+
+}
+
 function updateMapColors() {
-    svgPaths.forEach(svgPath => {
-        updateColorsAndText(svgPath.id, null);
-    });
+    const districtTotalPosts = {};
+
+    for (const districtPath in jsonData) {
+        if (jsonData.hasOwnProperty(districtPath)) {
+            const districtData = jsonData[districtPath];
+            let totalPosts = 0;
+
+            districtData.forEach(post => {
+                if (post.post === selectedPostType) {
+                    totalPosts += post.total;
+                }
+            });
+
+            districtTotalPosts[districtPath] = totalPosts;
+
+            updateColorsAndText(districtPath, null, totalPosts);
+        }
+    }
+
+    console.log('District Total Posts:', districtTotalPosts);
 }
 
 document.addEventListener('click', function (event) {
     if (!districtTable || districtTable.contains(event.target)) {
-        // Click was inside the table or there is no table, do nothing
         return;
     }
 
-    // Click was outside the table, remove the table
     districtTable.remove();
 });
 
-function updateColorsAndText(districtPath, event) {
+function updateColorsAndText(districtPath, event, totalPosts) {
     console.log(`Updating colors and text for ${districtPath}`);
     const districtData = jsonData[districtPath];
 
@@ -601,54 +652,9 @@ function updateColorsAndText(districtPath, event) {
         return;
     }
 
-    let totalPosts = 0;
+    const colorThresholdsForType = colorThresholds[selectedPostType];
+    const color = getColor(totalPosts, colorThresholdsForType);
 
-    // Initialize category counts
-    let categoryCounts = {};
-
-    districtData.forEach(post => {
-        totalPosts += post.total;
-
-        // Count category-wise posts
-        if (!categoryCounts[post.post]) {
-            categoryCounts[post.post] = {};
-        }
-
-        categoryCounts[post.post][post.UR] = (categoryCounts[post.post][post.UR] || 0) + post.total;
-        categoryCounts[post.post][post.OBC_MOBC] = (categoryCounts[post.post][post.OBC_MOBC] || 0) + post.total;
-        // Add more categories as needed
-        categoryCounts[post.post]["SC"] = (categoryCounts[post.post]["SC"] || 0) + post.SC;
-        categoryCounts[post.post]["ST(P)"] = (categoryCounts[post.post]["ST(P)"] || 0) + post["ST(P)"];
-        categoryCounts[post.post]["ST(H)"] = (categoryCounts[post.post]["ST(H)"] || 0) + post["ST(H)"];
-        categoryCounts[post.post]["PwD"] = (categoryCounts[post.post]["PwD"] || 0) + post.PwD;
-        categoryCounts[post.post]["Tea Tribes"] = (categoryCounts[post.post]["Tea Tribes"] || 0) + post["Tea Tribes"];
-        
-    });
-
-    console.log(`Total Posts: ${totalPosts}`);
-    console.log(`Category Counts:`, categoryCounts);
-
-    let color = '';
-
-if (selectedPostType === "Assistant Teacher") {
-    if (totalPosts >= 50 && totalPosts <= 99) {
-        color = 'red';
-    } else if (totalPosts >= 20 && totalPosts <= 49) {
-        color = 'blue';
-    } else if (totalPosts >= 0 && totalPosts <= 19) {
-        color = 'yellow';
-    }
-} else if (selectedPostType === "Science Teacher") {
-    if (totalPosts >= 10 && totalPosts <= 99) {
-        color = 'red';
-    } else if (totalPosts >= 5 && totalPosts <= 8) {
-        color = 'blue';
-    } else if (totalPosts >= 0 && totalPosts <= 4) {
-        color = 'yellow';
-    }
-}
-
-    console.log(`Setting color for ${districtPath} to ${color}`);
     document.getElementById(districtPath).style.fill = color;
 
     const svgPath = document.getElementById(districtPath);
@@ -673,9 +679,9 @@ if (selectedPostType === "Assistant Teacher") {
     const headerCell3 = headerRow.insertCell(2);
     const headerCell4 = headerRow.insertCell(3);
     headerCell1.innerHTML = '<b>District</b>';
-    headerCell2.innerHTML = '<b>Type Of Posts</b>';
-    headerCell3.innerHTML = '<b>Category</b>';
-    headerCell4.innerHTML = '<b>Total</b>';
+    headerCell2.innerHTML = '<b>Type of Posts</b>';
+    headerCell3.innerHTML = '<b>Category-wise<br>Posts</b>';
+    headerCell4.innerHTML = '<b>Total<br>Posts</b>';
 
     districtData.forEach(post => {
         if (post.post === selectedPostType) {
@@ -687,7 +693,6 @@ if (selectedPostType === "Assistant Teacher") {
             cell1.innerHTML = post.district;
             cell2.innerHTML = post.post;
 
-            // Create a cell for category information
             const categoryCell = document.createElement('td');
             const categoryHtml = `<p>UR:${post.UR}</p><p>OBC/MOBC:${post.OBC_MOBC}</p>
                                   <p>SC:${post.SC}</p><p>ST(P):${post["ST(P)"]}</p>
@@ -707,6 +712,10 @@ if (selectedPostType === "Assistant Teacher") {
         districtTable.style.backgroundColor = 'white';
 
         document.body.appendChild(districtTable);
+		 // Center align text in all cells
+    const allTableCells = districtTable.getElementsByTagName('td');
+    for (const cell of allTableCells) {
+        cell.style.textAlign = 'center';}
     }
 }
 
@@ -720,7 +729,6 @@ function debounce(func, wait) {
         }, wait);
     };
 }
-
 </script>
 
 </body>
