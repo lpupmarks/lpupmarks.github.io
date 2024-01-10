@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Posts Map</title>
 </head>
+<style>
+
+</style>
 <body><P><b>Note:For Assamese Medium Schools Only<b></p>
 <button id="assistantTeacherBtn">Assistant Teacher</button>
 <button id="scienceTeacherBtn">Science Teacher</button>
@@ -669,7 +672,7 @@ function updateColorsAndText(districtPath, event, totalPosts) {
 
     districtTable = document.createElement('table');
     districtTable.border = '1';
-
+	
     const tbody = document.createElement('tbody');
     districtTable.appendChild(tbody);
 
@@ -707,9 +710,10 @@ function updateColorsAndText(districtPath, event, totalPosts) {
 
     if (event) {
         districtTable.style.position = 'absolute';
-        districtTable.style.left = event.clientX + 'px';
-        districtTable.style.top = event.clientY + 'px';
+        districtTable.style.left = (event.pageX + 10) + 'px';
+        districtTable.style.top = (event.pageY + 10) + 'px';
         districtTable.style.backgroundColor = 'white';
+		districtTable.style.display = 'block';
 
         document.body.appendChild(districtTable);
 		 // Center align text in all cells
