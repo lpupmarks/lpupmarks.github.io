@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Posts Map</title>
 </head>
-<style>
-
-</style>
 <body><P><b>Note:For Assamese Medium Schools Only<b></p>
 <button id="assistantTeacherBtn">Assistant Teacher</button>
 <button id="scienceTeacherBtn">Science Teacher</button>
@@ -672,7 +669,7 @@ function updateColorsAndText(districtPath, event, totalPosts) {
 
     districtTable = document.createElement('table');
     districtTable.border = '1';
-	
+
     const tbody = document.createElement('tbody');
     districtTable.appendChild(tbody);
 
@@ -710,16 +707,16 @@ function updateColorsAndText(districtPath, event, totalPosts) {
 
     if (event) {
         districtTable.style.position = 'absolute';
-        districtTable.style.left = (event.pageX + 10) + 'px';
-		districtTable.style.top = (event.pageY + 10) + 'px';
+        districtTable.style.left = event.clientX + 'px';
+        districtTable.style.top = event.clientY + 'px';
         districtTable.style.backgroundColor = 'white';
-		
 
         document.body.appendChild(districtTable);
 		 // Center align text in all cells
     const allTableCells = districtTable.getElementsByTagName('td');
     for (const cell of allTableCells) {
-        cell.style.textAlign = 'center';}
+        cell.style.textAlign = 'center';
+		cell.style.fontSize = 'small';}
     }
 }
 
@@ -736,4 +733,4 @@ function debounce(func, wait) {
 </script>
 
 </body>
-</html
+</html>
