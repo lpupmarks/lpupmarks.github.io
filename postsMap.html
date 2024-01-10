@@ -710,10 +710,11 @@ function updateColorsAndText(districtPath, event, totalPosts) {
 
     if (event) {
         districtTable.style.position = 'absolute';
-        districtTable.style.left = (event.pageX + 10) + 'px';
-        districtTable.style.top = (event.pageY + 10) + 'px';
+        districtTable.style.left = event.clientX + 'px';
+        districtTable.style.top = event.clientY + 'px';
         districtTable.style.backgroundColor = 'white';
 		districtTable.style.display = 'block';
+		
 
         document.body.appendChild(districtTable);
 		 // Center align text in all cells
