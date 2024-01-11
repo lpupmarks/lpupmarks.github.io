@@ -673,37 +673,31 @@ function updateColorsAndText(districtPath, event, totalPosts) {
     const tbody = document.createElement('tbody');
     districtTable.appendChild(tbody);
 
-    const headerRow = tbody.insertRow(0);
-    const headerCell1 = headerRow.insertCell(0);
-    const headerCell2 = headerRow.insertCell(1);
-    const headerCell3 = headerRow.insertCell(2);
-    const headerCell4 = headerRow.insertCell(3);
-    headerCell1.innerHTML = '<b>District</b>';
-    headerCell2.innerHTML = '<b>Type of Posts</b>';
-    headerCell3.innerHTML = '<b>Category-wise<br>Posts</b>';
-    headerCell4.innerHTML = '<b>Total<br>Posts</b>';
+   const headerRow = tbody.insertRow(0);
+const headerCell1 = headerRow.insertCell(0);
+const headerCell2 = headerRow.insertCell(1);
 
-    districtData.forEach(post => {
-        if (post.post === selectedPostType) {
-            const row = tbody.insertRow(-1);
-            const cell1 = row.insertCell(0);
-            const cell2 = row.insertCell(1);
-            const cell3 = row.insertCell(2);
-            const cell4 = row.insertCell(3);
-            cell1.innerHTML = post.district;
-            cell2.innerHTML = post.post;
+headerCell1.innerHTML = '<b>District &<br>Post Type</b>';
+headerCell2.innerHTML = '<b>Category-wise<br>Posts</b>';
 
-            const categoryCell = document.createElement('td');
-            const categoryHtml = `<p>UR:${post.UR}</p><p>OBC/MOBC:${post.OBC_MOBC}</p>
-                                  <p>SC:${post.SC}</p><p>ST(P):${post["ST(P)"]}</p>
-                                  <p>ST(H):${post["ST(H)"]}</p><p>PwD:${post.PwD}</p>
-                                  <p>Tea Tribes:${post["Tea Tribes"]}</p>`;
-            categoryCell.innerHTML = categoryHtml;
-            cell3.appendChild(categoryCell);
+districtData.forEach(post => {
+    if (post.post === selectedPostType) {
+        const row = tbody.insertRow(-1);
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
 
-            cell4.innerHTML = post.total;
-        }
-    });
+        // Include post.post value next to the district name
+        cell1.innerHTML = `<b>${post.district}<br>(${post.post}</b>)`;
+        
+        const categoryCell = document.createElement('td');
+        const categoryHtml = `<p>UR: ${post.UR}</p><p>OBC/MOBC: ${post.OBC_MOBC}</p>
+                              <p>SC: ${post.SC}</p><p>ST(P): ${post["ST(P)"]}</p>
+                              <p>ST(H): ${post["ST(H)"]}</p><p>PwD: ${post.PwD}</p>
+                              <p>Tea Tribes: ${post["Tea Tribes"]}</p><p><b>Total: ${post.total}</b></p>`;
+        categoryCell.innerHTML = categoryHtml;
+        cell2.appendChild(categoryCell);
+    }
+});
 
     if (event) {
         districtTable.style.position = 'absolute';
