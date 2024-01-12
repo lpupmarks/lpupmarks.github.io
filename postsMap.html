@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Posts Map</title>
 </head>
-<body><P><b>Note:For Assamese Medium Schools Only<b></p>
-<button id="assistantTeacherBtn">Assistant Teacher</button>
-<button id="scienceTeacherBtn">Science Teacher</button>
+<body><P><b>Note: For Assamese Medium Schools Only<b><br>Choose Post Type by clicking on the buttons below: ⇩
+<br><button id="assistantTeacherBtn">Assistant Teacher</button>
+<button id="scienceTeacherBtn">Science Teacher</button></p>
 <svg
    xml:space="preserve"
    width="100%"
@@ -489,7 +489,7 @@
      x="13243.615"
      y="17389.98">Hailakandi</tspan></text></g>
 </svg>
-
+<p><b>© AB</b></p>
 <script>
 const jsonData = {
     "dis3": [
@@ -690,10 +690,7 @@ districtData.forEach(post => {
         cell1.innerHTML = `<b>${post.district}<br>(${post.post}</b>)`;
         
         const categoryCell = document.createElement('td');
-        const categoryHtml = `<p>UR: ${post.UR}</p><p>OBC/MOBC: ${post.OBC_MOBC}</p>
-                              <p>SC: ${post.SC}</p><p>ST(P): ${post["ST(P)"]}</p>
-                              <p>ST(H): ${post["ST(H)"]}</p><p>PwD: ${post.PwD}</p>
-                              <p>Tea Tribes: ${post["Tea Tribes"]}</p><p><b>Total: ${post.total}</b></p>`;
+        const categoryHtml = `<p>UR: ${post.UR}</br>OBC/MOBC: ${post.OBC_MOBC}</br>SC: ${post.SC}</br>ST(P): ${post["ST(P)"]}</br>ST(H): ${post["ST(H)"]}</br>PwD: ${post.PwD}</br>Tea Tribes: ${post["Tea Tribes"]}</br><b>Total: ${post.total}</b></p>`;
         categoryCell.innerHTML = categoryHtml;
         cell2.appendChild(categoryCell);
     }
