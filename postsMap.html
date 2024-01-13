@@ -1133,8 +1133,8 @@ districtData.forEach(post => {
 
     if (event) {
         districtTable.style.position = 'absolute';
-        districtTable.style.left = (event.clientX + 10) + 'px';
-        districtTable.style.top = (event.clientY + 10) + 'px';
+        districtTable.style.left = (event.pageX + 10) + 'px';
+        districtTable.style.top = (event.pageY + 10) + 'px';
         districtTable.style.backgroundColor = 'white';
 
         document.body.appendChild(districtTable);
