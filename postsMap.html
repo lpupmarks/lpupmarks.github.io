@@ -6,10 +6,7 @@
     <title>Interactive Posts Map</title>
 </head>
 <style>
-svg path:hover {
-            stroke: white;
-        stroke-width: 150px;
-		}
+
 </style>
 <body><P><b>Note: For Assamese Medium Schools Only.<b><br>Choose Post Type by clicking on the buttons below: ⇩
 <br><button id="assistantTeacherBtn">Assistant Teacher</button>
@@ -1133,8 +1130,8 @@ districtData.forEach(post => {
 
     if (event) {
         districtTable.style.position = 'absolute';
-        districtTable.style.left = (event.pageX + 10) + 'px';
-        districtTable.style.top = (event.pageY + 10) + 'px';
+        districtTable.style.left = event.clientX + 'px';
+        districtTable.style.top = event.clientY + 'px';
         districtTable.style.backgroundColor = 'white';
 
         document.body.appendChild(districtTable);
