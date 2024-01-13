@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Posts Map</title>
 </head>
-<sty
+<style>
+svg path:hover {
+            stroke: white;
+        stroke-width: 150px;
+		}
+</style>
 <body><P><b>Note: For Assamese Medium Schools Only.<b><br>Choose Post Type by clicking on the buttons below: ⇩
 <br><button id="assistantTeacherBtn">Assistant Teacher</button>
 <button id="scienceTeacherBtn">Science Teacher</button></p>
@@ -979,11 +984,11 @@ let selectedPostType = "Assistant Teacher";
 
 const colorThresholds = {
     "Assistant Teacher": {
-        red: 100,
-        green: 50,
-        yellow: 30,
-        orange: 20,
-		purple: 10,
+        red: 50,
+        green: 30,
+        yellow: 20,
+        orange: 10,
+		purple: 1,
 		white: 0,
     },
     "Science Teacher": {
@@ -1128,8 +1133,8 @@ districtData.forEach(post => {
 
     if (event) {
         districtTable.style.position = 'absolute';
-        districtTable.style.left = event.clientX + 'px';
-        districtTable.style.top = event.clientY + 'px';
+        districtTable.style.left = (event.clientX + 10) + 'px';
+        districtTable.style.top = (event.clientY + 10) + 'px';
         districtTable.style.backgroundColor = 'white';
 
         document.body.appendChild(districtTable);
