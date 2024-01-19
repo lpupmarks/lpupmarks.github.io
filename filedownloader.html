@@ -3,52 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document Downloader</title>
+  <title>DEE Uploaded Documents Viewer</title>
+  <style>
+    #viewer {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .document-container {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      text-decoration: underline;
+      color: blue;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
   <h2>Enter Registration Number:</h2>
-  <input type="text" id="registrationNumber" placeholder="e.g., ABC123">
+  <input type="text" id="registrationNumber" placeholder="e.g., 23200000">
 
-  <button onclick="downloadDocuments()">Download Documents</button>
+  <button onclick="viewDocuments()">View Documents</button>
 
-  <script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
+  <div id="viewer"></div>
+
   <script>
-    function downloadDocuments() {
+    function viewDocuments() {
       var registrationNumber = document.getElementById('registrationNumber').value;
+      var viewerContainer = document.getElementById('viewer');
 
-      var links = [
-        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/tetmarksheet/${registrationNumber}T.pdf`,
-        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/photo/${registrationNumber}P.jpg`,
-        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/sign/${registrationNumber}S.jpg`,
-        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/gradsmarksheet/${registrationNumber}GM.pdf`
+      // Clear previous viewer content
+      viewerContainer.innerHTML = '';
+
+      var documentInfo = [
+        { type: 'Photo', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/photo/${registrationNumber}P.jpg` },
+        { type: 'Signature', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/sign/${registrationNumber}S.jpg` },
+        
+{ type: 'HSLC Admit', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/age/${registrationNumber}A.pdf` },
+
+{ type: 'HSSLC Marksheet', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/hsmarksheet/${registrationNumber}HM.pdf` },
+
+{ type: 'HSSLC Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/hscertificate/${registrationNumber}HC.pdf` },
+
+        { type: 'Graduation Marksheet', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/gradsmarksheet/${registrationNumber}GM.pdf` },
+        
+        { type: 'Graduation Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/graduationcertificate/${registrationNumber}GC.pdf` },
+
+{ type: 'Professional Qualification Marksheet', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/pqmarksheet/${registrationNumber}PQ.pdf` },
+{ type: 'Professional Qualification Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/pqcertificate/${registrationNumber}PQC.pdf` },
+
+ { type: 'TET Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/tetcertificate/${registrationNumber}TC.pdf` },
+        { type: 'PRC', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/prc/${registrationNumber}PRC.pdf` }
+        
+        
       ];
 
-      var filenames = [
-        `${registrationNumber}T.pdf`,
-        `${registrationNumber}P.jpg`,
-        `${registrationNumber}S.jpg`,
-        `${registrationNumber}GM.pdf`
-      ];
+      documentInfo.forEach(function (doc, index) {
+        // Create a div for each document
+        var documentContainer = document.createElement('div');
+        documentContainer.className = 'document-container';
+        viewerContainer.appendChild(documentContainer);
 
-      var zip = new JSZip();
+        // Display document type
+        var label = document.createElement('p');
+        if (doc.type === 'Tet Marksheet' || doc.type === 'Graduation Marksheet' || doc.type === 'HSLC Admit' || doc.type === 'HSSLC Marksheet' || doc.type === 'Graduation Certificate' || doc.type === 'Professional Qualification Marksheet' || doc.type === 'Professional Qualification Certificate' || doc.type === 'HSSLC Certificate' || doc.type === 'PRC'|| doc.type === 'TET Certificate') {
+          var link = document.createElement('a');
+          link.href = 'javascript:void(0)';
+          link.textContent = doc.type;
+          link.onclick = function () {
+            window.open(doc.url, '_blank' );
+          };
+          label.appendChild(link);
+        } else {
+          label.textContent = doc.type + ':';
+        }
+        documentContainer.appendChild(label);
 
-      function downloadFile(url, filename) {
-        return fetch(url)
-          .then(response => response.blob())
-          .then(blob => zip.file(filename, blob));
-      }
-
-      var downloadPromises = links.map((link, index) => downloadFile(link, filenames[index]));
-
-      Promise.all(downloadPromises).then(() => {
-        zip.generateAsync({ type: "blob" })
-          .then(function (blob) {
-            var link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Documents_${registrationNumber}.zip`;
-            link.click();
-          });
+        // Display document content
+        if (doc.type === 'Photo' || doc.type === 'Signature') {
+          var img = document.createElement('img');
+          img.src = doc.url;
+          documentContainer.appendChild(img);
+        }
       });
     }
   </script>
