@@ -12,21 +12,26 @@
 
   <button onclick="downloadDocuments()">Download Documents</button>
 
+  <script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
   <script>
     function downloadDocuments() {
       var registrationNumber = document.getElementById('registrationNumber').value;
 
+      var links = [
+        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/tetmarksheet/${registrationNumber}T.pdf`,
+        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/photo/${registrationNumber}P.jpg`,
+        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/sign/${registrationNumber}S.jpg`,
+        `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/gradsmarksheet/${registrationNumber}GM.pdf`
+      ];
 
-            var links = [
-                               `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/tetmarksheet/${registrationNumber}T.pdf`,
-                `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/photo/${registrationNumber}P.jpg
-`,
-                `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/sign/${registrationNumber}s
-S.jpg`,
-                `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/gradsmarksheet/${registrationNumber}GM.pdf`
-            ];
+      var filenames = [
+        `${registrationNumber}T.pdf`,
+        `${registrationNumber}P.jpg`,
+        `${registrationNumber}S.jpg`,
+        `${registrationNumber}GM.pdf`
+      ];
 
-            var zip = new JSZip();
+      var zip = new JSZip();
 
       function downloadFile(url, filename) {
         return fetch(url)
