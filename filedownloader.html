@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Downloader</title>
+</head>
+<body>
+
+  <h2>Enter Registration Number:</h2>
+  <input type="text" id="registrationNumber" placeholder="e.g., ABC123">
+
+  <button onclick="downloadDocuments()">Download Documents</button>
+
+  <script>
+    function downloadDocuments() {
+      var registrationNumber = document.getElementById('registrationNumber').value;
+
+
+            var links = [
+                               `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/tetmarksheet/${registrationNumber}T.pdf`,
+                `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/photo/${registrationNumber}P.jpg
+`,
+                `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/sign/${registrationNumber}s
+S.jpg`,
+                `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/gradsmarksheet/${registrationNumber}GM.pdf`
+            ];
+
+            var zip = new JSZip();
+
+      function downloadFile(url, filename) {
+        return fetch(url)
+          .then(response => response.blob())
+          .then(blob => zip.file(filename, blob));
+      }
+
+      var downloadPromises = links.map((link, index) => downloadFile(link, filenames[index]));
+
+      Promise.all(downloadPromises).then(() => {
+        zip.generateAsync({ type: "blob" })
+          .then(function (blob) {
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Documents_${registrationNumber}.zip`;
+            link.click();
+          });
+      });
+    }
+  </script>
+
+</body>
+</html>
