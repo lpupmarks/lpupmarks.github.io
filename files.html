@@ -73,9 +73,20 @@
 
 { type: 'Professional Qualification Marksheet', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/pqmarksheet/${registrationNumber}PQ.pdf` },
 { type: 'Professional Qualification Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/pqcertificate/${registrationNumber}PQC.pdf` },
-
  { type: 'TET Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/tetcertificate/${registrationNumber}TC.pdf` },
-        { type: 'PRC', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/prc/${registrationNumber}PRC.pdf` }
+  { type: 'TET Marksheet', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/tetmarksheet/${registrationNumber}T.pdf` },
+  { type: 'Caste Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/caste/${registrationNumber}C.pdf` },
+
+  { type: 'PRC', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/prc/${registrationNumber}PRC.pdf` },
+{ type: 'Masters Marksheet', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/masterMarksheet/${registrationNumber}MM.pdf` },
+{ type: 'Masters Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/masterCertificate//${registrationNumber}MC.pdf` },
+{ type: 'Experience Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/exproof/${registrationNumber}EX.pdf` },
+{ type: 'NCC Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/ncc/${registrationNumber}N.pdf` },
+{ type: 'Sports Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/sports/${registrationNumber}S.pdf` },
+{ type: 'Culture Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/culture/${registrationNumber}CUL.pdf` },
+{ type: 'PWD Certificate', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/pwd/${registrationNumber}PWD.pdf` },
+
+    { type: 'Form A', url: `https://rectteduassam.in/elementary2023_part2/lp_up_2023/DOCUMENTS_FOLDR/formA/${registrationNumber}B.pdf` }
         
         
       ];
@@ -88,7 +99,8 @@
 
         // Display document type
         var label = document.createElement('p');
-        if (doc.type === 'Tet Marksheet' || doc.type === 'Graduation Marksheet' || doc.type === 'HSLC Admit' || doc.type === 'HSSLC Marksheet' || doc.type === 'Graduation Certificate' || doc.type === 'Professional Qualification Marksheet' || doc.type === 'Professional Qualification Certificate' || doc.type === 'HSSLC Certificate' || doc.type === 'PRC'|| doc.type === 'TET Certificate') {
+        if (doc.type === 'TET Marksheet' || doc.type === 'Graduation Marksheet' || doc.type === 'HSLC Admit' || doc.type === 'HSSLC Marksheet' || doc.type === 'Graduation Certificate' || doc.type === 'Professional Qualification Marksheet' || doc.type === 'Professional Qualification Certificate' || doc.type === 'HSSLC Certificate' || doc.type === 'PRC' || doc.type === 'TET Certificate' || doc.type === 'Caste Certificate' || doc.type === 'Photo' || doc.type === 'Signature' || doc.type === 'Masters Marksheet' || doc.type === 'Masters Certificate' || doc.type === 'Experience Certificate' || doc.type === 'NCC Certificate' || doc.type === 'Sports Certificate' || doc.type === 'Culture Certificate' || doc.type === 'PWD Certificate' || doc.type === 'Form A')
+ {
           var link = document.createElement('a');
           link.href = 'javascript:void(0)';
           link.textContent = doc.type;
