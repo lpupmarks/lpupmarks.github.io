@@ -84,6 +84,7 @@ exclude: [
   'node_modules',
   'initpost.sh',
   'Gemfile',
+  'vendor',
   'Gemfile.lock',
   'gulpfile.js',
   'README.md'
