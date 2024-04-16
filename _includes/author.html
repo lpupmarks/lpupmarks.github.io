@@ -9,7 +9,7 @@
       {% endif %}
       <p class="def">{{ site.translations.text.author | default: "Author" }}</p>
       <h3 class="name">
-        <a href="/blog{{ author.url }}">{{ author.display_name }}</a>
+        {{ author.display_name }}
       </h3>
       <p class="desc">{{ author.bio }}</p>
       <p>
