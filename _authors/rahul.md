@@ -1,6 +1,6 @@
 ---
 layout: author
-photo: /blog/assets/img/uploads/profile.png
+photo: /rahulgogoi/images/profile.png
 name: rahul
 display_name: Rahul Gogoi
 position: Chief Editor
