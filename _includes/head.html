@@ -32,7 +32,12 @@
     {% else %}
         {% assign url = page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url %}
     {% endif %}
+{% if page.url == "/" %}
+    <script src="{{ base.url | prepend: site.url }}/assets/js/alert.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endif %}
 
+     
     <title>{{ title }}</title>
     <meta name="description" content="{{ description }}">
     {% if page.tags %}
@@ -93,7 +98,7 @@
     <link rel="canonical" href="{{ url }}">
     <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
 
-     
+
     <!-- Include extra styles -->
     {% include extra-css.html %}
 
