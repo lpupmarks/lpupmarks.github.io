@@ -121,23 +121,7 @@ layout: main
     {% assign social_urls = social_urls | append: '"https://www.linkedin.com/in/' | append: site.linkedin_username | append: '",' %}
 {% endif %}
 
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function displayPopup() {
-            setTimeout(function() {
-                Swal.fire({
-                    title: '',
-                    html: 'I have taken a challange to read 100 books.<br/><a href="./100books.html"  target="_blank" rel="noopener norefferer">Click here</a> to see the timeline of the progress made so far.',
-                    icon: 'info',
-                    showCloseButton: true,
-                    showConfirmButton: false
-                });
-            }, 2500); 
-        }
 
-        // Call the function on page load
-        window.onload = displayPopup;
-    </script>
 
 <script type="application/ld+json">
 {
