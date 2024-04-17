@@ -1,7 +1,7 @@
 ---
 date: 2024-04-17 12:00:00
 layout: post
-title: মামণি ৰয়ছম গোস্বামীৰ প্রিয় গল্প
+title: মামণি ৰয়ছম গোস্বামীৰ প্রিয়
 subtitle: Mamoni Roysam Goswamir Priya Galpa
 description: 
 image: https://raw.githubusercontent.com/lpupmarks/rahulgogoi/main/images/16.webp
