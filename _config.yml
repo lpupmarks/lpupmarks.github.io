@@ -17,7 +17,7 @@ menu:
   - title: Feed
     url: /feed.xml
   - title: 100 Books Challange
-    url: ./100books.html
+    url: https://rahulgogoi.vercel.app/100books.html
 email: 
 
 
