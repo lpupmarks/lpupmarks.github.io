@@ -1,19 +1,9 @@
-<style>
-    .recommendation.collapsed .post-preview {
-        display: none;
-    }
-</style>
-
 <div class="recommendation">
     <div class="message">
         <strong>{{ site.translations.recommendation.text | default: "Why don't you read something next?" }}</strong>
         <div>
-            <button id="collapseBtn" onclick="event.stopPropagation();">
-                <svg><use xlink:href="#icon-collapse"></use></svg>
-                <span>Collapse</span>
-            </button>
-            <button onclick="window.scrollTo(0, 0);">
-                <svg><use xlink:href="#icon-arrow-up"></use></svg>
+            <button>
+                <svg><use xlink:href="#icon-arrow-right"></use></svg>
                 <span>{{ site.translations.recommendation.back_btn | default: "Go back to top" }}</span>
             </button>
         </div>
@@ -38,14 +28,3 @@
         <h3 class="title">{{ recommendation.title }}</h3>
     </a>
 </div>
-
-<script>
-    const collapseBtn = document.getElementById('collapseBtn');
-    const recommendationDiv = document.querySelector('.recommendation');
-    
-    collapseBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        recommendationDiv.classList.toggle('collapsed');
-    });
-</script>
-
