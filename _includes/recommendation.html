@@ -8,9 +8,9 @@
     <div class="message">
         <strong>{{ site.translations.recommendation.text | default: "Why don't you read something next?" }}</strong>
         <div>
-            <button id="collapseBtn">
+            <button id="collapseBtn" onclick="event.stopPropagation();">
                 <svg><use xlink:href="#icon-collapse"></use></svg>
-                <span>Collapse This Section</span>
+                <span>Collapse</span>
             </button>
             <button onclick="window.scrollTo(0, 0);">
                 <svg><use xlink:href="#icon-arrow-up"></use></svg>
@@ -43,7 +43,9 @@
     const collapseBtn = document.getElementById('collapseBtn');
     const recommendationDiv = document.querySelector('.recommendation');
     
-    collapseBtn.addEventListener('click', () => {
+    collapseBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
         recommendationDiv.classList.toggle('collapsed');
     });
 </script>
+
