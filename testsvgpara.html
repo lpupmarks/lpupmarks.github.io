@@ -433,7 +433,7 @@ body {
     });
 
     document.getElementById("path2").addEventListener("click", function() {
-        openNewPopup("popup2");
+        openNewPopup("newPopup2");
     });
 
     document.getElementById("path14").addEventListener("click", function() {
@@ -444,9 +444,18 @@ body {
         document.getElementById(newPopupId).style.display = "block";
     }
 
-    window.closeNewPopup = function(newPopupId) {
+    window.closePopup = function(newPopupId) {
         document.getElementById(newPopupId).style.display = "none";
     }
+    
+    // Add event listeners for close buttons
+    var closeButtons = document.querySelectorAll(".close");
+    closeButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            var newPopupId = this.parentElement.parentElement.id;
+            closeNewPopup(newPopupId);
+        });
+    });
 });
 
 </script>
