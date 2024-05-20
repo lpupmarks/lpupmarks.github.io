@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Path Click Example</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            display: none; /* Hidden by default */
+        }
+        .popup-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-svg {
+            width: 100dvw;
+            height: 100dvh;
+        }
+        .popup-path {
+            transform: scale(1);
+            transform-origin: center;
+            transition: transform 0.2s;
+        }
+        svg {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body onclick="resetPopup()">
+
+<div id="popup-container" class="popup-container" onclick="resetPopup()">
+    <div class="popup-content">
+        <svg id="popup-svg" class="popup-svg" viewBox="0 0 500 500">
+            <path id="popup-path" class="popup-path" d="" fill=""></path>
+        </svg>
+    </div>
+</div>
+
+<svg id="svg" width="500" height="500" viewBox="0 0 500 500" onclick="event.stopPropagation()">
+    <path id="path1" d="M 100 100 L 200 100 L 150 200 Z" fill="red" onclick="popupPath(event)"></path>
+    <path id="path2" d="M 300 100 L 400 100 L 350 200 Z" fill="blue" onclick="popupPath(event)"></path>
+    <path id="path3" d="M 200 300 L 300 300 L 250 400 Z" fill="green" onclick="popupPath(event)"></path>
+</svg>
+
+<script>
+    function popupPath(event) {
+        event.stopPropagation(); // Prevent the click event from bubbling up to the body
+        
+        // Get the clicked path element
+        const path = event.target;
+        
+        // Get the bounding box of the clicked path
+        const bbox = path.getBBox();
+        
+        // Set the path data and fill color for the popup path
+        const popupPath = document.getElementById('popup-path');
+        popupPath.setAttribute('d', path.getAttribute('d'));
+        popupPath.setAttribute('fill', path.getAttribute('fill'));
+
+        // Calculate the viewBox to center the path
+        const viewBox = `${bbox.x - bbox.width / 2} ${bbox.y - bbox.height / 2} ${bbox.width * 2} ${bbox.height * 2}`;
+        const popupSvg = document.getElementById('popup-svg');
+        popupSvg.setAttribute('viewBox', viewBox);
+
+        // Show the popup container
+        const popupContainer = document.getElementById('popup-container');
+        popupContainer.style.display = 'flex';
+    }
+
+    function resetPopup() {
+        const popupContainer = document.getElementById('popup-container');
+        popupContainer.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
