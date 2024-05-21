@@ -3,30 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Data Parser</title>
-    <style>
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assam Map Pop-Up</title>
+    <title>DEE UP Posts Assam, Dec 2023 Ad</title>
     <style>
 body {
     margin: 0;
@@ -75,6 +52,8 @@ svg {
     fill: lightblue;
 }
 
+close{display:block;
+text-align:right;}
 
 .newPopup {
     display: none;
@@ -94,14 +73,14 @@ svg {
     background-color:transparent;
     opacity: 1; /* Full opacity for content */
     margin: auto;
+	justify-content:center;
     padding: 20px;
-    border: 1px solid #888;
     width: 400px; /* Set fixed width for table */
     max-width: 500px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     animation-name: animatetop;
     animation-duration: 0.4s;
     z-index: 1000;
+	text-align:right;
 }
 
 @keyframes animatetop {
@@ -122,7 +101,7 @@ th, td {
 </head>
 <body onclick="resetPopup()" onclick="closeNewPopup()">
 
-<div id="popup-container" class="popup-container" onclick="resetPopup()">
+<div id="popup-container" class="popup-container" onclick="closePopup('newPopup')" onclick="resetPopup()">
     <div class="popup-content">
         <svg id="popup-svg" class="popup-svg" viewBox="0 0 500 500">
             <path id="popup-path" class="popup-path" d="" fill=""></path>
@@ -417,16 +396,17 @@ th, td {
      id="tspan64"
      x="13243.615"
      y="17389.98">Hailakandi</tspan></text></g></svg>
-<div class="newPopup" id="newPopup">
-        <div class="newPopup-content">
-            <span class="close" onclick="closePopup('newPopup')" style="color:white;">&times;</span>
+<div class="newPopup" id="newPopup" onclick="resetPopup(); closePopup('newPopup')">
+        <div class="newPopup-content" onclick="closePopup('newPopup')">
+            <span class="close" onclick="closePopup('newPopup')" style="color:white; font-size:2rem;">&times;</span>
             <table id="dataTable" style="width: 300px;background-color: rgba(0, 0, 0, 0.3);">
                 <tbody></tbody>
             </table>
         </div>
     </div>
-
-<script>const jsonData = {
+<footer>&copy; Abhigyan</footer>
+<script>
+const jsonData = {
     "path6": [
         {
             "post": "Assistant Teacher",
@@ -453,7 +433,7 @@ th, td {
             "total": 13
         }
     ],
-    "path2": [
+	 "path33": [
         {
             "post": "Assistant Teacher",
             "district": "Tinsukia",
@@ -479,7 +459,8 @@ th, td {
             "total": 14
         }
     ],
-    "path14": [
+	
+	 "path34": [
         {
             "post": "Assistant Teacher",
             "district": "Dibrugarh",
@@ -504,7 +485,466 @@ th, td {
             "Tea Tribes": 2,
             "total": 23
         }
+    ],
+	
+	
+	 "path35": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Dhemaji",
+            "UR": 12,
+            "OBC_MOBC": 11,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 4,
+            "PwD": 2,
+            "Tea Tribes": 2,
+            "total": 31
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Dhemaji",
+            "UR": 1,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 1,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 4
+        }
+    ],
+	
+	
+	 "path2": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Lakhimpur",
+            "UR": 41,
+            "OBC_MOBC": 11,
+            "SC": 9,
+            "ST(P)": 0,
+            "ST(H)": 8,
+            "PwD": 10,
+            "Tea Tribes": 7,
+            "total": 86
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Lakhimpur",
+            "UR": 14,
+            "OBC_MOBC": 3,
+            "SC": 1,
+            "ST(P)": 0,
+            "ST(H)": 3,
+            "PwD": 2,
+            "Tea Tribes": 2,
+            "total": 25
+        }
+    ],
+	
+	 "path4": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Majuli",
+            "UR": 15,
+            "OBC_MOBC": 2,
+            "SC": 2,
+            "ST(P)": 0,
+            "ST(H)": 3,
+            "PwD": 3,
+            "Tea Tribes": 3,
+            "total": 26
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Majuli",
+            "UR": 2,
+            "OBC_MOBC": 1,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 1,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 6
+        }
+    ],
+	
+	 "path3": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Jorhat",
+            "UR": 11,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 2,
+            "PwD": 1,
+            "Tea Tribes": 2,
+            "total": 16
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Jorhat",
+            "UR": 4,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 1,
+            "ST(H)": 1,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 8
+        }
+    ],
+	
+	 "path7": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Sonitpur",
+            "UR": 28,
+            "OBC_MOBC": 3,
+            "SC": 0,
+            "ST(P)": 2,
+            "ST(H)": 0,
+            "PwD": 4,
+            "Tea Tribes": 5,
+            "total": 42
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Sonitpur",
+            "UR": 0,
+            "OBC_MOBC": 0,
+            "SC": 2,
+            "ST(P)": 1,
+            "ST(H)": 1,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 6
+        }
+    ],
+	"path5": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Nagaon",
+            "UR": 23,
+            "OBC_MOBC": 12,
+            "SC": 0,
+            "ST(P)": 15,
+            "ST(H)": 7,
+            "PwD": 8,
+            "Tea Tribes": 6,
+            "total": 71
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Nagaon",
+            "UR": 8,
+            "OBC_MOBC": 3,
+            "SC": 2,
+            "ST(P)": 6,
+            "ST(H)": 3,
+            "PwD": 3,
+            "Tea Tribes": 3,
+            "total": 28
+        }
+    ],
+	"path11": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Morigaon",
+            "UR": 14,
+            "OBC_MOBC": 2,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 8,
+            "PwD": 0,
+            "Tea Tribes": 6,
+            "total": 30
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Morigaon",
+            "UR": 0,
+            "OBC_MOBC": 2,
+            "SC": 1,
+            "ST(P)": 2,
+            "ST(H)": 2,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 9
+        }
+    ],
+	"path12": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Darrang",
+            "UR": 1,
+            "OBC_MOBC": 1,
+            "SC": 1,
+            "ST(P)": 1,
+            "ST(H)": 1,
+            "PwD": 0,
+            "Tea Tribes": 1,
+            "total": 6
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Darrang",
+            "UR": 0,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 2,
+            "ST(H)": 2,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 6
+        }
+    ],
+	
+	"path19": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Nalbari",
+            "UR": 5,
+            "OBC_MOBC": 3,
+            "SC": 2,
+            "ST(P)": 8,
+            "ST(H)": 7,
+            "PwD": 5,
+            "Tea Tribes": 6,
+            "total": 36
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Nalbari",
+            "UR": 0,
+            "OBC_MOBC": 3,
+            "SC": 2,
+            "ST(P)": 3,
+            "ST(H)": 2,
+            "PwD": 2,
+            "Tea Tribes": 2,
+            "total": 14
+        }
+    ],
+	
+	"path20": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Barpeta",
+            "UR": 0,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 4,
+            "ST(H)": 5,
+            "PwD": 5,
+            "Tea Tribes": 5,
+            "total": 19
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Barpeta",
+            "UR": 3,
+            "OBC_MOBC": 3,
+            "SC": 1,
+            "ST(P)": 3,
+            "ST(H)": 2,
+            "PwD": 2,
+            "Tea Tribes": 2,
+            "total": 16
+        }
+    ],
+	
+	"path27": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Goalpara",
+            "UR": 20,
+            "OBC_MOBC": 2,
+            "SC": 2,
+            "ST(P)": 0,
+            "ST(H)": 3,
+            "PwD": 2,
+            "Tea Tribes": 4,
+            "total": 33
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Goalpara",
+            "UR": 2,
+            "OBC_MOBC": 4,
+            "SC": 1,
+            "ST(P)": 1,
+            "ST(H)": 2,
+            "PwD": 2,
+            "Tea Tribes": 2,
+            "total": 14
+        }
+    ],
+	
+	"path26": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Dhubri",
+            "UR": 28,
+            "OBC_MOBC": 19,
+            "SC": 14,
+            "ST(P)": 11,
+            "ST(H)": 9,
+            "PwD": 8,
+            "Tea Tribes": 2,
+            "total": 91
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Dhubri",
+            "UR": 8,
+            "OBC_MOBC": 12,
+            "SC": 6,
+            "ST(P)": 5,
+            "ST(H)": 5,
+            "PwD": 1,
+            "Tea Tribes": 2,
+            "total": 39
+        }
+    ],
+	
+	"path25": [
+        {
+            "post": "Assistant Teacher",
+            "district": "South Salmara",
+            "UR": 11,
+            "OBC_MOBC": 12,
+            "SC": 8,
+            "ST(P)": 9,
+            "ST(H)": 5,
+            "PwD": 4,
+            "Tea Tribes": 4,
+            "total": 53
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Sonitpur",
+            "UR": 3,
+            "OBC_MOBC": 6,
+            "SC": 2,
+            "ST(P)": 3,
+            "ST(H)": 2,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 18
+        }
+    ],
+	
+		"path18": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Kamrup Rural",
+            "UR": 0,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 0,
+            "PwD": 0,
+            "Tea Tribes": 0,
+            "total": 0
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Kamrup Rural",
+            "UR": 15,
+            "OBC_MOBC": 2,
+            "SC": 2,
+            "ST(P)": 2,
+            "ST(H)": 3,
+            "PwD": 3,
+            "Tea Tribes": 3,
+            "total": 30
+        }
+    ],
+	
+	"path10": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Kamrup Metro",
+            "UR": 0,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 0,
+            "PwD": 0,
+            "Tea Tribes": 0,
+            "total": 0
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Kamrup Metro",
+            "UR": 0,
+            "OBC_MOBC": 1,
+            "SC": 1,
+            "ST(P)": 1,
+            "ST(H)": 1,
+            "PwD": 0,
+            "Tea Tribes": 1,
+            "total": 5
+        }
+    ],
+	
+	"path32": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Sivasagar",
+            "UR": 0,
+            "OBC_MOBC": 0,
+            "SC": 0,
+            "ST(P)": 0,
+            "ST(H)": 0,
+            "PwD": 0,
+            "Tea Tribes": 0,
+            "total": 0
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Sivasagar",
+            "UR": 6,
+            "OBC_MOBC": 4,
+            "SC": 3,
+            "ST(P)": 5,
+            "ST(H)": 2,
+            "PwD": 3,
+            "Tea Tribes": 3,
+            "total": 26
+        }
+    ],
+	
+    "path24": [
+        {
+            "post": "Assistant Teacher",
+            "district": "Bongaigaon",
+            "UR": 11,
+            "OBC_MOBC": 0,
+            "SC": 1,
+            "ST(P)": 4,
+            "ST(H)": 5,
+            "PwD": 5,
+            "Tea Tribes": 5,
+            "total": 19
+        },
+        {
+            "post": "Science Teacher",
+            "district": "Bongaigaon",
+            "UR": 0,
+            "OBC_MOBC": 0,
+            "SC": 1,
+            "ST(P)": 1,
+            "ST(H)": 2,
+            "PwD": 1,
+            "Tea Tribes": 1,
+            "total": 6
+        }
     ]
+    // Add more districts as needed
 };
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -547,7 +987,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Post details cell
             const postDetailsCell = document.createElement('td');
-            postDetailsCell.innerText = `UR: ${item.UR}\nOBC-MOBC: ${item.OBC_MOBC}\nSC: ${item.SC}\nST(P): ${item["ST(P)"]}\nST(H): ${item["ST(H)"]}\nPwD: ${item.PwD}\nTea Tribes: ${item["Tea Tribes"]}`;
+            postDetailsCell.innerText = `UR: ${item.UR}\nOBC-MOBC: ${item.OBC_MOBC}\nSC: ${item.SC}\nST(P): ${item["ST(P)"]}\nST(H): ${item["ST(H)"]}\nPwD: ${item.PwD}\nTea Tribes: ${item["Tea Tribes"]}\nTotal:${item["total"]}`;
             detailsRow.appendChild(postDetailsCell);
         });
 
