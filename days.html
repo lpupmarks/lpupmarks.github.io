@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Days Passed Since DEE LPS, UPS Teachers' Posts Ad, December 2023</title>
+    <style>
+       body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .timeD{
+          font-weight: bold;
+          font-size: 7.5rem;
+        }
+        
+        .time {
+            font-size: 1.5em;
+            color: #333;
+        }
+        footer {
+            
+            color: black;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="timeD" id="daysPassed">Days: 0</div>
+                <div class="time" id="daysPassed"><u>Days</u></div>
+        <div class="time" id="hoursPassed">Hours: 0</div>
+        <div class="time" id="minutesPassed">Minutes: 0</div>
+        <div class="time" id="secondsPassed">Seconds: 0</div>
+    </div>
+<footer>Since 00:00 HRS, 27/12/23</footer>
+    <script>
+    function calculateTimePassed() {
+            const startDate = new Date('2023-12-27T00:00:00');
+            const now = new Date();
+            const timeDifference = now - startDate;
+
+            const daysPassed = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hoursPassed = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutesPassed = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const secondsPassed = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+            document.getElementById('daysPassed').textContent = `${daysPassed}`;
+            document.getElementById('hoursPassed').textContent = `${hoursPassed} Hour${hoursPassed !== 1 ? 's' : ''}`;
+            document.getElementById('minutesPassed').textContent = `${minutesPassed} Minute${minutesPassed !== 1 ? 's' : ''} `;
+            document.getElementById('secondsPassed').textContent = `${secondsPassed} Second${secondsPassed !== 1 ? 's' : ''} `;
+        }
+
+        function updateTime() {
+            calculateTimePassed();
+            setTimeout(updateTime, 1000);
+        }
+
+        window.onload = updateTime;</script>
+</body>
+</html>
