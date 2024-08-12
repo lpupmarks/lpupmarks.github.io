@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADRE Calender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            align-items: center;
+        }
+        .date {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+        .past {
+            border-color: red;
+        }
+        .present {
+            border-color: blue;
+        }
+        .future {
+            border-color: green;
+        }
+        .special {
+            border-color: orange;
+            background-color: orange;
+            color: white;
+        }
+        .month {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .day-name {
+            font-weight: bold;
+        }
+        .countdown {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calendar</h1>
+    <div class="countdown" id="countdown"></div>
+    <div class="month">
+        <h2>August 2024</h2>
+        <div class="calendar" id="augustCalendar">
+            <!-- Weekdays will be injected by JavaScript -->
+        </div>
+    </div>
+    <div class="month">
+        <h2>September 2024</h2>
+        <div class="calendar" id="septemberCalendar">
+            <!-- Weekdays will be injected by JavaScript -->
+        </div>
+    </div>
+    <script>
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);  // Normalize to midnight
+
+        const startDate = new Date('2024-08-01');
+        const endDate = new Date('2024-09-15');
+        const specialDates = [new Date('2024-09-15'), new Date('2024-09-22')];
+        specialDates.forEach(date => date.setHours(0, 0, 0, 0));  // Normalize to midnight
+
+        const countdownElement = document.getElementById('countdown');
+        const augustCalendar = document.getElementById('augustCalendar');
+        const septemberCalendar = document.getElementById('septemberCalendar');
+
+        // Function to calculate the number of days remaining until a given date
+        function calculateDaysRemaining(targetDate) {
+            const timeDifference = targetDate - today;
+            return Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+        }
+
+        countdownElement.textContent = `${calculateDaysRemaining(endDate)} Days Remaining`;
+
+        // Function to create the day names row
+        function createDayNamesRow(container) {
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day-name');
+                dayElement.textContent = day;
+                container.appendChild(dayElement);
+            });
+        }
+
+        // Function to create a calendar for a given month
+        function createCalendar(month, year, container, lastDate) {
+            const startDate = new Date(year, month, 1);
+            const endDate = new Date(year, month, lastDate);
+            let d = new Date(startDate);
+            d.setDate(d.getDate() - d.getDay());  // Set d to the first Sunday before or on the 1st
+
+            createDayNamesRow(container);
+
+            while (d <= endDate) {
+                const dateElement = document.createElement('div');
+                dateElement.classList.add('date');
+
+                if (d.getMonth() !== month) {
+                    dateElement.textContent = '';
+                } else {
+                    dateElement.textContent = d.getDate();
+
+                    // Normalize the date to midnight for comparison
+                    let normalizedDate = new Date(d);
+                    normalizedDate.setHours(0, 0, 0, 0);
+
+                    if (specialDates.some(date => date.getTime() === normalizedDate.getTime())) {
+                        dateElement.classList.add('special');
+                    } else if (d < today) {
+                        dateElement.classList.add('past');
+                    } else if (d.getTime() === today.getTime()) {
+                        dateElement.classList.add('present');
+                    } else {
+                        dateElement.classList.add('future');
+                    }
+                }
+
+                container.appendChild(dateElement);
+                
+                // Break the loop after September 22 is added
+                if (d.getTime() === endDate.getTime()) {
+                    break;
+                }
+                
+                d.setDate(d.getDate() + 1);
+            }
+        }
+
+        createCalendar(7, 2024, augustCalendar, 31);  // Full month of August
+        createCalendar(8, 2024, septemberCalendar, 22);  // Only till September 22
+    </script>
+</body>
+</html>
