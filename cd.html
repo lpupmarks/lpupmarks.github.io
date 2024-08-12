@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #dcc3ff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .countdown {
+            text-align: center;
+            background-color: #f3eaff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .countdown h1 {
+            font-size: 2em;
+            margin-bottom: 40px;
+            color: #249;
+        }
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .timer-box, .total-days-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            background-color: #007;
+            color: #fff;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+        }
+        .total-days-box {
+            width: 260px;
+            background-color: #007;
+        }
+        .timer-box span, .total-days-box span {
+            font-size: 0.8em;
+            margin-top: 5px;
+            color: #ddd;
+        }
+        @media (max-width: 768px) {
+            .timer-box, .total-days-box {
+                width: 80px;
+                height: 80px;
+                font-size: 1.2em;
+            }
+            .total-days-box {
+                width: 160px;
+            }
+            .timer-box span, .total-days-box span {
+                font-size: 0.7em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="countdown">
+        <h1>Countdown to May 10, 2025</h1>
+        <div id="timer" class="timer-container">
+            <div class="total-days-box">
+                <div id="totalDays">--</div>
+                <span>Days</span>
+            </div>
+            
+            <div class="timer-box">
+                <div id="months">--</div>
+                <span>Months</span>
+            </div>
+            <div class="timer-box">
+                <div id="days">--</div>
+                <span>Days</span>
+            </div>
+            <div class="timer-box">
+                <div id="hours">--</div>
+                <span>Hours</span>
+            </div>
+            <div class="timer-box">
+                <div id="minutes">--</div>
+                <span>Minutes</span>
+            </div>
+            <div class="timer-box">
+                <div id="seconds">--</div>
+                <span>Seconds</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateCountdown() {
+            const targetDate = new Date('May 10, 2025 00:00:00').getTime();
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            const monthsInYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            const currentYear = new Date().getFullYear();
+            if ((currentYear % 4 === 0 && currentYear % 100 !== 0) || currentYear % 400 === 0) {
+                monthsInYear[1] = 29; // Adjust for leap year
+            }
+
+            let daysLeft = Math.floor(difference / (1000 * 60 * 60 * 24));
+            let monthsLeft = 0;
+            let remainingDays = daysLeft;
+
+            let currentMonth = new Date().getMonth(); // January is 0
+            let currentDate = new Date().getDate();
+
+            while (remainingDays >= 0) {
+                const daysInCurrentMonth = monthsInYear[currentMonth];
+                if (remainingDays - daysInCurrentMonth < 0) {
+                    break;
+                } else {
+                    remainingDays -= daysInCurrentMonth;
+                    monthsLeft++;
+                }
+                currentMonth = (currentMonth + 1) % 12;
+            }
+
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            
+            document.getElementById('totalDays').innerHTML = daysLeft;
+            document.getElementById('months').innerHTML = monthsLeft;
+            document.getElementById('days').innerHTML = remainingDays;
+            document.getElementById('hours').innerHTML = hours;
+            document.getElementById('minutes').innerHTML = minutes;
+            document.getElementById('seconds').innerHTML = seconds;
+
+            if (difference < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById('timer').innerHTML = "The date has passed!";
+            }
+        }
+
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
