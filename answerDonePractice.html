@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        label {
+            flex: 1;
+            text-align: left;
+        }
+        select {
+            flex: 2;
+            padding: 5px;
+        }
+        button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+        }
+        #result {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: justify-center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Remedial Videos & Practice Sets</h2>
+
+        <div class="form-group">
+            <label for="classSelect">Class:</label>
+            <select id="classSelect">
+                <option value="7">7</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="rollNumberSelect">Roll Number:</label>
+            <select id="rollNumberSelect">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="examSelect">Exam:</label>
+            <select id="examSelect">
+                <option value="Unit Test 1">Unit Test 1</option>
+                <option value="Unit Test 2">Unit Test 2</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="marksSelect">Marks Obtained:</label>
+            <select id="marksSelect">
+                <option value="45">45</option>
+                <option value="47">47</option>
+            </select>
+        </div>
+
+        <button style="background-color:navy; color:white; font-size:18px" onclick="fetchInfo()">Get Information</button>
+
+       <div id="result">
+            <h3>Mathematics</h3>
+            <table>
+                <tr>
+                    <th>Class</th>
+                    <td id="classResult"></td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td id="nameResult"></td>
+                </tr>
+                <tr>
+                    <th>Exam</th>
+                    <td id="examResult"></td>
+                </tr>
+                <tr>
+                    <th>Videos</th>
+                    <td id="videoResult"></td>
+                </tr>
+                <tr>
+                    <th>Practice Questions</th>
+                    <td id="questionResult"></td>
+                </tr>
+                <tr>
+                    <th>Marks Obtained</th>
+                    <td id="marksResult"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            {
+                "Class": 7,
+                "Roll Number": 1,
+                "Name": "Test 1",
+                "Exam": "Unit Test 1",
+                "Video": [
+                    { "name": "1st Video", "url": null }
+                ],
+                "Questions": [
+                    { "name": "2nd Question", "url": "https://exampleqq.com" },
+                    { "name": "4th Q", "url": null },
+                    { "name": "7th Q", "url": null }
+                ],
+                "Marks Obtained": ["47"]
+            },
+            {
+                "Class": 7,
+                "Roll Number": 2,
+                "Name": "Test 2",
+                "Exam": "Unit Test 2",
+                "Video": [
+                    { "name": "2nd Video", "url": "https://example.com" },
+                    { "name": "4th Video", "url": null },
+                    { "name": "7th Video", "url": null }
+                ],
+                "Questions": [
+                    { "name": "2nd Question", "url": "https://exampleqq.com" },
+                    { "name": "4th Q", "url": null },
+                    { "name": "7th Q", "url": null }
+                ],
+                "Marks Obtained": ["45"]
+            }
+        ];
+
+        function fetchInfo() {
+            const classValue = document.getElementById("classSelect").value;
+            const rollNumberValue = document.getElementById("rollNumberSelect").value;
+            const examValue = document.getElementById("examSelect").value;
+            const marksValue = document.getElementById("marksSelect").value;
+
+            const result = data.find(item => 
+                item.Class == classValue && 
+                item["Roll Number"] == rollNumberValue && 
+                item.Exam == examValue && 
+                item["Marks Obtained"].includes(marksValue)
+            );
+
+            if (result) {
+                document.getElementById("classResult").textContent = result.Class;
+                document.getElementById("nameResult").textContent = result.Name;
+                document.getElementById("examResult").textContent = result.Exam;
+
+                // Handle Video Links with URLs
+                let videosHtml = '';
+                result.Video.forEach(video => {
+                    if (video.url) {
+                        videosHtml += `<a href="${video.url}" target="_blank">${video.name}</a>, `;
+                    } else {
+                        videosHtml += `${video.name}, `;
+                    }
+                });
+
+                // Remove trailing comma and space
+                videosHtml = videosHtml.slice(0, -2);
+
+                // Handle Question Links with URLs
+                let questionsHtml = '';
+                result.Questions.forEach(question => {
+                    if (question.url) {
+                        questionsHtml += `<a href="${question.url}" target="_blank">${question.name}</a>, `;
+                    } else {
+                        questionsHtml += `${question.name}, `;
+                    }
+                });
+
+                // Remove trailing comma and space
+                questionsHtml = questionsHtml.slice(0, -2);
+
+                document.getElementById("videoResult").innerHTML = videosHtml;
+                document.getElementById("questionResult").innerHTML = questionsHtml;
+                document.getElementById("marksResult").textContent = result["Marks Obtained"].join(", ");
+                
+                document.getElementById("result").style.display = "block"; // Show the result div
+            } else {
+                alert("No matching data found.");
+                document.getElementById("result").style.display = "none"; // Hide the result div if no data is found
+            }
+        }
+    </script>
+</body>
+</html>
