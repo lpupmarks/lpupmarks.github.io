@@ -77,7 +77,7 @@
 
         const startDate = new Date('2024-08-01');
         const endDate = new Date('2024-09-14');
-        const specialDates = [new Date('2024-09-15'), new Date('2024-09-22')];
+        const specialDates = [new Date('2024-09-15'), new Date('2024-09-29')];
         specialDates.forEach(date => date.setHours(0, 0, 0, 0));  // Normalize to midnight
 
         const countdownElement = document.getElementById('countdown');
@@ -148,7 +148,7 @@
         }
 
         createCalendar(7, 2024, augustCalendar, 31);  // Full month of August
-        createCalendar(8, 2024, septemberCalendar, 22);  // Only till September 22
+        createCalendar(8, 2024, septemberCalendar, 29);  // Only till September 29
     </script>
 </body>
 </html>
