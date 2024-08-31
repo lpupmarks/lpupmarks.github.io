@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frequency Detector</title>
+    <title>Instrument Frequency Detector</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,7 +21,7 @@
             color: #4b0082;
         }
 
-        button {
+        button, select {
             padding: 10px 20px;
             font-size: 16px;
             margin-top: 20px;
@@ -36,7 +36,11 @@
     </style>
 </head>
 <body>
-    <h1>Click on start and play the notes.</h1>
+    <h1>Click on start, then play.r</h1>
+    <select id="instrument-select">
+        <option value="ukulele">Ukulele</option>
+        <option value="guitar">Guitar</option>
+    </select>
     <button id="start-button">Start</button>
     <p id="frequency-display">Frequency: 0 Hz</p>
     <p id="note-display">Note: -</p>
@@ -45,6 +49,7 @@
         const startButton = document.getElementById('start-button');
         const frequencyDisplay = document.getElementById('frequency-display');
         const noteDisplay = document.getElementById('note-display');
+        const instrumentSelect = document.getElementById('instrument-select');
 
         let audioContext;
         let analyser;
@@ -59,31 +64,70 @@
         // Target sequence of notes
         const targetSequence = ['A', 'G', 'B'];
 
-        // List of musical notes with their corresponding frequencies
-        const notes = [
-            { note: 'C', frequency: 261.63 },
-            { note: 'C#', frequency: 277.18 },
-            { note: 'D', frequency: 293.66 },
-            { note: 'D#', frequency: 311.13 },
-            { note: 'E', frequency: 329.63 },
-            { note: 'F', frequency: 349.23 },
-            { note: 'F#', frequency: 369.99 },
-            { note: 'G', frequency: 392.00 },
-            { note: 'G#', frequency: 415.30 },
-            { note: 'A', frequency: 440.00 },
-            { note: 'A#', frequency: 466.16 },
-            { note: 'B', frequency: 493.88 }
-        ];
+        // Frequency data for instruments
+        const instrumentNotes = {
+            ukulele: [
+                { note: 'C', frequency: 261.63 },
+                { note: 'C#', frequency: 277.18 },
+                { note: 'D', frequency: 293.66 },
+                { note: 'D#', frequency: 311.13 },
+                { note: 'E', frequency: 329.63 },
+                { note: 'F', frequency: 349.23 },
+                { note: 'F#', frequency: 369.99 },
+                { note: 'G', frequency: 392.00 },
+                { note: 'G#', frequency: 415.30 },
+                { note: 'A', frequency: 440.00 },
+                { note: 'A#', frequency: 466.16 },
+                { note: 'B', frequency: 493.88 }
+            ],
+            guitar: [
+                { note: 'E', frequency: 82.41 },
+                { note: 'F', frequency: 87.31 },
+                { note: 'F#', frequency: 92.50 },
+                { note: 'G', frequency: 98.00 },
+                { note: 'G#', frequency: 103.83 },
+                { note: 'A', frequency: 110.00 },
+                { note: 'A#', frequency: 116.54 },
+                { note: 'B', frequency: 123.47 },
+                { note: 'C', frequency: 130.81 },
+                { note: 'C#', frequency: 138.59 },
+                { note: 'D', frequency: 146.83 },
+                { note: 'D#', frequency: 155.56 },
+                { note: 'E', frequency: 164.81 },
+                { note: 'F', frequency: 174.61 },
+                { note: 'F#', frequency: 185.00 },
+                { note: 'G', frequency: 196.00 },
+                { note: 'G#', frequency: 207.65 },
+                { note: 'A', frequency: 220.00 },
+                { note: 'A#', frequency: 233.08 },
+                { note: 'B', frequency: 246.94 },
+                { note: 'C', frequency: 261.63 },
+                { note: 'C#', frequency: 277.18 },
+                { note: 'D', frequency: 293.66 },
+                { note: 'D#', frequency: 311.13 },
+                { note: 'E', frequency: 329.63 }
+            ]
+        };
+
+        // Current selected instrument's notes
+        let currentNotes = instrumentNotes.ukulele;
+
+        // Function to update the notes based on the selected instrument
+        function updateInstrument() {
+            const selectedInstrument = instrumentSelect.value;
+            currentNotes = instrumentNotes[selectedInstrument];
+            resetSequence();
+        }
 
         // Calculate the closest note to a given frequency
         function getClosestNote(frequency) {
-            let closestNote = notes[0];
+            let closestNote = currentNotes[0];
             let minDiff = Math.abs(frequency - closestNote.frequency);
 
-            for (let i = 1; i < notes.length; i++) {
-                const diff = Math.abs(frequency - notes[i].frequency);
+            for (let i = 1; i < currentNotes.length; i++) {
+                const diff = Math.abs(frequency - currentNotes[i].frequency);
                 if (diff < minDiff) {
-                    closestNote = notes[i];
+                    closestNote = currentNotes[i];
                     minDiff = diff;
                 }
             }
@@ -171,7 +215,7 @@
             // Check if the target sequence is completed
             if (sequence.length === targetSequence.length) {
                 successShown = true;
-                alert("You cracked the code! Welcome to my site!");
+                alert("You did it!");
                 resetSequence(); // Reset after showing success
             }
         }
@@ -189,6 +233,8 @@
             clearTimeout(sequenceTimer);
         }
 
+        // Update instrument when selection changes
+        instrumentSelect.addEventListener('change', updateInstrument);
         startButton.addEventListener('click', startDetection);
     </script>
 </body>
