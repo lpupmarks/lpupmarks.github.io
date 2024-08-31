@@ -39,8 +39,8 @@
     <div id="successDiv">You played the correct notes!</div>
     <div id="logContainer"></div> <!-- Log display section -->
 
-    <!-- Import pitch-detection library -->
-    <script src="https://cdn.jsdelivr.net/npm/pitch-detection@latest/dist/pitch-detection.min.js"></script>
+    <!-- Import pitchy library -->
+    <script src="https://cdn.jsdelivr.net/npm/pitchy@3.1.1/dist/pitchy.min.js"></script>
     <script>
         // Variables to manage audio processing
         let audioContext;
@@ -69,7 +69,7 @@
                 sourceNode.connect(analyserNode);
 
                 // Initialize pitch detector with buffer size matching analyser
-                pitchDetector = PitchDetection.PitchDetector.forFloat32Array(analyserNode.fftSize);
+                pitchDetector = pitchy.PitchDetector.forFloat32Array(analyserNode.fftSize);
 
                 // Buffer to hold the audio data
                 buffer = new Float32Array(analyserNode.fftSize);
