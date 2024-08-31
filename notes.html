@@ -14,19 +14,29 @@
             font-size: 24px;
             margin-top: 20px;
         }
+        #console {
+            margin-top: 20px;
+            white-space: pre-wrap; /* Preserve whitespace formatting */
+            text-align: left;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
     <h1>Ukulele Note Detector</h1>
     <p id="note">Playing: </p>
+    <div id="console"></div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const noteElement = document.getElementById('note');
+            const consoleElement = document.getElementById('console');
 
             // Set up audio context
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const analyser = audioContext.createAnalyser();
-            const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+            const bufferLength = 2048;
+            const dataArray = new Uint8Array(bufferLength);
+            const scriptProcessor = audioContext.createScriptProcessor(bufferLength, 1, 1);
 
             function setupMicrophone() {
                 navigator.mediaDevices.getUserMedia({ audio: true })
@@ -36,9 +46,9 @@
                         analyser.connect(scriptProcessor);
                         scriptProcessor.connect(audioContext.destination);
 
-                        scriptProcessor.onaudioprocess = (e) => {
-                            const buffer = e.inputBuffer.getChannelData(0);
-                            const frequency = getFrequency(buffer);
+                        scriptProcessor.onaudioprocess = () => {
+                            analyser.getByteFrequencyData(dataArray);
+                            const frequency = getFrequency(dataArray, audioContext.sampleRate);
                             const note = frequencyToNote(frequency);
 
                             if (note) {
@@ -47,16 +57,20 @@
                                 noteElement.textContent = 'Playing: No note detected';
                             }
 
-                            console.log(`Frequency: ${frequency.toFixed(2)} Hz, Note: ${note}`);
+                            const logMessage = `Frequency: ${frequency.toFixed(2)} Hz, Note: ${note}\n`;
+                            consoleElement.textContent += logMessage;
                         };
                     })
                     .catch(err => console.error('Error accessing microphone:', err));
             }
 
-            function getFrequency(buffer) {
-                // Implement a simple frequency detection algorithm here
-                // For demonstration, this is a placeholder that returns a fixed frequency
-                return Math.random() * 1000 + 100; // Replace with actual frequency detection
+            function getFrequency(dataArray, sampleRate) {
+                const FFT_SIZE = 2048;
+                const buffer = new Float32Array(FFT_SIZE);
+                const freqArray = new Uint8Array(FFT_SIZE);
+                const maxIndex = dataArray.indexOf(Math.max(...dataArray));
+                const frequency = (maxIndex / FFT_SIZE) * sampleRate;
+                return frequency;
             }
 
             function frequencyToNote(frequency) {
