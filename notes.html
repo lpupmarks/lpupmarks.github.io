@@ -2,125 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ukulele Note Matcher</title>
+    <title>Ukulele Note Detector</title>
     <style>
-        #successDiv {
-            display: none;
-            padding: 20px;
-            background-color: lightgreen;
-            border: 2px solid green;
-            margin-top: 20px;
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
         }
-
-        #detectedNote, #detectedFrequency {
-            font-size: 20px;
+        #note {
+            font-size: 24px;
             margin-top: 20px;
-            color: blue;
-        }
-
-        #logContainer {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            height: 200px;
-            overflow-y: auto;
-            background: #f9f9f9;
-            font-family: monospace;
         }
     </style>
 </head>
 <body>
-    <h1>Ukulele Note Matcher</h1>
-    <button id="startDetection">Start Detection</button>
-    <div id="detectedNote">Detected Note: None</div>
-    <div id="detectedFrequency">Detected Frequency: None</div>
-    <div id="successDiv">You played the correct notes!</div>
-    <div id="logContainer"></div> <!-- Log display section -->
-
-    <!-- Load Pitch.js -->
-    <script src="https://cdn.jsdelivr.net/npm/pitchy@latest/dist/pitchy.min.js"></script>
+    <h1>Ukulele Note Detector</h1>
+    <p id="note">Playing: </p>
     <script>
-        let audioContext;
-        let analyserNode;
-        let sourceNode;
-        let scriptProcessor;
-        let pitchDetector;
+        document.addEventListener('DOMContentLoaded', () => {
+            const noteElement = document.getElementById('note');
 
-        // Example target notes to compare
-        const targetNotes = ['C', 'E', 'G', 'A'];
+            // Set up audio context
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
 
-        document.getElementById('startDetection').addEventListener('click', () => {
-            logMessage('Starting detection...');
-            startAudioProcessing();
-        });
+            function setupMicrophone() {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        const source = audioContext.createMediaStreamSource(stream);
+                        source.connect(analyser);
+                        analyser.connect(scriptProcessor);
+                        scriptProcessor.connect(audioContext.destination);
 
-        async function startAudioProcessing() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyserNode = audioContext.createAnalyser();
-                analyserNode.fftSize = 2048;
-                sourceNode = audioContext.createMediaStreamSource(stream);
-                sourceNode.connect(analyserNode);
+                        scriptProcessor.onaudioprocess = (e) => {
+                            const buffer = e.inputBuffer.getChannelData(0);
+                            const frequency = getFrequency(buffer);
+                            const note = frequencyToNote(frequency);
 
-                // Create a script processor node
-                scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
-                analyserNode.connect(scriptProcessor);
-                scriptProcessor.connect(audioContext.destination);
+                            if (note) {
+                                noteElement.textContent = `Playing: ${note} (${frequency.toFixed(2)} Hz)`;
+                            } else {
+                                noteElement.textContent = 'Playing: No note detected';
+                            }
 
-                // Initialize Pitch.js pitch detector
-                pitchDetector = Pitch.MacadamPitch();
-
-                logMessage('Microphone access granted, starting audio processing...');
-                processAudio();
-            } catch (error) {
-                logMessage(`Error accessing microphone: ${error}`);
-                console.error('Error accessing microphone:', error);
+                            console.log(`Frequency: ${frequency.toFixed(2)} Hz, Note: ${note}`);
+                        };
+                    })
+                    .catch(err => console.error('Error accessing microphone:', err));
             }
-        }
 
-        function processAudio() {
-            scriptProcessor.onaudioprocess = (event) => {
-                const buffer = event.inputBuffer.getChannelData(0);
-                const [pitch, clarity] = pitchDetector(buffer, audioContext.sampleRate);
+            function getFrequency(buffer) {
+                // Implement a simple frequency detection algorithm here
+                // For demonstration, this is a placeholder that returns a fixed frequency
+                return Math.random() * 1000 + 100; // Replace with actual frequency detection
+            }
 
-                if (clarity > 0.9) { // High clarity indicates a clear note
-                    const frequency = pitch;
-                    const note = detectNoteFromFrequency(frequency);
-                    document.getElementById('detectedNote').innerText = `Detected Note: ${note || 'None'}`;
-                    document.getElementById('detectedFrequency').innerText = `Detected Frequency: ${frequency.toFixed(2)} Hz`;
-                    logMessage(`Detected Frequency: ${frequency.toFixed(2)} Hz, Note: ${note || 'None'}`);
+            function frequencyToNote(frequency) {
+                const A4 = 440;
+                const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                if (frequency === 0) return null;
+                const noteNumber = Math.round(12 * Math.log2(frequency / A4)) + 49;
+                return notes[(noteNumber % 12 + 12) % 12];
+            }
 
-                    if (targetNotes.includes(note)) {
-                        document.getElementById('successDiv').style.display = 'block';
-                        logMessage('Correct notes played!');
-                    }
-                } else {
-                    document.getElementById('detectedNote').innerText = 'Detected Note: None';
-                    document.getElementById('detectedFrequency').innerText = 'Detected Frequency: None';
-                    logMessage('No clear note detected.');
-                }
-            };
-        }
-
-        function detectNoteFromFrequency(frequency) {
-            // Frequency ranges for common ukulele notes (G4, C4, E4, A4)
-            if (frequency >= 246.94 && frequency <= 261.63) return 'C'; // C4
-            if (frequency >= 329.63 && frequency <= 349.23) return 'E'; // E4
-            if (frequency >= 392.00 && frequency <= 415.30) return 'G'; // G4
-            if (frequency >= 440.00 && frequency <= 466.16) return 'A'; // A4
-            return null;
-        }
-
-        function logMessage(message) {
-            const logContainer = document.getElementById('logContainer');
-            const logEntry = document.createElement('div');
-            logEntry.textContent = message;
-            logContainer.appendChild(logEntry);
-            logContainer.scrollTop = logContainer.scrollHeight;
-        }
+            setupMicrophone();
+        });
     </script>
 </body>
 </html>
