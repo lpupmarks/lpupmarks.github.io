@@ -40,6 +40,7 @@
     <h1>Select between Ukulele/Guitar.
     <br>Click on start, then play.</h1>
     <select id="instrument-select">
+        <option value="">Select Instrument</option>
         <option value="ukulele">Ukulele</option>
         <option value="guitar">Guitar</option>
     </select>
@@ -111,18 +112,20 @@
             ]
         };
 
-        // Current selected instrument's notes
-        let currentNotes = instrumentNotes.ukulele;
+        // Initialize currentNotes to null; it will be set based on user selection
+        let currentNotes = null;
 
         // Function to update the notes based on the selected instrument
         function updateInstrument() {
             const selectedInstrument = instrumentSelect.value;
-            currentNotes = instrumentNotes[selectedInstrument];
+            currentNotes = instrumentNotes[selectedInstrument] || [];
             resetSequence();
         }
 
         // Calculate the closest note to a given frequency
         function getClosestNote(frequency) {
+            if (!currentNotes.length) return { note: '-' }; // Return default if no instrument selected
+
             let closestNote = currentNotes[0];
             let minDiff = Math.abs(frequency - closestNote.frequency);
 
@@ -139,6 +142,11 @@
 
         // Function to start audio processing
         function startDetection() {
+            if (!currentNotes.length) {
+                alert('Please select an instrument.');
+                return;
+            }
+
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
             scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
@@ -217,7 +225,7 @@
             // Check if the target sequence is completed
             if (sequence.length === targetSequence.length) {
                 successShown = true;
-                alert("You cracked the secret! Welcome to my site!");
+                alert("You did it!");
                 resetSequence(); // Reset after showing success
             }
         }
