@@ -13,11 +13,17 @@
             border: 2px solid green;
             margin-top: 20px;
         }
+        #detectedNote {
+            font-size: 20px;
+            margin-top: 20px;
+            color: blue;
+        }
     </style>
 </head>
 <body>
     <h1>Ukulele Note Matcher</h1>
     <button id="startDetection">Start Detection</button>
+    <div id="detectedNote">Detected Note: None</div>
     <div id="successDiv">You played the correct notes!</div>
 
     <script src="https://unpkg.com/pitchy/dist/pitchy.min.js"></script>
@@ -28,14 +34,16 @@
         let sourceNode;
         let pitchDetector;
 
-        const targetNotes = ['C', 'E', 'G']; // Example target notes; these should match the notes in your audio file
+        // Example target notes to compare
+        const targetNotes = ['C', 'E', 'G']; // Example target notes; should match your audio file notes
 
+        // Start detection button event listener
         document.getElementById('startDetection').addEventListener('click', () => {
             startAudioProcessing();
         });
 
         async function startAudioProcessing() {
-            // Request audio access
+            // Request microphone access
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -58,24 +66,32 @@
                 analyserNode.getFloatTimeDomainData(buffer);
                 const [pitch, clarity] = pitchDetector.findPitch(buffer, audioContext.sampleRate);
 
-                if (clarity > 0.9) {
+                if (clarity > 0.9) { // Check the clarity to ensure it is a note
                     const note = detectNoteFromFrequency(pitch);
-                    console.log('Detected Note:', note);
-                    
-                    if (targetNotes.includes(note)) {
-                        document.getElementById('successDiv').style.display = 'block';
-                        clearInterval(checkNotesInterval);
+                    if (note) {
+                        // Display the detected note
+                        document.getElementById('detectedNote').innerText = `Detected Note: ${note}`;
+
+                        // Check if the detected note is in the target notes
+                        if (targetNotes.includes(note)) {
+                            document.getElementById('successDiv').style.display = 'block';
+                            clearInterval(checkNotesInterval);
+                        }
+                    } else {
+                        // Update if no note is detected
+                        document.getElementById('detectedNote').innerText = 'Detected Note: None';
                     }
                 }
-            }, 200);
+            }, 200); // Interval for checking audio data
         }
 
+        // Function to detect note from the frequency
         function detectNoteFromFrequency(frequency) {
-            // Example conversion of frequency to note (simplified for common ukulele notes)
+            // Simplified example of frequency to note conversion for common ukulele notes
             if (frequency >= 261.63 && frequency <= 277.18) return 'C'; // C4
             if (frequency >= 329.63 && frequency <= 349.23) return 'E'; // E4
             if (frequency >= 392.00 && frequency <= 415.30) return 'G'; // G4
-            // Add more notes as needed
+            // Extend with more notes based on the ukulele tuning and ranges
             return null;
         }
     </script>
