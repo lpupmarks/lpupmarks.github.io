@@ -31,22 +31,21 @@
             const noteElement = document.getElementById('note');
             const consoleElement = document.getElementById('console');
 
-            // Set up audio context
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const analyser = audioContext.createAnalyser();
-            const bufferLength = 2048;
+            const bufferLength = analyser.fftSize;
             const dataArray = new Uint8Array(bufferLength);
-            const scriptProcessor = audioContext.createScriptProcessor(bufferLength, 1, 1);
 
             function setupMicrophone() {
                 navigator.mediaDevices.getUserMedia({ audio: true })
                     .then(stream => {
                         const source = audioContext.createMediaStreamSource(stream);
                         source.connect(analyser);
-                        analyser.connect(scriptProcessor);
-                        scriptProcessor.connect(audioContext.destination);
 
-                        scriptProcessor.onaudioprocess = () => {
+                        analyser.fftSize = 2048;
+                        analyser.smoothingTimeConstant = 0.3;
+
+                        function detectNote() {
                             analyser.getByteFrequencyData(dataArray);
                             const frequency = getFrequency(dataArray, audioContext.sampleRate);
                             const note = frequencyToNote(frequency);
@@ -59,24 +58,42 @@
 
                             const logMessage = `Frequency: ${frequency.toFixed(2)} Hz, Note: ${note}\n`;
                             consoleElement.textContent += logMessage;
-                        };
+
+                            requestAnimationFrame(detectNote);
+                        }
+
+                        detectNote();
                     })
                     .catch(err => console.error('Error accessing microphone:', err));
             }
 
             function getFrequency(dataArray, sampleRate) {
-                const FFT_SIZE = 2048;
-                const buffer = new Float32Array(FFT_SIZE);
-                const freqArray = new Uint8Array(FFT_SIZE);
-                const maxIndex = dataArray.indexOf(Math.max(...dataArray));
-                const frequency = (maxIndex / FFT_SIZE) * sampleRate;
+                const fftSize = analyser.fftSize;
+                const binCount = fftSize / 2;
+                const threshold = 0.1 * 255; // Adjust threshold for more sensitivity
+                let maxIndex = -1;
+                let maxMagnitude = 0;
+
+                for (let i = 0; i < binCount; i++) {
+                    const magnitude = dataArray[i];
+                    if (magnitude > maxMagnitude && magnitude > threshold) {
+                        maxMagnitude = magnitude;
+                        maxIndex = i;
+                    }
+                }
+
+                if (maxIndex === -1) return 0;
+
+                const nyquist = sampleRate / 2;
+                const frequency = (maxIndex / binCount) * nyquist;
+
                 return frequency;
             }
 
             function frequencyToNote(frequency) {
+                if (frequency === 0) return null;
                 const A4 = 440;
                 const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-                if (frequency === 0) return null;
                 const noteNumber = Math.round(12 * Math.log2(frequency / A4)) + 49;
                 return notes[(noteNumber % 12 + 12) % 12];
             }
