@@ -39,6 +39,10 @@
     <div id="frequencyDisplay">Frequency: - Hz</div>
     <div id="consoleLog">Console Log:</div>
 
+    <!-- Include Tone.js and Pitchy libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.35/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pitchy@2.3.0/dist/index.min.js"></script>
+
     <script>
         const noteDisplay = document.getElementById('noteDisplay');
         const frequencyDisplay = document.getElementById('frequencyDisplay');
@@ -46,13 +50,16 @@
         const startButton = document.getElementById('startButton');
 
         let audioContext;
-        let analyser;
-        let pitchDetector;
-        let mediaStreamSource;
+        let analyserNode;
+        let pitchEstimator;
+        let bufferLength;
+        let buffer;
+        let threshold = 5; // Frequency tolerance threshold
 
+        // Predefined ukulele notes and their frequencies
         const notes = {
-            'C': { frequency: 261.63 },
-            'G': { frequency: 392.00 }
+            'C': 261.63,
+            'G': 392.00
         };
 
         // Log messages to the page console
@@ -63,28 +70,34 @@
             consoleLog.scrollTop = consoleLog.scrollHeight;
         }
 
-        // Start audio processing
+        // Start listening to audio input
         async function startListening() {
             logMessage('Starting audio listening...');
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaStreamSource = audioContext.createMediaStreamSource(stream);
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 2048;
-            mediaStreamSource.connect(analyser);
-            pitchDetector = await PitchDetector.create(audioContext);
+            const source = audioContext.createMediaStreamSource(stream);
+            analyserNode = audioContext.createAnalyser();
+            analyserNode.fftSize = 2048;
+            source.connect(analyserNode);
+
+            // Initialize Pitchy
+            pitchEstimator = Pitchy.getPitchEstimator(audioContext.sampleRate);
+            bufferLength = analyserNode.fftSize;
+            buffer = new Float32Array(bufferLength);
+
             detectPitch();
         }
 
         // Detect the pitch of the incoming audio
-        async function detectPitch() {
-            const bufferLength = analyser.fftSize;
-            const buffer = new Float32Array(bufferLength);
-            analyser.getFloatTimeDomainData(buffer);
+        function detectPitch() {
+            analyserNode.getFloatTimeDomainData(buffer);
+            const [frequency, clarity] = pitchEstimator(buffer);
 
-            const pitch = pitchDetector.detectPitch(buffer);
-            if (pitch && pitch.frequency) {
-                displayNoteAndFrequency(pitch.frequency);
+            if (clarity > 0.98 && frequency) { // Adjust clarity threshold for better accuracy
+                displayNoteAndFrequency(frequency);
+            } else {
+                noteDisplay.textContent = `Note: -`;
+                frequencyDisplay.textContent = `Frequency: - Hz`;
             }
 
             requestAnimationFrame(detectPitch);
@@ -93,8 +106,8 @@
         // Display the detected note and frequency
         function displayNoteAndFrequency(frequency) {
             let detectedNote = '-';
-            for (const [note, data] of Object.entries(notes)) {
-                if (Math.abs(frequency - data.frequency) < 5) {
+            for (const [note, noteFreq] of Object.entries(notes)) {
+                if (Math.abs(frequency - noteFreq) < threshold) {
                     detectedNote = note;
                     break;
                 }
