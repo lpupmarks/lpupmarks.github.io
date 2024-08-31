@@ -39,22 +39,34 @@
     <div id="successDiv">You played the correct notes!</div>
     <div id="logContainer"></div> <!-- Log display section -->
 
-    <!-- Import Essentia.js for pitch detection -->
-    <script src="https://cdn.jsdelivr.net/gh/MTG/essentia.js/dist/essentia.js"></script>
+    <!-- Import Essentia.js and its WASM backend -->
+    <script src="https://cdn.jsdelivr.net/gh/MTG/essentia.js/dist/essentia.js-core.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/MTG/essentia.js/dist/essentia-wasm.module.js"></script>
     <script>
         let audioContext;
         let analyserNode;
         let sourceNode;
         let scriptProcessor;
-        let essentia;
+        let essentia; // This will hold the initialized Essentia.js object
 
-        // Example target notes to compare
-        const targetNotes = ['C', 'E', 'G', 'A'];
+        const targetNotes = ['C', 'E', 'G', 'A']; // Example target notes
 
-        document.getElementById('startDetection').addEventListener('click', () => {
+        document.getElementById('startDetection').addEventListener('click', async () => {
             logMessage('Starting detection...');
+            await initializeEssentia();
             startAudioProcessing();
         });
+
+        async function initializeEssentia() {
+            try {
+                // Initialize Essentia.js with its WASM backend
+                essentia = await EssentiaWASM();
+                logMessage('Essentia.js initialized successfully.');
+            } catch (error) {
+                logMessage(`Error initializing Essentia.js: ${error}`);
+                console.error('Error initializing Essentia.js:', error);
+            }
+        }
 
         async function startAudioProcessing() {
             try {
@@ -65,13 +77,9 @@
                 sourceNode = audioContext.createMediaStreamSource(stream);
                 sourceNode.connect(analyserNode);
 
-                // Create a script processor node
                 scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
                 analyserNode.connect(scriptProcessor);
                 scriptProcessor.connect(audioContext.destination);
-
-                // Initialize Essentia for pitch detection
-                essentia = new Essentia();
 
                 logMessage('Microphone access granted, starting audio processing...');
                 processAudio();
@@ -84,8 +92,10 @@
         function processAudio() {
             scriptProcessor.onaudioprocess = (event) => {
                 const buffer = event.inputBuffer.getChannelData(0);
-                const { pitch } = essentia.PitchYinProbabilistic(buffer, audioContext.sampleRate);
-                const frequency = pitch[0];
+
+                // Using Essentia's PitchYinProbabilistic algorithm to detect pitch
+                const pitchDetectionResult = essentia.PitchYinProbabilistic(buffer, audioContext.sampleRate);
+                const frequency = pitchDetectionResult.pitch;
 
                 if (frequency && frequency > 0) {
                     const note = detectNoteFromFrequency(frequency);
