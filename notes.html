@@ -39,17 +39,17 @@
     <div id="successDiv">You played the correct notes!</div>
     <div id="logContainer"></div> <!-- Log display section -->
 
-    <!-- Import Aubio.js library -->
-    <script src="https://cdn.jsdelivr.net/npm/aubiojs/dist/aubio.js"></script>
+    <!-- Import Essentia.js for pitch detection -->
+    <script src="https://cdn.jsdelivr.net/gh/MTG/essentia.js/dist/essentia.js"></script>
     <script>
         let audioContext;
         let analyserNode;
         let sourceNode;
         let scriptProcessor;
-        let pitchDetector;
+        let essentia;
 
         // Example target notes to compare
-        const targetNotes = ['C', 'E', 'G', 'A']; 
+        const targetNotes = ['C', 'E', 'G', 'A'];
 
         document.getElementById('startDetection').addEventListener('click', () => {
             logMessage('Starting detection...');
@@ -70,8 +70,8 @@
                 analyserNode.connect(scriptProcessor);
                 scriptProcessor.connect(audioContext.destination);
 
-                // Initialize aubio pitch detector
-                pitchDetector = new Aubio.Pitch('default', 2048, 2048, audioContext.sampleRate);
+                // Initialize Essentia for pitch detection
+                essentia = new Essentia();
 
                 logMessage('Microphone access granted, starting audio processing...');
                 processAudio();
@@ -84,13 +84,15 @@
         function processAudio() {
             scriptProcessor.onaudioprocess = (event) => {
                 const buffer = event.inputBuffer.getChannelData(0);
-                const frequency = pitchDetector(buffer);
+                const { pitch } = essentia.PitchYinProbabilistic(buffer, audioContext.sampleRate);
+                const frequency = pitch[0];
+
                 if (frequency && frequency > 0) {
                     const note = detectNoteFromFrequency(frequency);
                     document.getElementById('detectedNote').innerText = `Detected Note: ${note || 'None'}`;
                     document.getElementById('detectedFrequency').innerText = `Detected Frequency: ${frequency.toFixed(2)} Hz`;
                     logMessage(`Detected Frequency: ${frequency.toFixed(2)} Hz, Note: ${note || 'None'}`);
-                    
+
                     if (targetNotes.includes(note)) {
                         document.getElementById('successDiv').style.display = 'block';
                         logMessage('Correct notes played!');
