@@ -32,13 +32,11 @@
     <p>Detected Note: <span id="note">--</span></p>
 
     <script>
-        // Variables for audio context and frequency analysis
         let audioContext;
         let analyser;
         let bufferLength;
         let dataArray;
 
-        // Note frequency data for ukulele (common notes)
         const notes = [
             { note: 'G4', frequency: 392.00 },
             { note: 'C4', frequency: 261.63 },
@@ -46,34 +44,31 @@
             { note: 'A4', frequency: 440.00 }
         ];
 
-        // Function to start audio input and frequency analysis
         async function startAudio() {
-            // Set up the audio context and analyser node
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
             analyser.fftSize = 2048;
-            bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
+            bufferLength = analyser.fftSize;
+            dataArray = new Float32Array(bufferLength);
 
-            // Request access to the microphone
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const source = audioContext.createMediaStreamSource(stream);
-            source.connect(analyser);
-
-            // Continuously analyze the frequency
-            detectFrequency();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                detectFrequency();
+            } catch (err) {
+                alert('Error accessing microphone: ' + err.message);
+            }
         }
 
-        // Function to detect the frequency
         function detectFrequency() {
-            analyser.getByteTimeDomainData(dataArray);
+            analyser.getFloatTimeDomainData(dataArray);
             const autoCorrelation = autoCorrelate(dataArray, audioContext.sampleRate);
 
             if (autoCorrelation !== -1) {
                 const detectedFrequency = autoCorrelation.toFixed(2);
                 document.getElementById('frequency').textContent = detectedFrequency;
 
-                // Find the closest note
                 const closestNote = notes.reduce((prev, curr) =>
                     Math.abs(curr.frequency - detectedFrequency) < Math.abs(prev.frequency - detectedFrequency) ? curr : prev
                 );
@@ -86,25 +81,24 @@
             requestAnimationFrame(detectFrequency);
         }
 
-        // Function to estimate the pitch using auto-correlation
         function autoCorrelate(buffer, sampleRate) {
             const SIZE = buffer.length;
             let sumOfSquares = 0;
             for (let i = 0; i < SIZE; i++) {
-                sumOfSquares += (buffer[i] - 128) * (buffer[i] - 128);
+                sumOfSquares += buffer[i] * buffer[i];
             }
             const RMS = Math.sqrt(sumOfSquares / SIZE);
             if (RMS < 0.01) return -1;
 
-            let r1 = 0, r2 = SIZE - 1, threshold = 0.2;
+            let r1 = 0, r2 = SIZE - 1;
             for (let i = 0; i < SIZE / 2; i++) {
-                if (Math.abs(buffer[i] - 128) < threshold) {
+                if (Math.abs(buffer[i]) < 0.2) {
                     r1 = i;
                     break;
                 }
             }
             for (let i = 1; i < SIZE / 2; i++) {
-                if (Math.abs(buffer[SIZE - i] - 128) < threshold) {
+                if (Math.abs(buffer[SIZE - i]) < 0.2) {
                     r2 = SIZE - i;
                     break;
                 }
@@ -116,11 +110,12 @@
             const c = new Array(SIZE).fill(0);
             for (let i = 0; i < SIZE; i++) {
                 for (let j = 0; j < SIZE - i; j++) {
-                    c[i] = c[i] + (buffer[j] - 128) * (buffer[j + i] - 128);
+                    c[i] = c[i] + buffer[j] * buffer[j + i];
                 }
             }
 
-            let d = 0; while (c[d] > c[d + 1]) d++;
+            let d = 0;
+            while (c[d] > c[d + 1]) d++;
             let maxValue = -1, maxIndex = -1;
             for (let i = d; i < SIZE; i++) {
                 if (c[i] > maxValue) {
@@ -128,17 +123,16 @@
                     maxIndex = i;
                 }
             }
+
             let T0 = maxIndex;
 
-            let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
-            const a = (x1 + x3 - 2 * x2) / 2;
-            const b = (x3 - x1) / 2;
-            if (a) T0 = T0 - b / (2 * a);
+            if (c[T0 + 1] - c[T0 - 1]) {
+                T0 = T0 - (c[T0 + 1] - c[T0 - 1]) / (2 * (2 * c[T0] - c[T0 - 1] - c[T0 + 1]));
+            }
 
             return sampleRate / T0;
         }
 
-        // Start audio input when the page loads
         window.onload = startAudio;
     </script>
 </body>
