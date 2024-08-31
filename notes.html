@@ -19,6 +19,16 @@
             margin-top: 20px;
             color: blue;
         }
+
+        #logContainer {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -27,6 +37,7 @@
     <div id="detectedNote">Detected Note: None</div>
     <div id="detectedFrequency">Detected Frequency: None</div>
     <div id="successDiv">You played the correct notes!</div>
+    <div id="logContainer"></div> <!-- Log display section -->
 
     <!-- Import pitch-detection library -->
     <script src="https://cdn.jsdelivr.net/npm/pitch-detection@latest/dist/pitch-detection.min.js"></script>
@@ -43,6 +54,7 @@
 
         // Start detection button event listener
         document.getElementById('startDetection').addEventListener('click', () => {
+            logMessage('Starting detection...');
             startAudioProcessing();
         });
 
@@ -62,8 +74,10 @@
                 // Buffer to hold the audio data
                 buffer = new Float32Array(analyserNode.fftSize);
 
+                logMessage('Microphone access granted, starting audio processing...');
                 processAudio();
             } catch (error) {
+                logMessage(`Error accessing microphone: ${error}`);
                 console.error('Error accessing microphone:', error);
             }
         }
@@ -89,14 +103,19 @@
 
                     document.getElementById('detectedFrequency').innerText = `Detected Frequency: ${frequency.toFixed(2)} Hz`;
 
+                    // Log the detected values
+                    logMessage(`Detected Frequency: ${frequency.toFixed(2)} Hz, Note: ${note || 'None'}, Clarity: ${clarity.toFixed(2)}`);
+
                     // Check if the detected note is in the target notes
                     if (targetNotes.includes(note)) {
                         document.getElementById('successDiv').style.display = 'block';
                         clearInterval(checkNotesInterval);
+                        logMessage('Correct notes played!');
                     }
                 } else {
                     document.getElementById('detectedNote').innerText = 'Detected Note: None';
                     document.getElementById('detectedFrequency').innerText = 'Detected Frequency: None';
+                    logMessage('No clear note detected.');
                 }
             }, 200);
         }
@@ -109,6 +128,15 @@
             if (frequency >= 440.00 && frequency <= 466.16) return 'A'; // A4
             // Expand the ranges based on detected frequencies and tuning
             return null;
+        }
+
+        // Function to append log messages to the log container
+        function logMessage(message) {
+            const logContainer = document.getElementById('logContainer');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight; // Auto-scroll to the latest message
         }
     </script>
 </body>
