@@ -54,6 +54,7 @@
         // Sequence state to detect the order of notes A, G, B within 4 seconds
         let sequence = [];
         let sequenceTimer;
+        let successShown = false;
 
         // Target sequence of notes
         const targetSequence = ['A', 'G', 'B'];
@@ -153,24 +154,39 @@
             return sampleRate / T0;
         }
 
-        // Function to check if the detected note matches the target sequence
+        // Function to check if the detected notes match the target sequence
         function checkSequence(note) {
-            if (sequenceTimer) clearTimeout(sequenceTimer); // Reset the timer if a note is played
-            sequence.push(note);
-
-            // Trim the sequence to the length of the target sequence
-            if (sequence.length > targetSequence.length) sequence.shift();
-
-            // Check if the sequence matches the target
-            if (JSON.stringify(sequence) === JSON.stringify(targetSequence)) {
-                alert("You did it!");
-                sequence = []; // Reset the sequence after success
+            if (successShown) return; // Prevent multiple alerts
+            
+            // Start or reset the timer if the first note is "A"
+            if (sequence.length === 0 && note === targetSequence[0]) {
+                startSequenceTimer();
             }
 
-            // Set a timer to reset the sequence after 4 seconds
-            sequenceTimer = setTimeout(() => {
-                sequence = [];
-            }, 4000);
+            // Add note to the sequence only if it matches the next required note
+            if (note === targetSequence[sequence.length]) {
+                sequence.push(note);
+            }
+
+            // Check if the target sequence is completed
+            if (sequence.length === targetSequence.length) {
+                successShown = true;
+                alert("You did it!");
+                resetSequence(); // Reset after showing success
+            }
+        }
+
+        // Start or reset the sequence timer
+        function startSequenceTimer() {
+            if (sequenceTimer) clearTimeout(sequenceTimer);
+            sequenceTimer = setTimeout(resetSequence, 4000); // Reset sequence if not completed in 4 seconds
+        }
+
+        // Function to reset the sequence
+        function resetSequence() {
+            sequence = [];
+            successShown = false;
+            clearTimeout(sequenceTimer);
         }
 
         startButton.addEventListener('click', startDetection);
