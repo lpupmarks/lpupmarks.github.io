@@ -19,6 +19,7 @@
 
         h1 {
             color: #4b0082;
+            text-align: center;
         }
 
         button, select {
@@ -36,7 +37,8 @@
     </style>
 </head>
 <body>
-    <h1>Click on start, then play.r</h1>
+    <h1>Select between Ukulele/Guitar.
+    <br>Click on start, then play.</h1>
     <select id="instrument-select">
         <option value="ukulele">Ukulele</option>
         <option value="guitar">Guitar</option>
@@ -215,7 +217,7 @@
             // Check if the target sequence is completed
             if (sequence.length === targetSequence.length) {
                 successShown = true;
-                alert("You did it!");
+                alert("You cracked the secret! Welcome to my site!");
                 resetSequence(); // Reset after showing success
             }
         }
