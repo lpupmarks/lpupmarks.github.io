@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ukulele Note Matcher</title>
+    <style>
+        #successDiv {
+            display: none;
+            padding: 20px;
+            background-color: lightgreen;
+            border: 2px solid green;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ukulele Note Matcher</h1>
+    <button id="startDetection">Start Detection</button>
+    <div id="successDiv">You played the correct notes!</div>
+
+    <script src="https://unpkg.com/pitchy/dist/pitchy.min.js"></script>
+    <script>
+        // Variables to manage audio processing
+        let audioContext;
+        let analyserNode;
+        let sourceNode;
+        let pitchDetector;
+
+        const targetNotes = ['C', 'E', 'G']; // Example target notes; these should match the notes in your audio file
+
+        document.getElementById('startDetection').addEventListener('click', () => {
+            startAudioProcessing();
+        });
+
+        async function startAudioProcessing() {
+            // Request audio access
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyserNode = audioContext.createAnalyser();
+                analyserNode.fftSize = 2048;
+                sourceNode = audioContext.createMediaStreamSource(stream);
+                sourceNode.connect(analyserNode);
+
+                pitchDetector = Pitchy.createDetector('wavelet', analyserNode.fftSize);
+
+                processAudio();
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+            }
+        }
+
+        function processAudio() {
+            const buffer = new Float32Array(analyserNode.fftSize);
+            const checkNotesInterval = setInterval(() => {
+                analyserNode.getFloatTimeDomainData(buffer);
+                const [pitch, clarity] = pitchDetector.findPitch(buffer, audioContext.sampleRate);
+
+                if (clarity > 0.9) {
+                    const note = detectNoteFromFrequency(pitch);
+                    console.log('Detected Note:', note);
+                    
+                    if (targetNotes.includes(note)) {
+                        document.getElementById('successDiv').style.display = 'block';
+                        clearInterval(checkNotesInterval);
+                    }
+                }
+            }, 200);
+        }
+
+        function detectNoteFromFrequency(frequency) {
+            // Example conversion of frequency to note (simplified for common ukulele notes)
+            if (frequency >= 261.63 && frequency <= 277.18) return 'C'; // C4
+            if (frequency >= 329.63 && frequency <= 349.23) return 'E'; // E4
+            if (frequency >= 392.00 && frequency <= 415.30) return 'G'; // G4
+            // Add more notes as needed
+            return null;
+        }
+    </script>
+</body>
+</html>
