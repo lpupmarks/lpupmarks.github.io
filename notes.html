@@ -39,34 +39,22 @@
     <div id="successDiv">You played the correct notes!</div>
     <div id="logContainer"></div> <!-- Log display section -->
 
-    <!-- Import Essentia.js and its WASM backend -->
-    <script src="https://cdn.jsdelivr.net/gh/MTG/essentia.js/dist/essentia.js-core.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/MTG/essentia.js/dist/essentia-wasm.module.js"></script>
+    <!-- Load Pitch.js -->
+    <script src="https://cdn.jsdelivr.net/npm/pitchy@latest/dist/pitchy.min.js"></script>
     <script>
         let audioContext;
         let analyserNode;
         let sourceNode;
         let scriptProcessor;
-        let essentia; // This will hold the initialized Essentia.js object
+        let pitchDetector;
 
-        const targetNotes = ['C', 'E', 'G', 'A']; // Example target notes
+        // Example target notes to compare
+        const targetNotes = ['C', 'E', 'G', 'A'];
 
-        document.getElementById('startDetection').addEventListener('click', async () => {
+        document.getElementById('startDetection').addEventListener('click', () => {
             logMessage('Starting detection...');
-            await initializeEssentia();
             startAudioProcessing();
         });
-
-        async function initializeEssentia() {
-            try {
-                // Initialize Essentia.js with its WASM backend
-                essentia = await EssentiaWASM();
-                logMessage('Essentia.js initialized successfully.');
-            } catch (error) {
-                logMessage(`Error initializing Essentia.js: ${error}`);
-                console.error('Error initializing Essentia.js:', error);
-            }
-        }
 
         async function startAudioProcessing() {
             try {
@@ -77,9 +65,13 @@
                 sourceNode = audioContext.createMediaStreamSource(stream);
                 sourceNode.connect(analyserNode);
 
+                // Create a script processor node
                 scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
                 analyserNode.connect(scriptProcessor);
                 scriptProcessor.connect(audioContext.destination);
+
+                // Initialize Pitch.js pitch detector
+                pitchDetector = Pitch.MacadamPitch();
 
                 logMessage('Microphone access granted, starting audio processing...');
                 processAudio();
@@ -92,12 +84,10 @@
         function processAudio() {
             scriptProcessor.onaudioprocess = (event) => {
                 const buffer = event.inputBuffer.getChannelData(0);
+                const [pitch, clarity] = pitchDetector(buffer, audioContext.sampleRate);
 
-                // Using Essentia's PitchYinProbabilistic algorithm to detect pitch
-                const pitchDetectionResult = essentia.PitchYinProbabilistic(buffer, audioContext.sampleRate);
-                const frequency = pitchDetectionResult.pitch;
-
-                if (frequency && frequency > 0) {
+                if (clarity > 0.9) { // High clarity indicates a clear note
+                    const frequency = pitch;
                     const note = detectNoteFromFrequency(frequency);
                     document.getElementById('detectedNote').innerText = `Detected Note: ${note || 'None'}`;
                     document.getElementById('detectedFrequency').innerText = `Detected Frequency: ${frequency.toFixed(2)} Hz`;
@@ -116,7 +106,7 @@
         }
 
         function detectNoteFromFrequency(frequency) {
-            // Common ukulele tuning (G4, C4, E4, A4)
+            // Frequency ranges for common ukulele notes (G4, C4, E4, A4)
             if (frequency >= 246.94 && frequency <= 261.63) return 'C'; // C4
             if (frequency >= 329.63 && frequency <= 349.23) return 'E'; // E4
             if (frequency >= 392.00 && frequency <= 415.30) return 'G'; // G4
