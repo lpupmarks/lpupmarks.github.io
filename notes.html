@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ukulele Note Detector</title>
+    <title>Ukulele Frequency Detector</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,126 +14,138 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #f0f8ff;
         }
+
         h1 {
-            margin-bottom: 20px;
+            color: #4b0082;
         }
-        #note {
-            font-size: 2em;
-            font-weight: bold;
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        #frequency-display, #note-display {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <h1>Ukulele Note Detector</h1>
-    <p>Play a note on your ukulele!</p>
-    <p>Detected Frequency: <span id="frequency">--</span> Hz</p>
-    <p>Detected Note: <span id="note">--</span></p>
+    <h1>Ukulele Frequency Detector</h1>
+    <button id="start-button">Start Detection</button>
+    <p id="frequency-display">Frequency: 0 Hz</p>
+    <p id="note-display">Note: -</p>
 
     <script>
+        const startButton = document.getElementById('start-button');
+        const frequencyDisplay = document.getElementById('frequency-display');
+        const noteDisplay = document.getElementById('note-display');
+
         let audioContext;
         let analyser;
-        let bufferLength;
-        let dataArray;
+        let microphone;
+        let scriptProcessor;
 
+        // List of musical notes with their corresponding frequencies
         const notes = [
-            { note: 'G4', frequency: 392.00 },
-            { note: 'C4', frequency: 261.63 },
-            { note: 'E4', frequency: 329.63 },
-            { note: 'A4', frequency: 440.00 }
+            { note: 'C', frequency: 261.63 },
+            { note: 'C#', frequency: 277.18 },
+            { note: 'D', frequency: 293.66 },
+            { note: 'D#', frequency: 311.13 },
+            { note: 'E', frequency: 329.63 },
+            { note: 'F', frequency: 349.23 },
+            { note: 'F#', frequency: 369.99 },
+            { note: 'G', frequency: 392.00 },
+            { note: 'G#', frequency: 415.30 },
+            { note: 'A', frequency: 440.00 },
+            { note: 'A#', frequency: 466.16 },
+            { note: 'B', frequency: 493.88 }
         ];
 
-        async function startAudio() {
+        // Calculate the closest note to a given frequency
+        function getClosestNote(frequency) {
+            let closestNote = notes[0];
+            let minDiff = Math.abs(frequency - closestNote.frequency);
+
+            for (let i = 1; i < notes.length; i++) {
+                const diff = Math.abs(frequency - notes[i].frequency);
+                if (diff < minDiff) {
+                    closestNote = notes[i];
+                    minDiff = diff;
+                }
+            }
+
+            return closestNote;
+        }
+
+        // Function to start audio processing
+        function startDetection() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 2048;
-            bufferLength = analyser.fftSize;
-            dataArray = new Float32Array(bufferLength);
+            scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
 
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const source = audioContext.createMediaStreamSource(stream);
-                source.connect(analyser);
-                detectFrequency();
-            } catch (err) {
-                alert('Error accessing microphone: ' + err.message);
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    microphone = audioContext.createMediaStreamSource(stream);
+                    microphone.connect(analyser);
+                    analyser.connect(scriptProcessor);
+                    scriptProcessor.connect(audioContext.destination);
+                    scriptProcessor.onaudioprocess = processAudio;
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    alert('Error accessing microphone: ' + error.message);
+                });
+        }
+
+        // Function to process audio and detect frequency
+        function processAudio(event) {
+            const buffer = event.inputBuffer.getChannelData(0);
+            const frequency = detectFrequency(buffer, audioContext.sampleRate);
+
+            if (frequency) {
+                frequencyDisplay.textContent = `Frequency: ${frequency.toFixed(2)} Hz`;
+                const closestNote = getClosestNote(frequency);
+                noteDisplay.textContent = `Note: ${closestNote.note}`;
             }
         }
 
-        function detectFrequency() {
-            analyser.getFloatTimeDomainData(dataArray);
-            const autoCorrelation = autoCorrelate(dataArray, audioContext.sampleRate);
-
-            if (autoCorrelation !== -1) {
-                const detectedFrequency = autoCorrelation.toFixed(2);
-                document.getElementById('frequency').textContent = detectedFrequency;
-
-                const closestNote = notes.reduce((prev, curr) =>
-                    Math.abs(curr.frequency - detectedFrequency) < Math.abs(prev.frequency - detectedFrequency) ? curr : prev
-                );
-                document.getElementById('note').textContent = closestNote.note;
-            } else {
-                document.getElementById('frequency').textContent = '--';
-                document.getElementById('note').textContent = '--';
-            }
-
-            requestAnimationFrame(detectFrequency);
-        }
-
-        function autoCorrelate(buffer, sampleRate) {
+        // Function to detect frequency using autocorrelation
+        function detectFrequency(buffer, sampleRate) {
             const SIZE = buffer.length;
-            let sumOfSquares = 0;
-            for (let i = 0; i < SIZE; i++) {
-                sumOfSquares += buffer[i] * buffer[i];
-            }
-            const RMS = Math.sqrt(sumOfSquares / SIZE);
-            if (RMS < 0.01) return -1;
+            const CORR_SIZE = Math.floor(SIZE / 2);
+            const corr = new Array(CORR_SIZE).fill(0);
 
-            let r1 = 0, r2 = SIZE - 1;
-            for (let i = 0; i < SIZE / 2; i++) {
-                if (Math.abs(buffer[i]) < 0.2) {
-                    r1 = i;
-                    break;
-                }
-            }
-            for (let i = 1; i < SIZE / 2; i++) {
-                if (Math.abs(buffer[SIZE - i]) < 0.2) {
-                    r2 = SIZE - i;
-                    break;
-                }
-            }
-
-            buffer = buffer.slice(r1, r2);
-            SIZE = buffer.length;
-
-            const c = new Array(SIZE).fill(0);
-            for (let i = 0; i < SIZE; i++) {
-                for (let j = 0; j < SIZE - i; j++) {
-                    c[i] = c[i] + buffer[j] * buffer[j + i];
+            for (let i = 0; i < CORR_SIZE; i++) {
+                for (let j = 0; j < CORR_SIZE; j++) {
+                    corr[i] += buffer[j] * buffer[j + i];
                 }
             }
 
             let d = 0;
-            while (c[d] > c[d + 1]) d++;
-            let maxValue = -1, maxIndex = -1;
-            for (let i = d; i < SIZE; i++) {
-                if (c[i] > maxValue) {
-                    maxValue = c[i];
+            while (corr[d] > corr[d + 1]) d++;
+
+            let maxVal = -1;
+            let maxIndex = -1;
+
+            for (let i = d; i < CORR_SIZE; i++) {
+                if (corr[i] > maxVal) {
+                    maxVal = corr[i];
                     maxIndex = i;
                 }
             }
 
             let T0 = maxIndex;
 
-            if (c[T0 + 1] - c[T0 - 1]) {
-                T0 = T0 - (c[T0 + 1] - c[T0 - 1]) / (2 * (2 * c[T0] - c[T0 - 1] - c[T0 + 1]));
-            }
-
             return sampleRate / T0;
         }
 
-        window.onload = startAudio;
+        startButton.addEventListener('click', startDetection);
     </script>
 </body>
 </html>
