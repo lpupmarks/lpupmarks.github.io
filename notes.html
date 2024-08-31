@@ -51,6 +51,13 @@
         let microphone;
         let scriptProcessor;
 
+        // Sequence state to detect the order of notes A, G, B within 4 seconds
+        let sequence = [];
+        let sequenceTimer;
+
+        // Target sequence of notes
+        const targetSequence = ['A', 'G', 'B'];
+
         // List of musical notes with their corresponding frequencies
         const notes = [
             { note: 'C', frequency: 261.63 },
@@ -112,6 +119,7 @@
                 frequencyDisplay.textContent = `Frequency: ${frequency.toFixed(2)} Hz`;
                 const closestNote = getClosestNote(frequency);
                 noteDisplay.textContent = `Note: ${closestNote.note}`;
+                checkSequence(closestNote.note);
             }
         }
 
@@ -143,6 +151,26 @@
             let T0 = maxIndex;
 
             return sampleRate / T0;
+        }
+
+        // Function to check if the detected note matches the target sequence
+        function checkSequence(note) {
+            if (sequenceTimer) clearTimeout(sequenceTimer); // Reset the timer if a note is played
+            sequence.push(note);
+
+            // Trim the sequence to the length of the target sequence
+            if (sequence.length > targetSequence.length) sequence.shift();
+
+            // Check if the sequence matches the target
+            if (JSON.stringify(sequence) === JSON.stringify(targetSequence)) {
+                alert("You did it!");
+                sequence = []; // Reset the sequence after success
+            }
+
+            // Set a timer to reset the sequence after 4 seconds
+            sequenceTimer = setTimeout(() => {
+                sequence = [];
+            }, 4000);
         }
 
         startButton.addEventListener('click', startDetection);
