@@ -39,20 +39,18 @@
     <div id="successDiv">You played the correct notes!</div>
     <div id="logContainer"></div> <!-- Log display section -->
 
-    <!-- Import pitchy library -->
-    <script src="https://cdn.jsdelivr.net/npm/pitchy@3.1.1/dist/pitchy.min.js"></script>
+    <!-- Import Aubio.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/aubiojs/dist/aubio.js"></script>
     <script>
-        // Variables to manage audio processing
         let audioContext;
         let analyserNode;
         let sourceNode;
+        let scriptProcessor;
         let pitchDetector;
-        let buffer;
 
         // Example target notes to compare
-        const targetNotes = ['C', 'E', 'G', 'A']; // Add 'A' if you want to detect all standard tuning notes
+        const targetNotes = ['C', 'E', 'G', 'A']; 
 
-        // Start detection button event listener
         document.getElementById('startDetection').addEventListener('click', () => {
             logMessage('Starting detection...');
             startAudioProcessing();
@@ -60,7 +58,6 @@
 
         async function startAudioProcessing() {
             try {
-                // Request microphone access
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 analyserNode = audioContext.createAnalyser();
@@ -68,11 +65,13 @@
                 sourceNode = audioContext.createMediaStreamSource(stream);
                 sourceNode.connect(analyserNode);
 
-                // Initialize pitch detector with buffer size matching analyser
-                pitchDetector = pitchy.PitchDetector.forFloat32Array(analyserNode.fftSize);
+                // Create a script processor node
+                scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+                analyserNode.connect(scriptProcessor);
+                scriptProcessor.connect(audioContext.destination);
 
-                // Buffer to hold the audio data
-                buffer = new Float32Array(analyserNode.fftSize);
+                // Initialize aubio pitch detector
+                pitchDetector = new Aubio.Pitch('default', 2048, 2048, audioContext.sampleRate);
 
                 logMessage('Microphone access granted, starting audio processing...');
                 processAudio();
@@ -83,33 +82,17 @@
         }
 
         function processAudio() {
-            // Set an interval to continuously process the audio input
-            const checkNotesInterval = setInterval(() => {
-                // Capture the audio data into the buffer
-                analyserNode.getFloatTimeDomainData(buffer);
-
-                // Run pitch detection
-                const [frequency, clarity] = pitchDetector.findPitch(buffer, audioContext.sampleRate);
-
-                if (clarity > 0.8) { // Adjust this value for more sensitivity
+            scriptProcessor.onaudioprocess = (event) => {
+                const buffer = event.inputBuffer.getChannelData(0);
+                const frequency = pitchDetector(buffer);
+                if (frequency && frequency > 0) {
                     const note = detectNoteFromFrequency(frequency);
-
-                    // Display the detected note and frequency
-                    if (note) {
-                        document.getElementById('detectedNote').innerText = `Detected Note: ${note}`;
-                    } else {
-                        document.getElementById('detectedNote').innerText = 'Detected Note: None';
-                    }
-
+                    document.getElementById('detectedNote').innerText = `Detected Note: ${note || 'None'}`;
                     document.getElementById('detectedFrequency').innerText = `Detected Frequency: ${frequency.toFixed(2)} Hz`;
-
-                    // Log the detected values
-                    logMessage(`Detected Frequency: ${frequency.toFixed(2)} Hz, Note: ${note || 'None'}, Clarity: ${clarity.toFixed(2)}`);
-
-                    // Check if the detected note is in the target notes
+                    logMessage(`Detected Frequency: ${frequency.toFixed(2)} Hz, Note: ${note || 'None'}`);
+                    
                     if (targetNotes.includes(note)) {
                         document.getElementById('successDiv').style.display = 'block';
-                        clearInterval(checkNotesInterval);
                         logMessage('Correct notes played!');
                     }
                 } else {
@@ -117,7 +100,7 @@
                     document.getElementById('detectedFrequency').innerText = 'Detected Frequency: None';
                     logMessage('No clear note detected.');
                 }
-            }, 200);
+            };
         }
 
         function detectNoteFromFrequency(frequency) {
@@ -126,17 +109,15 @@
             if (frequency >= 329.63 && frequency <= 349.23) return 'E'; // E4
             if (frequency >= 392.00 && frequency <= 415.30) return 'G'; // G4
             if (frequency >= 440.00 && frequency <= 466.16) return 'A'; // A4
-            // Expand the ranges based on detected frequencies and tuning
             return null;
         }
 
-        // Function to append log messages to the log container
         function logMessage(message) {
             const logContainer = document.getElementById('logContainer');
             const logEntry = document.createElement('div');
             logEntry.textContent = message;
             logContainer.appendChild(logEntry);
-            logContainer.scrollTop = logContainer.scrollHeight; // Auto-scroll to the latest message
+            logContainer.scrollTop = logContainer.scrollHeight;
         }
     </script>
 </body>
