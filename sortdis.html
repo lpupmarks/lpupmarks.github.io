@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District Post Sorting</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #4CAF50; color: white; cursor: pointer; }
+        select { padding: 5px; margin-bottom: 10px; }
+        .top3 { background-color: #87CEFA !important; } /* Light blue for top 3 */
+    </style>
+</head>
+<body>
+
+    <h2>District Post Sorting</h2>
+    
+    <label for="category">Filter by Category:</label>
+    <select id="category" onchange="filterData()">
+        <option value="TOTAL" selected>Total Posts</option>
+        <option value="UR">UR</option>
+        <option value="OBC/MOBC">OBC/MOBC</option>
+        <option value="Tea Tribes">Tea Tribes</option>
+        <option value="SC">SC</option>
+        <option value="ST (P)">ST (P)</option>
+        <option value="ST (H)">ST (H)</option>
+        <option value="PwD">PwD</option>
+    </select>
+
+    <table id="districtTable">
+        <thead>
+            <tr id="tableHead">
+                <th>Name of District</th>
+                <th id="categoryHeader">Total Posts</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+        const data = [
+            ["Barpeta", 12, 3, 2, 1, 3, 2, 1, 24],
+            ["Biswanath", 10, 2, 1, 2, 2, 2, 1, 20],
+            ["Bongaigaon", 22, 3, 2, 2, 4, 3, 2, 38],
+            ["Charaideo", 10, 3, 2, 1, 1, 1, 1, 19],
+            ["Darrang", 10, 2, 1, 2, 2, 2, 1, 20],
+            ["Dhemaji", 17, 4, 1, 2, 2, 2, 1, 29],
+            ["Dhubri", 11, 3, 2, 1, 3, 2, 1, 23],
+            ["Dibrugarh", 21, 2, 1, 2, 2, 3, 1, 32],
+            ["Goalpara", 21, 6, 2, 2, 2, 2, 1, 36],
+            ["Golaghat", 24, 3, 2, 2, 2, 5, 1, 39],
+            ["Hojai", 12, 4, 2, 2, 3, 2, 1, 26],
+            ["Jorhat", 11, 2, 1, 2, 2, 2, 1, 21],
+            ["Kamrup Metro", 8, 2, 1, 1, 2, 3, 1, 18],
+            ["Kamrup", 21, 6, 2, 1, 3, 3, 1, 37],
+            ["Lakhimpur", 31, 4, 2, 3, 0, 2, 1, 43],
+            ["Majuli", 10, 2, 1, 2, 2, 1, 1, 19],
+            ["Morigaon", 20, 4, 2, 2, 2, 2, 1, 33],
+            ["Nalbari", 8, 5, 2, 3, 3, 3, 1, 25],
+            ["Nagaon", 11, 4, 2, 1, 4, 2, 2, 26],
+            ["Sivasagar", 21, 3, 1, 1, 3, 3, 1, 33],
+            ["Sonitpur", 10, 2, 1, 2, 2, 2, 1, 20],
+            ["South Salmara", 2, 2, 1, 2, 2, 1, 1, 11],
+            ["Tinsukia", 15, 2, 1, 1, 2, 2, 1, 24]
+        ];
+
+        const headers = ["Name of District", "UR", "OBC/MOBC", "Tea Tribes", "SC", "ST (P)", "ST (H)", "PwD", "TOTAL"];
+
+        function filterData() {
+            const category = document.getElementById("category").value;
+            if (!category) return;
+
+            const columnIndex = headers.indexOf(category);
+            const filteredData = [...data].sort((a, b) => b[columnIndex] - a[columnIndex]);
+
+            // Update Table Header
+            document.getElementById("categoryHeader").textContent = category;
+
+            // Render Table with only District Name and Selected Category
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = "";
+
+            filteredData.forEach((row, index) => {
+                const tr = document.createElement("tr");
+                const tdDistrict = document.createElement("td");
+                const tdCategory = document.createElement("td");
+
+                tdDistrict.textContent = row[0]; // District Name
+                tdCategory.textContent = row[columnIndex]; // Selected Category Value
+
+                // Highlight Top 3
+                if (index < 3) tdCategory.classList.add("top3");
+
+                tr.appendChild(tdDistrict);
+                tr.appendChild(tdCategory);
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Load "Total Posts" by default on page load
+        window.onload = function() {
+            document.getElementById("category").value = "TOTAL";
+            filterData();
+        };
+    </script>
+
+</body>
+</html>
