@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extract LAKHIMPUR 251 Numbers</title>
+</head>
+<body>
+
+<h2>Extracted Numbers (LAKHIMPUR only)</h2>
+
+<button onclick="loadJSON()">Extract</button>
+
+<pre id="output"></pre>
+
+<script>
+async function loadJSON() {
+    try {
+        const res = await fetch("./lp_one.json");
+        const data = await res.json();
+
+        let result = [];
+
+        data.forEach(item => {
+            if (item.details) {
+
+                // check LAKHIMPUR exists
+                if (item.details.includes("LAKHIMPUR")) {
+
+                    // find 8 digit number starting with 251
+                    let match = item.details.match(/251\d{5}/);
+
+                    if (match) {
+                        result.push(match[0]);
+                    }
+
+                }
+            }
+        });
+
+        // format for JSON use
+        let formatted = result.map(n => `"${n}"`).join(",\n");
+
+        document.getElementById("output").textContent = formatted;
+
+    } catch (err) {
+        document.getElementById("output").textContent = err;
+    }
+}
+</script>
+
+</body>
+</html>
