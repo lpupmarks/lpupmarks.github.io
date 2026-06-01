@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>My Indian Currency Collection</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Patrick+Hand&display=swap" rel="stylesheet">
@@ -25,11 +26,10 @@ body{
         radial-gradient(circle at top left,#fffef9,#f8f3e6 70%);
     min-height:100vh;
     color:var(--ink);
-    font-family:'Patrick Hand', cursive;
+    font-family:'Patrick Hand',cursive;
     overflow-x:hidden;
 }
 
-/* subtle paper texture */
 body::before{
     content:"";
     position:fixed;
@@ -52,7 +52,7 @@ header{
 }
 
 h1{
-    font-family:'Permanent Marker', cursive;
+    font-family:'Permanent Marker',cursive;
     font-size:clamp(3rem,7vw,6rem);
     line-height:1;
     transform:rotate(-2deg);
@@ -85,23 +85,26 @@ h1{
 }
 
 .collection{
-    width:min(1400px,95%);
+    width:min(1500px,95%);
     margin:auto;
     padding:40px 0 80px;
 
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
     gap:45px;
 }
 
 .item{
     position:relative;
     transition:.3s ease;
+    transform:rotate(var(--rotation));
 }
 
-.item:hover{
-    transform:rotate(0deg) scale(1.08) !important;
-    z-index:100;
+@media (hover:hover){
+    .item:hover{
+        transform:rotate(0deg) scale(1.06);
+        z-index:100;
+    }
 }
 
 .note,
@@ -116,48 +119,68 @@ h1{
     position:relative;
 }
 
-/* paper cut style */
 .note{
     border-radius:18px;
 }
 
 .coin{
-    border-radius:32px;
+    border-radius:18px;
 }
 
-.note img{
+/* ===========================
+   FRONT + BACK IMAGE LAYOUT
+=========================== */
+
+.currency-images{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.currency-images img{
     width:100%;
     display:block;
+    background:white;
+    object-fit:contain;
+    transition:.25s ease;
+}
+
+.note .currency-images img{
     border-radius:10px;
 }
 
-.coin img{
-    width:100%;
+.coin .currency-images img{
     aspect-ratio:1;
-    object-fit:cover;
     border-radius:50%;
+    padding:4px;
 }
 
-/* random rotations */
-.r1{ transform:rotate(-6deg); }
-.r2{ transform:rotate(4deg); }
-.r3{ transform:rotate(-3deg); }
-.r4{ transform:rotate(7deg); }
-.r5{ transform:rotate(-8deg); }
-.r6{ transform:rotate(2deg); }
+.currency-images img:hover{
+    transform:scale(1.02);
+}
+
+.side-labels{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:8px;
+
+    text-align:center;
+    font-size:.95rem;
+    opacity:.65;
+}
 
 .caption{
-    margin-top:12px;
+    margin-top:14px;
     text-align:center;
-    font-size:1.25rem;
+    font-size:1.3rem;
 }
 
 .year{
-    opacity:.7;
     font-size:1rem;
+    opacity:.7;
 }
 
-/* fake tape */
 .tape{
     position:absolute;
     width:90px;
@@ -169,7 +192,6 @@ h1{
     backdrop-filter:blur(1px);
 }
 
-/* doodles */
 .star{
     position:absolute;
     font-size:1.6rem;
@@ -188,7 +210,9 @@ footer{
 }
 
 @media(max-width:700px){
+
     .collection{
+        grid-template-columns:1fr;
         gap:35px;
     }
 
@@ -196,8 +220,43 @@ footer{
         font-size:1rem;
     }
 }
+
+/* lightbox */
+
+.lightbox{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.9);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    padding:20px;
+}
+
+.lightbox.open{
+    display:flex;
+}
+
+.lightbox img{
+    max-width:95vw;
+    max-height:95vh;
+    border-radius:12px;
+    background:white;
+}
+
+.close-btn{
+    position:absolute;
+    top:20px;
+    right:25px;
+    color:white;
+    font-size:3rem;
+    cursor:pointer;
+    line-height:1;
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -209,8 +268,8 @@ footer{
     </p>
 
     <div class="stats">
-        <div class="badge">🪙 20 Coins</div>
-        <div class="badge">💵 20 Notes</div>
+        <div class="badge" id="coinCount">🪙 0 Coins</div>
+        <div class="badge" id="noteCount">💵 0 Notes</div>
         <div class="badge">🇮🇳 India</div>
     </div>
 
@@ -224,90 +283,162 @@ footer{
 
     <!-- NOTE -->
 
-    <div class="item r1">
+    <div class="item note-item" style="--rotation:-6deg">
         <div class="tape"></div>
+
         <div class="note">
-            <img src="images/note-10-1996.jpg" alt="">
+
+            <div class="currency-images">
+                <img src="1f.webp" alt="₹10 Note Front" loading="lazy">
+                <img src="1b.webp" alt="₹10 Note Back" loading="lazy">
+            </div>
+
+            <div class="side-labels">
+                <div>Front</div>
+                <div>Back</div>
+            </div>
+
             <div class="caption">
                 ₹10 Note
                 <div class="year">1996</div>
             </div>
+
         </div>
     </div>
 
     <!-- COIN -->
 
-    <div class="item r3">
+    <!-- div class="item coin-item" style="--rotation:4deg" -->
         <div class="tape"></div>
+
         <div class="coin">
-            <img src="images/coin-1rupee.jpg" alt="">
+
+            <div class="currency-images">
+                <img src="2f.webp" alt="1 Rupee Coin Front" loading="lazy">
+                <img src="2b.webp" alt="1 Rupee Coin Back" loading="lazy">
+            </div>
+
+            <div class="side-labels">
+                <div>Front</div>
+                <div>Back</div>
+            </div>
+
             <div class="caption">
                 1 Rupee Coin
                 <div class="year">1985</div>
             </div>
+
         </div>
-    </div>
+    <!-- /div -->
 
-    <!-- NOTE -->
+    <!-- EXAMPLES -->
 
-    <div class="item r4">
+    <div class="item note-item" style="--rotation:-3deg">
         <div class="tape"></div>
+
         <div class="note">
-            <img src="images/note-100.jpg" alt="">
+
+            <div class="currency-images">
+                <img src="3f.webp" alt="₹100 Note Front" loading="lazy">
+                <img src="3b.webp" alt="₹100 Note Back" loading="lazy">
+            </div>
+
+            <div class="side-labels">
+                <div>Front</div>
+                <div>Back</div>
+            </div>
+
             <div class="caption">
                 ₹100 Note
                 <div class="year">Mahatma Gandhi Series</div>
             </div>
+
         </div>
     </div>
 
-    <!-- COIN -->
-
-    <div class="item r2">
+    <!-- div class="item coin-item" style="--rotation:7deg" -->
         <div class="tape"></div>
+
         <div class="coin">
-            <img src="images/coin-5rupee.jpg" alt="">
+
+            <div class="currency-images">
+                <img src="4f.webp" alt="₹5 Coin Front" loading="lazy">
+                <img src="4b.webp" alt="₹5 Coin Back" loading="lazy">
+            </div>
+
+            <div class="side-labels">
+                <div>Front</div>
+                <div>Back</div>
+            </div>
+
             <div class="caption">
                 ₹5 Coin
                 <div class="year">2005</div>
             </div>
+
         </div>
-    </div>
-
-    <!-- NOTE -->
-
-    <div class="item r5">
-        <div class="tape"></div>
-        <div class="note">
-            <img src="images/note-20.jpg" alt="">
-            <div class="caption">
-                ₹20 Note
-                <div class="year">Old Design</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- COIN -->
-
-    <div class="item r6">
-        <div class="tape"></div>
-        <div class="coin">
-            <img src="images/coin-50paise.jpg" alt="">
-            <div class="caption">
-                50 Paise
-                <div class="year">1994</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Duplicate blocks and replace images/details -->
-    <!-- Add remaining notes and coins here -->
+    <!-- /div -->
 
 </section>
 
 <footer>
     Collected with curiosity • Preserved with care
 </footer>
+
+<!-- LIGHTBOX -->
+
+<div class="lightbox" id="lightbox">
+    <span class="close-btn">&times;</span>
+    <img id="lightboxImage" src="" alt="">
+</div>
+
+<script>
+
+/* dynamic stats */
+
+document.getElementById('coinCount').textContent =
+    `🪙 ${document.querySelectorAll('.coin-item').length} Coins`;
+
+document.getElementById('noteCount').textContent =
+    `💵 ${document.querySelectorAll('.note-item').length} Notes`;
+
+/* image viewer */
+
+const lightbox = document.getElementById('lightbox');
+const lightboxImage = document.getElementById('lightboxImage');
+
+document.querySelectorAll('.currency-images img').forEach(img => {
+
+    img.addEventListener('click', () => {
+
+        lightboxImage.src = img.src;
+        lightboxImage.alt = img.alt;
+
+        lightbox.classList.add('open');
+    });
+
+});
+
+lightbox.addEventListener('click', e => {
+
+    if (
+        e.target === lightbox ||
+        e.target.classList.contains('close-btn')
+    ){
+        lightbox.classList.remove('open');
+    }
+
+});
+
+document.addEventListener('keydown', e => {
+
+    if(e.key === 'Escape'){
+        lightbox.classList.remove('open');
+    }
+
+});
+
+</script>
 
 </body>
 </html>
