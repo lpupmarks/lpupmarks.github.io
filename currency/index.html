@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Indian Currency Collection</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Patrick+Hand&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --paper:#f8f3e6;
+    --ink:#222;
+    --shadow:rgba(0,0,0,.18);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:
+        radial-gradient(circle at top left,#fffef9,#f8f3e6 70%);
+    min-height:100vh;
+    color:var(--ink);
+    font-family:'Patrick Hand', cursive;
+    overflow-x:hidden;
+}
+
+/* subtle paper texture */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    opacity:.06;
+    pointer-events:none;
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #000 0px,
+            #000 1px,
+            transparent 1px,
+            transparent 6px
+        );
+}
+
+header{
+    text-align:center;
+    padding:60px 20px 30px;
+}
+
+h1{
+    font-family:'Permanent Marker', cursive;
+    font-size:clamp(3rem,7vw,6rem);
+    line-height:1;
+    transform:rotate(-2deg);
+
+    text-shadow:
+        4px 4px 0 white,
+        8px 8px 0 rgba(0,0,0,.08);
+}
+
+.subtitle{
+    margin-top:15px;
+    font-size:1.4rem;
+    transform:rotate(1deg);
+}
+
+.stats{
+    margin-top:20px;
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.badge{
+    background:white;
+    padding:10px 18px;
+    border-radius:999px;
+    box-shadow:0 4px 12px rgba(0,0,0,.12);
+    font-size:1.1rem;
+}
+
+.collection{
+    width:min(1400px,95%);
+    margin:auto;
+    padding:40px 0 80px;
+
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:45px;
+}
+
+.item{
+    position:relative;
+    transition:.3s ease;
+}
+
+.item:hover{
+    transform:rotate(0deg) scale(1.08) !important;
+    z-index:100;
+}
+
+.note,
+.coin{
+    background:white;
+    padding:12px;
+
+    box-shadow:
+        0 0 0 10px white,
+        0 12px 25px var(--shadow);
+
+    position:relative;
+}
+
+/* paper cut style */
+.note{
+    border-radius:18px;
+}
+
+.coin{
+    border-radius:32px;
+}
+
+.note img{
+    width:100%;
+    display:block;
+    border-radius:10px;
+}
+
+.coin img{
+    width:100%;
+    aspect-ratio:1;
+    object-fit:cover;
+    border-radius:50%;
+}
+
+/* random rotations */
+.r1{ transform:rotate(-6deg); }
+.r2{ transform:rotate(4deg); }
+.r3{ transform:rotate(-3deg); }
+.r4{ transform:rotate(7deg); }
+.r5{ transform:rotate(-8deg); }
+.r6{ transform:rotate(2deg); }
+
+.caption{
+    margin-top:12px;
+    text-align:center;
+    font-size:1.25rem;
+}
+
+.year{
+    opacity:.7;
+    font-size:1rem;
+}
+
+/* fake tape */
+.tape{
+    position:absolute;
+    width:90px;
+    height:28px;
+    background:rgba(255,255,255,.55);
+    top:-12px;
+    left:50%;
+    transform:translateX(-50%) rotate(-6deg);
+    backdrop-filter:blur(1px);
+}
+
+/* doodles */
+.star{
+    position:absolute;
+    font-size:1.6rem;
+    opacity:.2;
+}
+
+.s1{top:180px;left:40px;}
+.s2{top:700px;right:50px;}
+.s3{top:1200px;left:80px;}
+
+footer{
+    text-align:center;
+    padding:50px 20px;
+    font-size:1.2rem;
+    opacity:.7;
+}
+
+@media(max-width:700px){
+    .collection{
+        gap:35px;
+    }
+
+    .badge{
+        font-size:1rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+
+    <h1>My Indian Currency Collection</h1>
+
+    <p class="subtitle">
+        Coins • Notes • Memories
+    </p>
+
+    <div class="stats">
+        <div class="badge">🪙 20 Coins</div>
+        <div class="badge">💵 20 Notes</div>
+        <div class="badge">🇮🇳 India</div>
+    </div>
+
+</header>
+
+<div class="star s1">★</div>
+<div class="star s2">✦</div>
+<div class="star s3">★</div>
+
+<section class="collection">
+
+    <!-- NOTE -->
+
+    <div class="item r1">
+        <div class="tape"></div>
+        <div class="note">
+            <img src="images/note-10-1996.jpg" alt="">
+            <div class="caption">
+                ₹10 Note
+                <div class="year">1996</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COIN -->
+
+    <div class="item r3">
+        <div class="tape"></div>
+        <div class="coin">
+            <img src="images/coin-1rupee.jpg" alt="">
+            <div class="caption">
+                1 Rupee Coin
+                <div class="year">1985</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTE -->
+
+    <div class="item r4">
+        <div class="tape"></div>
+        <div class="note">
+            <img src="images/note-100.jpg" alt="">
+            <div class="caption">
+                ₹100 Note
+                <div class="year">Mahatma Gandhi Series</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COIN -->
+
+    <div class="item r2">
+        <div class="tape"></div>
+        <div class="coin">
+            <img src="images/coin-5rupee.jpg" alt="">
+            <div class="caption">
+                ₹5 Coin
+                <div class="year">2005</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTE -->
+
+    <div class="item r5">
+        <div class="tape"></div>
+        <div class="note">
+            <img src="images/note-20.jpg" alt="">
+            <div class="caption">
+                ₹20 Note
+                <div class="year">Old Design</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COIN -->
+
+    <div class="item r6">
+        <div class="tape"></div>
+        <div class="coin">
+            <img src="images/coin-50paise.jpg" alt="">
+            <div class="caption">
+                50 Paise
+                <div class="year">1994</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicate blocks and replace images/details -->
+    <!-- Add remaining notes and coins here -->
+
+</section>
+
+<footer>
+    Collected with curiosity • Preserved with care
+</footer>
+
+</body>
+</html>
