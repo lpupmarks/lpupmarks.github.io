@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#245c45">
+<title>DEE Assam · Cut-off Checker</title>
+<style>
+:root{--bg:#f7f7f2;--paper:#fff;--ink:#20231f;--muted:#737970;--line:#e4e7df;--green:#245c45;--green-dark:#194632;--green-pale:#edf4ef;--orange:#d97745;--orange-pale:#fff2e9;--shadow:0 8px 30px rgba(29,44,32,.045);--radius:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}button,input{font:inherit}button{cursor:pointer}.container{width:min(1160px,100% - 36px);margin:0 auto;padding:28px 0 34px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:30px;color:var(--muted);font-size:.73rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase}.brand{display:flex;align-items:center;gap:10px}.brand-mark{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--green);color:white;font-size:.8rem;letter-spacing:0}.source-pill{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:rgba(255,255,255,.65);letter-spacing:0;text-transform:none;font-weight:600}.source-pill:before{content:"";width:7px;height:7px;border-radius:50%;background:#6e9c70}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:27px}.eyebrow{font-size:.75rem;font-weight:800;letter-spacing:.14em;color:var(--green);text-transform:uppercase;margin:0 0 10px}.hero h1{font-size:clamp(2.5rem,5vw,3.5rem);line-height:1.03;letter-spacing:-.065em;font-weight:760;margin:0;max-width:720px}.hero h1 span{color:var(--green)}.hero-copy{max-width:440px;color:var(--muted);font-size:.94rem;margin:14px 0 0}.hero-side{flex-shrink:0;text-align:right;padding-bottom:4px}.hero-side strong{display:block;font-size:1rem;letter-spacing:-.02em}.hero-side span{font-size:.75rem;color:var(--muted)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.filters{padding:23px;margin-bottom:18px}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:19px}.panel-heading h2{margin:0;font-size:1rem;letter-spacing:-.025em}.panel-heading p{margin:4px 0 0;font-size:.8rem;color:var(--muted)}.quiet-label{font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field-label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.8rem;font-weight:750;margin-bottom:8px}.field-label small{color:var(--muted);font-size:.72rem;font-weight:550}.multi{position:relative}.multi-trigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);text-align:left;transition:border-color .18s,box-shadow .18s}.multi-trigger:hover,.multi.open .multi-trigger{border-color:#9bb6a4}.multi-trigger:focus-visible,.score-input:focus-visible,button:focus-visible{outline:3px solid rgba(36,92,69,.2);outline-offset:2px}.trigger-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.88rem}.trigger-count{display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 6px;border-radius:7px;background:var(--green-pale);color:var(--green);font-size:.72rem;font-weight:800}.chevron{color:var(--muted);font-size:.85rem;transition:transform .2s}.multi.open .chevron{transform:rotate(180deg)}.dropdown{display:none;position:absolute;z-index:20;top:calc(100% + 7px);left:0;right:0;padding:10px;background:white;border:1px solid var(--line);border-radius:13px;box-shadow:0 16px 38px rgba(24,39,28,.13)}.multi.open .dropdown{display:block}.search-box{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:.84rem;outline:none;margin-bottom:8px}.search-box:focus{border-color:#91ad9a}.dropdown-actions{display:flex;justify-content:space-between;gap:10px;padding:1px 2px 8px;border-bottom:1px solid var(--line);margin-bottom:4px}.text-button{border:0;background:transparent;color:var(--green);font-size:.75rem;font-weight:750;padding:4px 2px}.options{max-height:230px;overflow:auto}.option{display:flex;align-items:center;gap:9px;padding:9px 7px;border-radius:7px;font-size:.82rem;cursor:pointer}.option:hover{background:#f5f7f3}.option input{width:16px;height:16px;accent-color:var(--green);flex-shrink:0}.option span{line-height:1.35}.selected-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.selected-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:4px 8px;border-radius:7px;background:var(--green-pale);color:var(--green);font-size:.72rem;font-weight:700}.selected-chip button{border:0;background:transparent;color:inherit;padding:0;font-size:1rem;line-height:1}.field-hint{font-size:.73rem;color:var(--muted);margin:7px 0 0}
+.category-block{border-top:1px solid var(--line);margin-top:22px;padding-top:19px}.category-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}.category-head label{font-size:.8rem;font-weight:750}.category-head span{font-size:.72rem;color:var(--muted)}.category-list{display:flex;flex-wrap:wrap;gap:7px}.category-item{position:relative}.category-item input{position:absolute;opacity:0;pointer-events:none}.category-item label{display:block;padding:7px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:#454a43;font-size:.77rem;font-weight:650;cursor:pointer;transition:all .16s;user-select:none}.category-item label:hover{border-color:#a6bcae}.category-item input:checked+label{background:var(--green);border-color:var(--green);color:white}.category-item input:focus-visible+label{outline:3px solid rgba(36,92,69,.2);outline-offset:2px}
+.score-zone{display:grid;grid-template-columns:minmax(190px,.9fr) 1.6fr;gap:20px;align-items:end;margin-top:22px;padding:19px;border-radius:13px;background:#f7f8f4;border:1px solid #edf0e8}.score-label{display:block;font-size:.8rem;font-weight:750;margin-bottom:7px}.score-input-wrap{position:relative}.score-input{width:100%;height:49px;border:1px solid #dce2d8;border-radius:10px;background:white;padding:10px 54px 10px 13px;font-size:1.15rem;font-weight:750;letter-spacing:-.02em;outline:none}.score-input:focus{border-color:#8eaa98;box-shadow:0 0 0 3px rgba(36,92,69,.08)}.score-suffix{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--muted);font-weight:750}.score-hint{font-size:.72rem;color:var(--muted);margin:7px 0 0}.score-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:45px;padding:10px 16px;border-radius:10px;font-size:.82rem;font-weight:750;transition:transform .16s,background .16s,border-color .16s}.btn:active{transform:scale(.98)}.btn-primary{border:1px solid var(--green);background:var(--green);color:white}.btn-primary:hover{background:var(--green-dark)}.btn-secondary{border:1px solid var(--line);background:white;color:var(--ink)}.btn-secondary:hover{border-color:#c1c9bd;background:#fafbf8}.btn-icon{font-size:1rem;line-height:1}
+.results-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin:29px 0 13px}.results-head h2{margin:0;font-size:1.2rem;letter-spacing:-.035em}.results-head p{margin:4px 0 0;font-size:.8rem;color:var(--muted)}.result-note{font-size:.72rem;color:var(--muted);text-align:right}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:14px}.stat-card{padding:15px 17px;background:white;border:1px solid var(--line);border-radius:13px}.stat-top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:.73rem;font-weight:650}.stat-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#f1f4ee;color:var(--green);font-weight:800}.stat-number{font-size:1.7rem;font-weight:780;letter-spacing:-.055em;line-height:1.2;margin-top:7px}.stat-extra{font-size:.72rem;color:var(--muted);margin-top:3px}.active-filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 13px}.filter-tag{border:1px solid #e4e8df;background:#f1f4ee;border-radius:7px;padding:5px 8px;color:#4b5e4d;font-size:.72rem;font-weight:650}.table-card{overflow:hidden}.table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px;border-bottom:1px solid var(--line)}.table-toolbar strong{font-size:.84rem}.table-toolbar span{font-size:.73rem;color:var(--muted)}.table-scroll{max-height:62vh;overflow:auto}table{width:100%;border-collapse:collapse;font-size:.84rem}thead{position:sticky;top:0;z-index:2}th{background:#f3f5f0;color:#666e64;text-align:left;padding:12px 17px;font-size:.69rem;text-transform:uppercase;letter-spacing:.09em;font-weight:800;border-bottom:1px solid var(--line);white-space:nowrap}td{padding:13px 17px;border-bottom:1px solid #edf0e9;vertical-align:middle}tbody tr:hover{background:#fafbf8}tbody tr:last-child td{border-bottom:0}.post-name{font-weight:700;color:#333a32}.district-name{font-weight:650}.category-text{color:#666e64}.cutoff{display:inline-flex;align-items:center;padding:5px 9px;border-radius:7px;background:#eef4ed;color:#285a3c;font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:.01em}.cutoff.near{background:var(--orange-pale);color:#9b542b}.null-val{color:#9ba197}.no-results{text-align:center;padding:54px 20px!important;color:var(--muted)}.empty-icon{display:grid;place-items:center;width:44px;height:44px;margin:0 auto 13px;border-radius:14px;background:#f1f4ee;color:var(--green);font-size:1.2rem}.no-results strong{display:block;color:var(--ink);font-size:.9rem;margin-bottom:5px}.no-results span{font-size:.79rem}.footer{display:flex;justify-content:space-between;gap:16px;margin-top:17px;color:var(--muted);font-size:.72rem;line-height:1.7}.footer strong{color:#4b5149;font-weight:750}.footer-right{text-align:right;flex-shrink:0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:760px){.container{width:min(100% - 24px,650px);padding-top:17px}.topline{margin-bottom:25px}.hero{display:block}.hero-side{display:none}.hero h1{font-size:clamp(2.15rem,10vw,3.2rem)}.hero-copy{font-size:.88rem}.filters{padding:17px}.filter-grid{grid-template-columns:1fr;gap:17px}.score-zone{grid-template-columns:1fr;gap:14px;padding:14px}.score-actions{justify-content:stretch}.score-actions .btn{flex:1}.stats{gap:7px}.stat-card{padding:12px 11px}.stat-top{font-size:.67rem;align-items:flex-start}.stat-icon{display:none}.stat-number{font-size:1.45rem}.stat-extra{font-size:.66rem}.results-head{align-items:flex-start}.result-note{display:none}.table-scroll{max-height:none;max-height:65vh}th,td{padding:12px 12px}.footer{display:block}.footer-right{text-align:left;margin-top:7px}.table-toolbar{padding:12px}.source-pill{font-size:.68rem}}
+@media(max-width:420px){.container{width:calc(100% - 20px)}.topline{font-size:.65rem}.brand-mark{width:29px;height:29px}.source-pill{padding:6px 8px}.filters{padding:14px}.category-item label{padding:7px 9px;font-size:.73rem}.score-actions .btn{padding:10px 11px;font-size:.76rem}.stat-card{padding:11px 9px}.stat-number{font-size:1.3rem}.table-scroll{overflow-x:auto}table{min-width:540px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="container">
+  <div class="topline">
+    <div class="brand"><span class="brand-mark">DEE</span><span>Merit List Analysis</span></div>
+    <div class="source-pill">Advertisement date: 26 Dec, 2023 (5550) </div>
+  </div>
+  <section class="hero" aria-labelledby="page-title">
+    <div><p class="eyebrow">Lower Primary Schools · Assamese medium</p><h1 id="page-title">Cut-off <span>Checker (LPS)</span></h1><p class="hero-copy">Based on merit lists of Advertisement-A (No. 31383723/117) Dated Kahilipara the 26th December, 2023.</p>
+    <h4>For Upper Primary Schools, <a href='./cutoff.html'>Click Here!</a></h4></div>
+    <div class="hero-side"><strong>2025 recruitment</strong><span>Cut-off reference · Assamese medium</span></div>
+  </section>
+
+  <section class="panel filters" aria-labelledby="filters-title">
+    <div class="score-zone"><div><label class="score-label" for="scoreInput">Your score / marks (Don't know it yet? <a href='https://lpupmarks.github.io/lps.html'>Check it here)</a></label><div class="score-input-wrap"><input class="score-input" type="number" id="scoreInput" step="0.001" min="0" max="100" placeholder="e.g. 66.600" inputmode="decimal"><span class="score-suffix">/ 100</span></div><p class="score-hint">With a score entered, only cut-offs at or below your score are shown.</p></div><div class="score-actions"><button class="btn btn-primary" id="checkBtn"><span class="btn-icon">⌕</span> Check</button><button class="btn btn-secondary" id="resetBtn"><span class="btn-icon">↺</span> Reset all</button></div></div>
+    <div class="panel-heading"><div><h2 id="filters-title">Build your search</h2><p></p></div><span class="quiet-label">01 / Filters</span></div>
+    <div class="filter-grid">
+      <div class="field"><div class="field-label"><label for="postTrigger">Post</label><small>Choose one or more</small></div><div class="multi" id="postMulti"><button class="multi-trigger" type="button" id="postTrigger" aria-expanded="false" aria-controls="postDropdown"><span class="trigger-value">All posts</span><span style="display:flex;align-items:center;gap:8px"><span class="trigger-count" hidden></span><span class="chevron">⌄</span></span></button><div class="dropdown" id="postDropdown"><input class="search-box" id="postSearch" type="search" placeholder="Search posts…" aria-label="Search posts"><div class="dropdown-actions"><button type="button" class="text-button" data-select-all="posts">Select all</button><button type="button" class="text-button" data-clear="posts">Clear</button></div><div class="options" id="postOptions"></div></div></div><div class="selected-chips" id="postChips"></div><p class="field-hint">Leave empty to include every post.</p></div>
+      <div class="field"><div class="field-label"><label for="districtTrigger">District</label><small>Choose one or more</small></div><div class="multi" id="districtMulti"><button class="multi-trigger" type="button" id="districtTrigger" aria-expanded="false" aria-controls="districtDropdown"><span class="trigger-value">All districts</span><span style="display:flex;align-items:center;gap:8px"><span class="trigger-count" hidden></span><span class="chevron">⌄</span></span></button><div class="dropdown" id="districtDropdown"><input class="search-box" id="districtSearch" type="search" placeholder="Search districts…" aria-label="Search districts"><div class="dropdown-actions"><button type="button" class="text-button" data-select-all="districts">Select all</button><button type="button" class="text-button" data-clear="districts">Clear</button></div><div class="options" id="districtOptions"></div></div></div><div class="selected-chips" id="districtChips"></div><p class="field-hint">Leave empty to include every district.</p></div>
+    </div>
+    <div class="category-block"><div class="category-head"><label>Category</label><span>Choose one category</span></div><div class="category-list" id="categoryRadios" role="radiogroup" aria-label="Category"></div></div>
+    </section>
+
+  <div class="results-head"><div><p class="eyebrow" style="margin-bottom:5px">02 / Results</p><h2>Your cut-off matches</h2><p id="resultsSubtitle">Set your filters or enter a score to explore the data.</p></div><div class="result-note">Cut-off marks shown to 3 decimal places</div></div>
+  <div class="stats" id="stats" aria-live="polite"><div class="stat-card"><div class="stat-top">You'd have cleared cut-offs of<span class="stat-icon">≡</span></div><div class="stat-number">—</div><div class="stat-extra">posts based on your filters</div></div><div class="stat-card"><div class="stat-top">Tyoes of Posts <span class="stat-icon">:</span></div><div class="stat-number">—</div><div class="stat-extra">Across matching results</div></div><div class="stat-card"><div class="stat-top">Districts <span class="stat-icon">⌖</span></div><div class="stat-number">—</div><div class="stat-extra">Across matching results</div></div></div>
+  <div class="active-filters" id="activeFilters"></div>
+  <section class="panel table-card" aria-label="Cut-off results"><div class="table-toolbar"><strong>Cut-off table</strong><span id="tableCount">Waiting for your search</span></div><div class="table-scroll"><table><thead><tr><th>Post</th><th>District</th><th>Category</th><th>Cut-off</th></tr></thead><tbody id="resultsBody"><tr><td colspan="4" class="no-results"><div class="empty-icon">⌕</div><strong>Waiting for you to search</strong><span>Enter your score and/or apply filters, then select “Check”.</span></td></tr></tbody></table></div></section>
+  <footer class="footer"><div><strong>Source:</strong> DEE Assam, district-wise, post-wise and medium-wise cut-off marks for Teachers of Lower Primary Schools (Assamese medium).<br><strong>Advertisement date:</strong> 26 Dec 2023 · <strong>Publication date:</strong> 07 Nov 2025.</div><div class="footer-right"><strong>Note: </strong>WR = Women Reservation · NA values are shown as —</div></footer>
+</main>
+<script>
+    const data = {
+  "Assistant Teacher of Lower Primary School": {
+    "BARPETA": {
+      "OBC/MOBC": 59.893,
+      "OBC/MOBC WR": 60.813,
+      "SC": 56.599,
+      "SC WR": 58.041,
+      "STH": null,
+      "STH WR": null,
+      "STP": 55.210,
+      "STP WR": 55.820,
+      "Tea_tribes": null,
+      "Tea_tribes WR": null,
+      "UR": 66.288,
+      "UR WR": 70.361,
+      "UR WR_PwD": null,
+      "UR_PwD": 53.806,
+      "Grand Total": 53.806
+    },
+    "BONGAIGAON": {
+      "OBC/MOBC": null,
+      "OBC/MOBC WR": null,
+      "SC": null,
+      "SC WR": null,
+      "STH": null,
+      "STH WR": null,
+      "STP": 53.880,
+      "STP WR": 55.907,
+      "Tea_tribes": 55.159,
+      "Tea_tribes WR": null,
+      "UR": 63.866,
+      "UR WR": 65.232,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 53.880
+    },
+    "DARRANG": {
+      "OBC/MOBC": 61.340,
+      "OBC/MOBC WR": 61.704,
+      "SC": 55.784,
+      "SC WR": 56.863,
+      "STH": null,
+      "STH WR": null,
+      "STP": 55.026,
+      "STP WR": 55.828,
+      "Tea_tribes": 53.526,
+      "Tea_tribes WR": null,
+      "UR": 65.018,
+      "UR WR": 66.246,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 53.526
+    },
+    "DHEMAJI": {
+      "OBC/MOBC": 59.504,
+      "OBC/MOBC WR": 59.771,
+      "SC": 56.074,
+      "SC WR": 56.079,
+      "STH": null,
+      "STH WR": null,
+      "STP": null,
+      "STP WR": null,
+      "Tea_tribes": null,
+      "Tea_tribes WR": null,
+      "UR": 60.789,
+      "UR WR": 61.374,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 56.074
+    },
+    "DHUBRI": {
+      "OBC/MOBC": 60.097,
+      "OBC/MOBC WR": 60.237,
+      "SC": 57.360,
+      "SC WR": 57.752,
+      "STH": null,
+      "STH WR": null,
+      "STP": 54.830,
+      "STP WR": 55.238,
+      "Tea_tribes": 52.856,
+      "Tea_tribes WR": null,
+      "UR": 62.913,
+      "UR WR": 63.018,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 52.856
+    },
+    "DIBRUGARH": {
+      "OBC/MOBC": 59.783,
+      "OBC/MOBC WR": 60.255,
+      "SC": 55.343,
+      "SC WR": 56.074,
+      "STH": null,
+      "STH WR": null,
+      "STP": null,
+      "STP WR": null,
+      "Tea_tribes": 52.303,
+      "Tea_tribes WR": 52.526,
+      "UR": 61.241,
+      "UR WR": 62.323,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 52.303
+    },
+    "GOALPARA": {
+      "OBC/MOBC": 59.809,
+      "OBC/MOBC WR": 59.957,
+      "SC": 56.983,
+      "SC WR": 57.508,
+      "STH": null,
+      "STH WR": null,
+      "STP": null,
+      "STP WR": null,
+      "Tea_tribes": null,
+      "Tea_tribes WR": null,
+      "UR": 62.639,
+      "UR WR": 63.231,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 56.983
+    },
+    "GOLAGHAT": {
+      "OBC/MOBC": 60.673,
+      "OBC/MOBC WR": 61.402,
+      "SC": 57.103,
+      "SC WR": 58.995,
+      "STH": null,
+      "STH WR": null,
+      "STP": null,
+      "STP WR": null,
+      "Tea_tribes": 54.313,
+      "Tea_tribes WR": 54.783,
+      "UR": 61.925,
+      "UR WR": 63.793,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 54.313
+    },
+    "JORHAT": {
+      "OBC/MOBC": null,
+      "OBC/MOBC WR": null,
+      "SC": null,
+      "SC WR": null,
+      "STH": null,
+      "STH WR": null,
+      "STP": null,
+      "STP WR": null,
+      "Tea_tribes": 56.474,
+      "Tea_tribes WR": 53.631,
+      "UR": 61.398,
+      "UR WR": 65.410,
+      "UR WR_PwD": 56.874,
+      "UR_PwD": null,
+      "Grand Total": 53.631
+    },
+    "LAKHIMPUR": {
+      "OBC/MOBC": 60.438,
+      "OBC/MOBC WR": 60.756,
+      "SC": 57.718,
+      "SC WR": 58.376,
+      "STH": null,
+      "STH WR": null,
+      "STP": 58.491,
+      "STP WR": 57.508,
+      "Tea_tribes": 52.508,
+      "Tea_tribes WR": 53.017,
+      "UR": 61.648,
+      "UR WR": 61.968,
+      "UR WR_PwD": 53.686,
+      "UR_PwD": null,
+      "Grand Total": 52.508
+    },
+    "MAJULI": {
+      "OBC/MOBC": 59.092,
+      "OBC/MOBC WR": 58.364,
+      "SC": null,
+      "SC WR": null,
+      "STH": null,
+      "STH WR": null,
+      "STP": 55.390,
+      "STP WR": 55.048,
+      "Tea_tribes": null,
+      "Tea_tribes WR": null,
+      "UR": 60.358,
+      "UR WR": 61.270,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 55.048
+    },
+    "MORIGAON": {
+      "OBC/MOBC": 59.559,
+      "OBC/MOBC WR": 60.094,
+      "SC": 56.017,
+      "SC WR": 57.488,
+      "STH": null,
+      "STH WR": null,
+      "STP": null,
+      "STP WR": null,
+      "Tea_tribes": null,
+      "Tea_tribes WR": 53.723,
+      "UR": 62.464,
+      "UR WR": 63.761,
+      "UR WR_PwD": 58.746,
+      "UR_PwD": 55.866,
+      "Grand Total": 53.723
+    },
+    "NAGAON": {
+      "OBC/MOBC": 60.673,
+      "OBC/MOBC WR": 61.358,
+      "SC": 58.379,
+      "SC WR": 58.649,
+      "STH": 56.702,
+      "STH WR": null,
+      "STP": 56.758,
+      "STP WR": 57.931,
+      "Tea_tribes": 52.391,
+      "Tea_tribes WR": 55.288,
+      "UR": 62.512,
+      "UR WR": 65.488,
+      "UR WR_PwD": 53.384,
+      "UR_PwD": 58.073,
+      "Grand Total": 52.391
+    },
+    "NALBARI": {
+      "OBC/MOBC": 60.577,
+      "OBC/MOBC WR": 63.803,
+      "SC": 57.648,
+      "SC WR": 59.861,
+      "STH": null,
+      "STH WR": null,
+      "STP": 55.333,
+      "STP WR": 56.289,
+      "Tea_tribes": null,
+      "Tea_tribes WR": null,
+      "UR": null,
+      "UR WR": null,
+      "UR WR_PwD": null,
+      "UR_PwD": 57.689,
+      "Grand Total": 55.333
+    },
+    "SONITPUR": {
+      "OBC/MOBC": 60.870,
+      "OBC/MOBC WR": 61.722,
+      "SC": 57.829,
+      "SC WR": 60.420,
+      "STH": null,
+      "STH WR": null,
+      "STP": 54.126,
+      "STP WR": 54.601,
+      "Tea_tribes": 53.486,
+      "Tea_tribes WR": 53.268,
+      "UR": 62.678,
+      "UR WR": 63.718,
+      "UR WR_PwD": null,
+      "UR_PwD": 55.488,
+      "Grand Total": 53.268
+    },
+    "SOUTH SALMARA-MANKACHAR": {
+      "OBC/MOBC": 59.383,
+      "OBC/MOBC WR": 59.348,
+      "SC": 56.541,
+      "SC WR": 56.993,
+      "STH": null,
+      "STH WR": null,
+      "STP": 54.250,
+      "STP WR": 54.348,
+      "Tea_tribes": 52.863,
+      "Tea_tribes WR": 56.446,
+      "UR": 60.451,
+      "UR WR": 60.219,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 52.863
+    },
+     "TINSUKIA": {
+      "OBC/MOBC": 59.797,
+      "OBC/MOBC WR": 60.318,
+      "SC": 57.166,
+      "SC WR": 57.361,
+      "STH": null,
+      "STH WR": null,
+      "STP": 55.193,
+      "STP WR": 57.662,
+      "Tea_tribes": 52.908,
+      "Tea_tribes WR": 56.901,
+      "UR": 60.920,
+      "UR WR": 61.093,
+      "UR WR_PwD": null,
+      "UR_PwD": null,
+      "Grand Total": 52.908
+    }
+  }
+};
+
+// Flatten the source data without altering the cut-off values.
+const allRows=[];
+const posts=Object.keys(data);
+const districtsSet=new Set();
+const categoriesSet=new Set();
+posts.forEach(post=>Object.keys(data[post]).forEach(district=>{
+  districtsSet.add(district);
+  Object.keys(data[post][district]).forEach(category=>{
+    categoriesSet.add(category);
+    allRows.push({post,district,category,cutoff:data[post][district][category]});
+  });
+}));
+const sortedCategories=[...categoriesSet].sort((a,b)=>{
+  const order=['UR','UR WR','OBC/MOBC','OBC/MOBC WR','SC','SC WR','STP','STP WR','STH','STH WR','Tea_tribes','Tea_tribes WR','PwD','PwD WR'];
+  const ia=order.indexOf(a),ib=order.indexOf(b);
+  if(ia===-1&&ib===-1)return a.localeCompare(b);if(ia===-1)return 1;if(ib===-1)return -1;return ia-ib;
+});
+const displayPost=p=>p.replace(' of Lower Primary School','');
+const displayCategory=c=>c==='Tea_tribes'?'Tea Tribes':c==='Tea_tribes WR'?'Tea Tribes WR':c;
+const selectedPosts=new Set();
+const selectedDistricts=new Set();
+const postOptions=document.getElementById('postOptions');
+const districtOptions=document.getElementById('districtOptions');
+const postMulti=document.getElementById('postMulti');
+const districtMulti=document.getElementById('districtMulti');
+let hasSearched=false;
+
+function makeOption(container,kind,value,label){
+  const id=`${kind}-${container.children.length}`;
+  const labelEl=document.createElement('label');labelEl.className='option';labelEl.htmlFor=id;
+  const input=document.createElement('input');input.type='checkbox';input.id=id;input.value=value;
+  input.checked=(kind==='post'?selectedPosts:selectedDistricts).has(value);
+  const text=document.createElement('span');text.textContent=label;
+  labelEl.append(input,text);container.appendChild(labelEl);
+  input.addEventListener('change',()=>{const set=kind==='post'?selectedPosts:selectedDistricts;input.checked?set.add(value):set.delete(value);updateMulti(kind);if(hasSearched)render();});
+}
+posts.forEach(p=>makeOption(postOptions,'post',p,displayPost(p)));
+[...districtsSet].sort().forEach(d=>makeOption(districtOptions,'district',d,d));
+function updateMulti(kind){
+  const isPost=kind==='post',set=isPost?selectedPosts:selectedDistricts;
+  const root=isPost?postMulti:districtMulti;
+  const label=root.querySelector('.trigger-value');const count=root.querySelector('.trigger-count');
+  label.textContent=set.size?(isPost?`${set.size} post${set.size===1?'':'s'} selected`:`${set.size} district${set.size===1?'':'s'} selected`):(isPost?'All posts':'All districts');
+  count.hidden=!set.size;count.textContent=set.size;
+  const chips=document.getElementById(isPost?'postChips':'districtChips');chips.innerHTML='';
+  [...set].slice(0,4).forEach(value=>{const chip=document.createElement('span');chip.className='selected-chip';const text=document.createElement('span');text.textContent=isPost?displayPost(value):value;const remove=document.createElement('button');remove.type='button';remove.setAttribute('aria-label',`Remove ${text.textContent}`);remove.textContent='×';remove.addEventListener('click',()=>{set.delete(value);const box=root.querySelector(`input[value="${CSS.escape(value)}"]`);if(box)box.checked=false;updateMulti(kind);if(hasSearched)render();});chip.append(text,remove);chips.appendChild(chip);});
+  if(set.size>4){const more=document.createElement('span');more.className='selected-chip';more.textContent=`+${set.size-4} more`;chips.appendChild(more);}
+}
+function closeDropdowns(except){[postMulti,districtMulti].forEach(root=>{if(root!==except){root.classList.remove('open');root.querySelector('.multi-trigger').setAttribute('aria-expanded','false');}})}
+[[postMulti,'postTrigger','postSearch','postOptions'],[districtMulti,'districtTrigger','districtSearch','districtOptions']].forEach(([root,triggerId,searchId,optionsId])=>{
+ const trigger=document.getElementById(triggerId),search=document.getElementById(searchId),options=document.getElementById(optionsId);
+ trigger.addEventListener('click',()=>{const open=!root.classList.contains('open');closeDropdowns(root);root.classList.toggle('open',open);trigger.setAttribute('aria-expanded',String(open));if(open)setTimeout(()=>search.focus(),0);});
+ search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();options.querySelectorAll('.option').forEach(item=>item.hidden=!item.textContent.toLowerCase().includes(q));});
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.multi'))closeDropdowns(null)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDropdowns(null)});
+document.querySelectorAll('[data-select-all]').forEach(button=>button.addEventListener('click',()=>{
+ const kind=button.dataset.selectAll,isPost=kind==='posts',set=isPost?selectedPosts:selectedDistricts,root=isPost?postMulti:districtMulti;set.clear();(isPost?posts:[...districtsSet]).forEach(v=>set.add(v));root.querySelectorAll('input[type="checkbox"]').forEach(box=>box.checked=true);updateMulti(isPost?'post':'district');if(hasSearched)render();
+}));
+document.querySelectorAll('[data-clear]').forEach(button=>button.addEventListener('click',()=>{
+ const kind=button.dataset.clear,isPost=kind==='posts',set=isPost?selectedPosts:selectedDistricts,root=isPost?postMulti:districtMulti;set.clear();root.querySelectorAll('input[type="checkbox"]').forEach(box=>box.checked=false);updateMulti(isPost?'post':'district');if(hasSearched)render();
+}));
+const radioContainer=document.getElementById('categoryRadios');
+function addCategory(value,label,checked=false){const wrapper=document.createElement('div');wrapper.className='category-item';const input=document.createElement('input');input.type='radio';input.name='category';input.id='cat_'+(radioContainer.children.length);input.value=value;input.checked=checked;const lab=document.createElement('label');lab.htmlFor=input.id;lab.textContent=label;wrapper.append(input,lab);radioContainer.appendChild(wrapper);input.addEventListener('change',()=>{if(hasSearched)render();});}
+addCategory('ALL','All categories',true);sortedCategories.forEach(c=>addCategory(c,displayCategory(c)));
+function getSelectedCategory(){return document.querySelector('input[name="category"]:checked')?.value||'ALL';}
+function showEmpty(title,message){document.getElementById('resultsBody').innerHTML=`<tr><td colspan="4" class="no-results"><div class="empty-icon">⌕</div><strong>${title}</strong><span>${message}</span></td></tr>`;}
+function render(){
+ hasSearched=true;
+ const selectedCat=getSelectedCategory();const scoreVal=document.getElementById('scoreInput').value;const score=scoreVal===''?null:parseFloat(scoreVal);
+ let filtered=allRows.filter(row=>{
+   if(selectedPosts.size&&!selectedPosts.has(row.post))return false;
+   if(selectedDistricts.size&&!selectedDistricts.has(row.district))return false;
+   if(selectedCat!=='ALL'&&row.category!==selectedCat)return false;
+   if(score!==null&&!Number.isNaN(score)){if(row.cutoff===null||row.cutoff>score)return false;}
+   return true;
+ });
+ filtered.sort((a,b)=>{if(a.post!==b.post)return a.post.localeCompare(b.post);if(a.district!==b.district)return a.district.localeCompare(b.district);return a.category.localeCompare(b.category);});
+ const tbody=document.getElementById('resultsBody');const stats=document.getElementById('stats');
+ if(!filtered.length){showEmpty('No matching cut-offs found','Your score may be below the selected cut-offs, or the filters may be too narrow. Try changing your score or filters.');stats.innerHTML=`<div class="stat-card"><div class="stat-top">Matching cut-offs</div><div class="stat-number">0</div><div class="stat-extra">No matches found</div></div><div class="stat-card"><div class="stat-top">Posts</div><div class="stat-number">0</div><div class="stat-extra">Across matching results</div></div><div class="stat-card"><div class="stat-top">Districts</div><div class="stat-number">0</div><div class="stat-extra">Across matching results</div></div>`;}
+ else{
+   tbody.innerHTML=filtered.map(r=>`<tr><td class="post-name">${displayPost(r.post)}</td><td class="district-name">${r.district}</td><td class="category-text">${displayCategory(r.category)}</td><td>${r.cutoff===null?'<span class="null-val">—</span>':`<span class="cutoff ${score!==null&&score-r.cutoff<1?'near':''}">${r.cutoff.toFixed(3)}</span>`}</td></tr>`).join('');
+   const uniquePosts=new Set(filtered.map(r=>r.post)).size,uniqueDistricts=new Set(filtered.map(r=>r.district)).size;
+   stats.innerHTML=`<div class="stat-card"><div class="stat-top">Matching cut-offs <span class="stat-icon">≡</span></div><div class="stat-number">${filtered.length.toLocaleString()}</div><div class="stat-extra">${score!==null&&!Number.isNaN(score)?'Cut-offs at or below your score':'Based on your selected filters'}</div></div><div class="stat-card"><div class="stat-top">Posts <span class="stat-icon">↗</span></div><div class="stat-number">${uniquePosts}</div><div class="stat-extra">Across matching results</div></div><div class="stat-card"><div class="stat-top">Districts <span class="stat-icon">⌖</span></div><div class="stat-number">${uniqueDistricts}</div><div class="stat-extra">Across matching results</div></div>`;
+ }
+ document.getElementById('tableCount').textContent=`${filtered.length.toLocaleString()} ${filtered.length===1?'entry':'entries'}`;
+ document.getElementById('resultsSubtitle').textContent=score!==null&&!Number.isNaN(score)?`Showing cut-offs of ${score.toFixed(3)} or lower.`:'Results based on your selected filters.';
+ const tags=[];if(selectedPosts.size)tags.push(`${selectedPosts.size} post${selectedPosts.size===1?'':'s'}`);if(selectedDistricts.size)tags.push(`${selectedDistricts.size} district${selectedDistricts.size===1?'':'s'}`);if(selectedCat!=='ALL')tags.push(displayCategory(selectedCat));if(score!==null&&!Number.isNaN(score))tags.push(`Score: ${score.toFixed(3)}`);
+ document.getElementById('activeFilters').innerHTML=tags.map(t=>`<span class="filter-tag">${t}</span>`).join('');
+}
+document.getElementById('checkBtn').addEventListener('click',render);
+document.getElementById('resetBtn').addEventListener('click',()=>{
+ selectedPosts.clear();selectedDistricts.clear();postMulti.querySelectorAll('input[type="checkbox"]').forEach(box=>box.checked=false);districtMulti.querySelectorAll('input[type="checkbox"]').forEach(box=>box.checked=false);document.getElementById('postSearch').value='';document.getElementById('districtSearch').value='';postOptions.querySelectorAll('.option').forEach(el=>el.hidden=false);districtOptions.querySelectorAll('.option').forEach(el=>el.hidden=false);document.getElementById('scoreInput').value='';document.getElementById('cat_0').checked=true;closeDropdowns(null);updateMulti('post');updateMulti('district');render();
+});
+document.getElementById('scoreInput').addEventListener('input',()=>{clearTimeout(window._scoreTimer);window._scoreTimer=setTimeout(()=>{if(hasSearched)render();},220);});
+</script>
+</body>
+</html>
