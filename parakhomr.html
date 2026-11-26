@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PARAKH OMR Camera</title>
+
+<style>
+:root {
+    --bg: #0b100e;
+    --panel: #121a16;
+    --border: #29372f;
+    --text: #e7eee9;
+    --muted: #8c9b91;
+    --green: #70d69a;
+    --red: #ff7777;
+    --yellow: #f1c66d;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 18px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 650px;
+    margin: auto;
+}
+
+h1 {
+    font-size: 23px;
+    margin: 5px 0;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 22px;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
+}
+
+.panel h2 {
+    font-size: 15px;
+    margin: 0 0 14px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 7px;
+}
+
+select, button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #0c130f;
+    color: var(--text);
+    font-size: 14px;
+}
+
+select {
+    margin-bottom: 13px;
+}
+
+button {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.primary {
+    background: #1e7545;
+    border-color: #1e7545;
+    color: white;
+}
+
+.secondary {
+    background: #202c25;
+}
+
+.danger {
+    background: #492323;
+    border-color: #633131;
+    color: #ffb4b4;
+}
+
+.small {
+    padding: 7px 10px;
+    font-size: 12px;
+    width: auto;
+}
+
+.status {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 9px;
+}
+
+.status.ok {
+    color: var(--green);
+}
+
+.status.error {
+    color: var(--red);
+}
+
+.status.loading {
+    color: var(--yellow);
+}
+
+.camera {
+    width: 100%;
+    background: #000;
+    border-radius: 9px;
+    overflow: hidden;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+video {
+    display: block;
+    width: 100%;
+    max-height: 440px;
+    object-fit: contain;
+}
+
+.camera-placeholder {
+    color: #77847b;
+    font-size: 13px;
+    padding: 35px;
+    text-align: center;
+}
+
+.camera-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.info {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.progress-track {
+    height: 7px;
+    background: #26332b;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--green);
+    transition: width .2s;
+}
+
+.student-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.student {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    background: #0c130f;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.student small {
+    display: block;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.zip-row {
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.zip-row:last-child {
+    border-bottom: none;
+}
+
+.zip-row-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.zip-row-info {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.notice {
+    background: #1b241e;
+    border: 1px solid #34483a;
+    border-radius: 8px;
+    padding: 11px;
+    font-size: 12px;
+    color: #b7c9bd;
+    line-height: 1.6;
+}
+
+#message {
+    font-size: 12px;
+    margin-top: 12px;
+    line-height: 1.5;
+}
+
+@media(max-width: 420px) {
+    body {
+        padding: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>PARAKH</h1>
+
+    <!-- LIBRARY STATUS -->
+    <div class="panel">
+        <h2>Library status</h2>
+
+        <div id="jszipStatus" class="status loading">
+            JSZip: Waiting...
+        </div>
+
+        <div id="jspdfStatus" class="status loading">
+            jsPDF: Waiting...
+        </div>
+
+        <button id="retryLibraries" class="secondary small"
+                style="margin-top:12px;" onclick="loadLibraries()">
+            Retry library loading
+        </button>
+    </div>
+
+    <!-- STUDENT SELECTION -->
+    <div class="panel">
+        <h2>Student details</h2>
+
+        <label for="classSelect">Select class</label>
+        <select id="classSelect">
+            <option value="2">Class 2</option>
+            <option value="6">Class 6</option>
+            <option value="8">Class 8</option>
+        </select>
+
+        <label for="rollSelect">Select roll number</label>
+        <select id="rollSelect"></select>
+
+        <div class="info">
+            School code: 18180222602<br>
+            Section: A<br>
+            Medium code: 01
+        </div>
+    </div>
+
+    <!-- CAMERA -->
+    <div class="panel">
+        <h2>Camera</h2>
+
+        <div class="camera">
+            <video id="video" autoplay playsinline muted
+                   style="display:none;"></video>
+
+            <div id="cameraPlaceholder" class="camera-placeholder">
+                Camera is not started.
+            </div>
+        </div>
+
+        <div class="camera-buttons">
+            <button id="startCamera" class="secondary">
+                Start camera
+            </button>
+
+            <button id="captureButton" class="primary" disabled>
+                Capture photo
+            </button>
+        </div>
+
+        <div id="cameraStatus" class="status">
+            Camera is stopped.
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <!-- CAPTURED STUDENTS -->
+    <div class="panel">
+        <h2>Captured photographs</h2>
+
+        <div id="captureSummary" class="info">
+            No photographs captured yet.
+        </div>
+
+        <div id="studentList" class="student-list"
+             style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ZIP EXPORT -->
+    <div class="panel">
+
+        <div id="zipRows" style="margin-top:12px;"></div>
+
+        <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <div id="exportStatus" class="status">
+            Ready to export.
+        </div>
+    </div>
+
+
+</div>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+
+<!-- LIBRARY LOADER -->
+<script>
+const librarySources = {
+    jszip: [
+        "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+        "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
+        "https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"
+    ],
+
+    jspdf: [
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js",
+        "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",
+        "https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"
+    ]
+};
+
+let librariesLoading = false;
+let librariesReady = false;
+
+function updateLibraryStatus(id, message, type) {
+    const element = document.getElementById(id);
+    element.textContent = message;
+    element.className = "status " + (type || "");
+}
+
+function loadScript(url) {
+    return new Promise((resolve, reject) => {
+
+        const script = document.createElement("script");
+
+        const timeout = setTimeout(() => {
+            script.remove();
+            reject(new Error("Loading timed out"));
+        }, 15000);
+
+        script.src = url;
+        script.async = true;
+
+        script.onload = () => {
+            clearTimeout(timeout);
+            resolve();
+        };
+
+        script.onerror = () => {
+            clearTimeout(timeout);
+            script.remove();
+            reject(new Error("Network or CDN error"));
+        };
+
+        document.head.appendChild(script);
+    });
+}
+
+async function loadOneLibrary(name, sources, globalCheck, statusId) {
+
+    if (globalCheck()) {
+        updateLibraryStatus(
+            statusId,
+            name + ": Already loaded",
+            "ok"
+        );
+        return true;
+    }
+
+    for (let i = 0; i < sources.length; i++) {
+
+        const url = sources[i];
+
+        updateLibraryStatus(
+            statusId,
+            name + ": Trying source " + (i + 1) + "/" + sources.length,
+            "loading"
+        );
+
+        try {
+            await loadScript(url);
+
+            if (globalCheck()) {
+                updateLibraryStatus(
+                    statusId,
+                    name + ": Loaded successfully",
+                    "ok"
+                );
+                return true;
+            }
+
+            throw new Error("Library loaded but global variable is missing");
+
+        } catch (error) {
+            console.warn(name + " failed:", url, error);
+        }
+    }
+
+    updateLibraryStatus(
+        statusId,
+        name + ": Failed to load. Check internet connection.",
+        "error"
+    );
+
+    return false;
+}
+
+async function loadLibraries() {
+
+    if (librariesLoading) return;
+
+    librariesLoading = true;
+    librariesReady = false;
+
+    const retryButton = document.getElementById("retryLibraries");
+    retryButton.disabled = true;
+    retryButton.textContent = "Loading...";
+
+    const results = await Promise.all([
+
+        loadOneLibrary(
+            "JSZip",
+            librarySources.jszip,
+            () => typeof window.JSZip !== "undefined",
+            "jszipStatus"
+        ),
+
+        loadOneLibrary(
+            "jsPDF",
+            librarySources.jspdf,
+            () => !!(window.jspdf && window.jspdf.jsPDF),
+            "jspdfStatus"
+        )
+
+    ]);
+
+    librariesReady = results.every(Boolean);
+    librariesLoading = false;
+
+    retryButton.disabled = false;
+    retryButton.textContent = librariesReady
+        ? "Libraries loaded"
+        : "Retry library loading";
+
+    if (librariesReady) {
+        document.getElementById("exportStatus").textContent =
+            "Export your ZIP files.";
+    } else {
+        document.getElementById("exportStatus").textContent =
+            "One or more libraries failed to load. Retry before exporting.";
+    }
+}
+
+window.omrLibrariesReady = loadLibraries();
+</script>
+
+
+<!-- MAIN APPLICATION -->
+<script>
+(() => {
+
+"use strict";
+
+const SCHOOL_CODE = "18180222602";
+const SECTION = "A";
+const MEDIUM = "01";
+
+const CLASSES = [2, 6, 8];
+const TOTAL_ROLLS = 23;
+
+const MAX_IMAGE_SIZE = 600 * 1024;
+const MAX_ZIP_SIZE = 100 * 1024 * 1024;
+const MAX_IMAGES_PER_ZIP = 250;
+
+const captured = {
+    2: new Map(),
+    6: new Map(),
+    8: new Map()
+};
+
+let cameraStream = null;
+let isExporting = false;
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+
+const classSelect = document.getElementById("classSelect");
+const rollSelect = document.getElementById("rollSelect");
+
+const startCameraButton = document.getElementById("startCamera");
+const captureButton = document.getElementById("captureButton");
+
+const cameraStatus = document.getElementById("cameraStatus");
+const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+
+const studentList = document.getElementById("studentList");
+const captureSummary = document.getElementById("captureSummary");
+
+const zipRows = document.getElementById("zipRows");
+const exportStatus = document.getElementById("exportStatus");
+const progressBar = document.getElementById("progressBar");
+
+const message = document.getElementById("message");
+
+
+/* ---------------------------------
+   STUDENT SELECTION
+---------------------------------- */
+
+function populateRolls() {
+
+    const cls = classSelect.value;
+
+    rollSelect.innerHTML = "";
+
+    for (let i = 1; i <= TOTAL_ROLLS; i++) {
+
+        const option = document.createElement("option");
+
+        option.value = i;
+        option.textContent = "Roll " + i;
+
+        if (captured[cls].has(i)) {
+            option.textContent += " (Captured)";
+            option.disabled = true;
+        }
+
+        rollSelect.appendChild(option);
+    }
+}
+
+classSelect.addEventListener("change", () => {
+    populateRolls();
+    renderCaptured();
+});
+
+rollSelect.addEventListener("change", () => {
+    message.textContent = "";
+});
+
+populateRolls();
+
+
+/* ---------------------------------
+   CAMERA
+---------------------------------- */
+
+async function startCamera() {
+
+    if (!navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia) {
+
+        cameraStatus.textContent =
+            "Camera access is unavailable. Use HTTPS or localhost.";
+
+        cameraStatus.className = "status error";
+        return;
+    }
+
+    try {
+
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+        }
+
+        cameraStatus.textContent = "Starting camera...";
+        cameraStatus.className = "status loading";
+
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+
+            audio: false,
+
+            video: {
+                facingMode: {
+                    ideal: "environment"
+                },
+                width: {
+                    ideal: 2048
+                },
+                height: {
+                    ideal: 1536
+                }
+            }
+
+        });
+
+        video.srcObject = cameraStream;
+
+        await video.play();
+
+        video.style.display = "block";
+        cameraPlaceholder.style.display = "none";
+
+        captureButton.disabled = false;
+
+        cameraStatus.textContent = "Camera is ready.";
+        cameraStatus.className = "status ok";
+
+        startCameraButton.textContent = "Restart camera";
+
+    } catch (error) {
+
+        console.error(error);
+
+        cameraStatus.textContent =
+            "Unable to access camera: " + error.message;
+
+        cameraStatus.className = "status error";
+    }
+}
+
+startCameraButton.addEventListener("click", startCamera);
+
+
+/* ---------------------------------
+   IMAGE COMPRESSION
+---------------------------------- */
+
+function canvasToBlob(canvas, quality) {
+
+    return new Promise((resolve, reject) => {
+
+        canvas.toBlob(blob => {
+
+            if (blob) {
+                resolve(blob);
+            } else {
+                reject(new Error("Image conversion failed."));
+            }
+
+        }, "image/jpeg", quality);
+    });
+}
+
+async function compressImage(sourceCanvas) {
+
+    let width = sourceCanvas.width;
+    let height = sourceCanvas.height;
+
+    const MAX_DIMENSION = 2400;
+    const MIN_DIMENSION = 1200;
+
+    if (Math.max(width, height) > MAX_DIMENSION) {
+
+        const ratio = MAX_DIMENSION / Math.max(width, height);
+
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+    }
+
+    const workCanvas = document.createElement("canvas");
+    const workContext = workCanvas.getContext("2d");
+
+    while (true) {
+
+        workCanvas.width = width;
+        workCanvas.height = height;
+
+        workContext.drawImage(
+            sourceCanvas,
+            0,
+            0,
+            width,
+            height
+        );
+
+        const qualities = [
+            0.86, 0.78, 0.70, 0.62,
+            0.54, 0.46, 0.38, 0.32
+        ];
+
+        for (const quality of qualities) {
+
+            const blob = await canvasToBlob(
+                workCanvas,
+                quality
+            );
+
+            if (blob.size <= MAX_IMAGE_SIZE) {
+                return blob;
+            }
+        }
+
+        if (Math.max(width, height) <= MIN_DIMENSION) {
+            throw new Error(
+                "Could not compress the photograph below 200 KB."
+            );
+        }
+
+        width = Math.round(width * 0.88);
+        height = Math.round(height * 0.88);
+    }
+}
+
+
+/* ---------------------------------
+   CAPTURE
+---------------------------------- */
+
+captureButton.addEventListener("click", async () => {
+
+    if (!cameraStream || !video.videoWidth) {
+        alert("Please start the camera first.");
+        return;
+    }
+
+    const cls = classSelect.value;
+    const roll = Number(rollSelect.value);
+
+    if (captured[cls].has(roll)) {
+        alert("This roll number has already been captured.");
+        return;
+    }
+
+    captureButton.disabled = true;
+    message.textContent = "Capturing and compressing photograph...";
+    message.className = "status loading";
+
+    try {
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        context.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const blob = await compressImage(canvas);
+
+        captured[cls].set(roll, blob);
+
+        message.textContent =
+            "Successfully captured. Size: " +
+            (blob.size / 1024).toFixed(1) + " KB";
+
+        message.className = "status ok";
+
+        populateRolls();
+        renderCaptured();
+        renderZipRows();
+
+        if (roll < TOTAL_ROLLS) {
+            rollSelect.value = String(roll + 1);
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.textContent = error.message;
+        message.className = "status error";
+
+    } finally {
+        captureButton.disabled = false;
+    }
+});
+
+
+/* ---------------------------------
+   FILE NAMING
+---------------------------------- */
+
+function getBaseFileName(cls, roll) {
+
+    const paddedRoll = String(roll).padStart(2, "0");
+
+    return SCHOOL_CODE + "_C" +
+           cls + "_" +
+           SECTION + "_" +
+           MEDIUM + "_0" +
+           paddedRoll;
+}
+
+
+/* ---------------------------------
+   CAPTURE LIST
+---------------------------------- */
+
+function renderCaptured() {
+
+    const cls = classSelect.value;
+    const records = captured[cls];
+
+    studentList.innerHTML = "";
+
+    if (records.size === 0) {
+
+        studentList.innerHTML =
+            '<div class="info">No photographs captured for this class.</div>';
+
+    } else {
+
+        [...records.entries()]
+            .sort((a, b) => a[0] - b[0])
+            .forEach(([roll, blob]) => {
+
+                const row = document.createElement("div");
+                row.className = "student";
+
+                const details = document.createElement("div");
+
+                details.innerHTML =
+                    "<strong>Roll " + roll + "</strong>" +
+                    "<small>" + getBaseFileName(cls, roll) +
+                    ".jpg · " +
+                    (blob.size / 1024).toFixed(1) +
+                    " KB</small>";
+
+                const removeButton = document.createElement("button");
+
+                removeButton.className = "danger small";
+                removeButton.textContent = "Remove";
+
+                removeButton.addEventListener("click", () => {
+
+                    if (confirm("Remove this photograph?")) {
+
+                        records.delete(roll);
+
+                        populateRolls();
+                        renderCaptured();
+                        renderZipRows();
+
+                    }
+                });
+
+                row.appendChild(details);
+                row.appendChild(removeButton);
+
+                studentList.appendChild(row);
+            });
+    }
+
+    let total = 0;
+
+    CLASSES.forEach(c => {
+        total += captured[c].size;
+    });
+
+    captureSummary.textContent =
+        "Current class: " + records.size + "/" + TOTAL_ROLLS +
+        " captured. Total across all classes: " + total + ".";
+}
+
+
+/* ---------------------------------
+   ZIP ROWS
+---------------------------------- */
+
+function renderZipRows() {
+
+    zipRows.innerHTML = "";
+
+    CLASSES.forEach(cls => {
+
+        const count = captured[cls].size;
+
+        const row = document.createElement("div");
+        row.className = "zip-row";
+
+        const title = document.createElement("div");
+        title.className = "zip-row-title";
+        title.textContent = "Class " + cls;
+
+        const info = document.createElement("div");
+        info.className = "zip-row-info";
+        info.textContent = count + " pdf(s) ready";
+
+        const button = document.createElement("button");
+        button.className = "primary";
+        button.textContent = "Generate Class " + cls + " ZIP";
+        button.disabled = count === 0;
+
+        button.addEventListener("click", () => makeZip(cls));
+
+        row.appendChild(title);
+        row.appendChild(info);
+        row.appendChild(button);
+
+        zipRows.appendChild(row);
+    });
+}
+
+renderZipRows();
+
+
+/* ---------------------------------
+   PDF GENERATION
+---------------------------------- */
+
+async function blobToDataURL(blob) {
+
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Unable to read image."));
+
+        reader.readAsDataURL(blob);
+    });
+}
+
+async function imageToPDF(imageBlob) {
+
+    const jsPDF = window.jspdf.jsPDF;
+
+    const dataURL = await blobToDataURL(imageBlob);
+
+    const image = new Image();
+
+    await new Promise((resolve, reject) => {
+
+        image.onload = resolve;
+        image.onerror = () => reject(
+            new Error("Could not load captured image.")
+        );
+
+        image.src = dataURL;
+    });
+
+    const imageWidth = image.naturalWidth;
+    const imageHeight = image.naturalHeight;
+
+    // Custom-sized PDF page, preserving image aspect ratio.
+    const pageWidth = 210;
+    const pageHeight = pageWidth * imageHeight / imageWidth;
+
+    const pdf = new jsPDF({
+        orientation: pageWidth > pageHeight ? "landscape" : "portrait",
+        unit: "mm",
+        format: [pageWidth, pageHeight],
+        compress: true
+    });
+
+    pdf.addImage(
+        dataURL,
+        "JPEG",
+        0,
+        0,
+        pageWidth,
+        pageHeight,
+        undefined,
+        "FAST"
+    );
+
+    return pdf.output("blob");
+}
+
+
+/* ---------------------------------
+   ZIP GENERATION
+---------------------------------- */
+
+async function makeZip(cls) {
+
+    if (isExporting) {
+        alert("Another ZIP is currently being generated.");
+        return;
+    }
+
+    // Wait for the library loader.
+    if (window.omrLibrariesReady) {
+        await window.omrLibrariesReady;
+    }
+
+    if (!window.JSZip ||
+        !window.jspdf ||
+        !window.jspdf.jsPDF) {
+
+        alert(
+            "PDF/ZIP libraries could not load. " +
+            "Please check your internet connection and retry."
+        );
+
+        return;
+    }
+
+    const records = [...captured[cls].entries()]
+        .sort((a, b) => a[0] - b[0]);
+
+    if (records.length === 0) {
+        alert("No photographs available for this class.");
+        return;
+    }
+
+    if (records.length > MAX_IMAGES_PER_ZIP) {
+        alert("Maximum 250 photographs allowed in one ZIP.");
+        return;
+    }
+
+    isExporting = true;
+
+    const buttons = zipRows.querySelectorAll("button");
+    buttons.forEach(button => button.disabled = true);
+
+    progressBar.style.width = "0%";
+
+    const zip = new window.JSZip();
+
+    let totalPDFSize = 0;
+
+    try {
+
+        for (let i = 0; i < records.length; i++) {
+
+            const [roll, imageBlob] = records[i];
+
+            exportStatus.textContent =
+                "Converting roll " + roll +
+                " (" + (i + 1) + "/" + records.length + ") to PDF...";
+
+            const pdfBlob = await imageToPDF(imageBlob);
+
+            totalPDFSize += pdfBlob.size;
+
+            if (totalPDFSize > MAX_ZIP_SIZE) {
+                throw new Error(
+                    "The generated PDFs exceed the 100 MB ZIP limit."
+                );
+            }
+
+            const baseName = getBaseFileName(cls, roll);
+
+            zip.file(baseName + ".pdf", pdfBlob);
+
+            progressBar.style.width =
+                Math.round(((i + 1) / records.length) * 80) + "%";
+        }
+
+        exportStatus.textContent = "Creating ZIP file...";
+
+        const zipBlob = await zip.generateAsync({
+
+            type: "blob",
+
+            compression: "STORE",
+
+            streamFiles: true
+
+        }, metadata => {
+
+            const percentage = 80 + metadata.percent * 0.2;
+
+            progressBar.style.width =
+                percentage.toFixed(0) + "%";
+
+        });
+
+        if (zipBlob.size > MAX_ZIP_SIZE) {
+            throw new Error("ZIP file exceeds the 100 MB limit.");
+        }
+
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+
+        const zipName =
+            "PRAGATI_" + year + "-" + month +
+            "_C" + cls +
+            "_" + SCHOOL_CODE +
+            "_Batch001.zip";
+
+        const url = URL.createObjectURL(zipBlob);
+
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = zipName;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+        progressBar.style.width = "100%";
+
+        exportStatus.textContent =
+            "ZIP generated successfully: " + zipName +
+            " (" + (zipBlob.size / 1024 / 1024).toFixed(2) + " MB)";
+
+    } catch (error) {
+
+        console.error(error);
+
+        exportStatus.textContent =
+            "Export failed: " + error.message;
+
+        alert("Export failed: " + error.message);
+
+    } finally {
+
+        isExporting = false;
+
+        buttons.forEach(button => {
+            button.disabled = captured[cls].size === 0;
+        });
+
+    }
+}
+
+
+/* ---------------------------------
+   STOP CAMERA ON PAGE EXIT
+---------------------------------- */
+
+window.addEventListener("beforeunload", () => {
+
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+    }
+
+});
+
+})();
+</script>
+
+</body>
+</html>
