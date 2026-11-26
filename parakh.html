@@ -255,8 +255,7 @@ video {
 
 <div class="container">
 
-    <h1>PARAKH OMR Camera</h1>
-    <div class="subtitle">Capture, compress and export student OMR sheets.</div>
+    <h1>PARAKH</h1>
 
     <!-- LIBRARY STATUS -->
     <div class="panel">
@@ -341,13 +340,6 @@ video {
 
     <!-- ZIP EXPORT -->
     <div class="panel">
-        <h2>Export class-wise ZIP</h2>
-
-        <div class="notice">
-            Each photograph will be converted into an individual PDF.
-            The ZIP file will contain PDFs, not JPG photographs.
-            Each JPG is compressed to a maximum of 200 KB before conversion.
-        </div>
 
         <div id="zipRows" style="margin-top:12px;"></div>
 
@@ -360,10 +352,6 @@ video {
         </div>
     </div>
 
-    <div class="info" style="text-align:center;margin:20px 0;">
-        Do not refresh or close this page before downloading your ZIP files.
-        Captured photographs are stored temporarily in browser memory.
-    </div>
 
 </div>
 
@@ -511,7 +499,7 @@ async function loadLibraries() {
 
     if (librariesReady) {
         document.getElementById("exportStatus").textContent =
-            "Libraries ready. You can export your ZIP files.";
+            "Export your ZIP files.";
     } else {
         document.getElementById("exportStatus").textContent =
             "One or more libraries failed to load. Retry before exporting.";
@@ -936,7 +924,7 @@ function renderZipRows() {
 
         const info = document.createElement("div");
         info.className = "zip-row-info";
-        info.textContent = count + " photograph(s) ready";
+        info.textContent = count + " pdf(s) ready";
 
         const button = document.createElement("button");
         button.className = "primary";
