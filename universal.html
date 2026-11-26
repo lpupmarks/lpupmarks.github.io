@@ -618,7 +618,7 @@ function createClassConfiguration() {
         end.id = "end_" + cls;
         end.min = "1";
         end.max = String(MAX_ROLL);
-        end.value = "20";
+        end.value = "100";
         end.placeholder = "End";
 
         row.append(checkbox, label, start, end);
@@ -1003,9 +1003,9 @@ function getBaseFileName(cls, roll) {
     const section = sectionInput.value.trim();
     const medium = mediumInput.value.trim();
 
-    const paddedRoll = String(roll).padStart(2, "0");
+    const paddedRoll = String(roll).padStart(3, "0");
 
-    return udise + "_" +
+    return udise + "_C" +
            cls + "_" +
            section + "_" +
            medium + "_" +
