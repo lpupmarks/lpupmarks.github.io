@@ -523,7 +523,7 @@ const MEDIUM = "01";
 const CLASSES = [2, 6, 8];
 const TOTAL_ROLLS = 20;
 
-const MAX_IMAGE_SIZE = 400 * 1024;
+const MAX_IMAGE_SIZE = 600 * 1024;
 const MAX_ZIP_SIZE = 100 * 1024 * 1024;
 const MAX_IMAGES_PER_ZIP = 250;
 
@@ -693,8 +693,8 @@ async function compressImage(sourceCanvas) {
     let width = sourceCanvas.width;
     let height = sourceCanvas.height;
 
-    const MAX_DIMENSION = 1800;
-    const MIN_DIMENSION = 900;
+    const MAX_DIMENSION = 2400;
+    const MIN_DIMENSION = 1200;
 
     if (Math.max(width, height) > MAX_DIMENSION) {
 
