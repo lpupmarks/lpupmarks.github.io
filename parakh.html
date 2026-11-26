@@ -532,7 +532,7 @@ const SCHOOL_CODE = "18180101002";
 const SECTION = "A";
 const MEDIUM = "01";
 
-const CLASSES = [2, 6, 8];
+const CLASSES = [C2, C6, C8];
 const TOTAL_ROLLS = 20;
 
 const MAX_IMAGE_SIZE = 400 * 1024;
@@ -839,7 +839,7 @@ function getBaseFileName(cls, roll) {
     return SCHOOL_CODE + "_" +
            cls + "_" +
            SECTION + "_" +
-           MEDIUM + "_" +
+           MEDIUM + "_0" +
            paddedRoll;
 }
 
