@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101614">
+
 <title>OMR Camera</title>
 
 <style>
@@ -18,7 +19,9 @@
   --danger: #ff8b8b;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -33,12 +36,6 @@ main {
   padding: 22px 16px 48px;
 }
 
-.top {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
 .eyebrow {
   color: var(--accent);
   font-size: 12px;
@@ -47,9 +44,20 @@ main {
   text-transform: uppercase;
 }
 
-h1 { font-size: 27px; margin: 4px 0; }
-h2 { font-size: 17px; margin: 0 0 12px; }
-p { margin: 6px 0; color: var(--muted); }
+h1 {
+  font-size: 27px;
+  margin: 4px 0;
+}
+
+h2 {
+  font-size: 17px;
+  margin: 0 0 12px;
+}
+
+p {
+  margin: 6px 0;
+  color: var(--muted);
+}
 
 .card {
   background: var(--panel);
@@ -138,10 +146,16 @@ button:disabled {
   margin-top: 10px;
   min-height: 20px;
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
-.status.error { color: var(--danger); }
-.status.good { color: var(--accent); }
+.status.error {
+  color: var(--danger);
+}
+
+.status.good {
+  color: var(--accent);
+}
 
 .progressrow {
   display: flex;
@@ -197,7 +211,9 @@ button:disabled {
   border-bottom: 1px solid var(--line);
 }
 
-.ziprow:last-child { border: 0; }
+.ziprow:last-child {
+  border: 0;
+}
 
 .ziprow small {
   display: block;
@@ -216,12 +232,23 @@ button:disabled {
   color: var(--muted);
 }
 
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
 @media(max-width:430px) {
-  main { padding: 18px 12px 36px; }
-  .card { padding: 14px; }
-  .rolls { grid-template-columns: repeat(5, 1fr); }
+  main {
+    padding: 18px 12px 36px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .rolls {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
   .ziprow {
     align-items: flex-start;
     flex-direction: column;
@@ -234,20 +261,24 @@ button:disabled {
 
 <main>
 
-<header class="top">
-  <div>
-    <div class="eyebrow">School assessment · OMR</div>
-    <h1>OMR Camera</h1>
-    <p>Capture, name and organise OMR photographs.</p>
-  </div>
+<header>
+  <div class="eyebrow">School assessment · OMR</div>
+  <h1>OMR Camera</h1>
+  <p>Capture, compress and organise OMR photographs.</p>
 </header>
 
+
+<!-- STUDENT SELECTION -->
+
 <section class="card">
+
   <h2>1. Select student</h2>
 
   <div class="grid">
+
     <div>
       <label for="classSelect">Class</label>
+
       <select id="classSelect">
         <option value="2">Class 2</option>
         <option value="6">Class 6</option>
@@ -259,38 +290,69 @@ button:disabled {
       <label for="rollSelect">Roll number</label>
       <select id="rollSelect"></select>
     </div>
+
   </div>
 
   <div class="filename" id="filenamePreview"></div>
+
 </section>
 
+
+<!-- CAMERA -->
+
 <section class="card">
+
   <h2>2. Camera</h2>
 
-  <div class="camera" id="cameraBox">
+  <div class="camera">
+
     <div class="placeholder" id="cameraPlaceholder">
       Start the camera to see the live preview.
     </div>
 
-    <video id="video" autoplay playsinline muted class="hidden"></video>
+    <video
+      id="video"
+      autoplay
+      playsinline
+      muted
+      class="hidden">
+    </video>
+
   </div>
 
   <div class="actions">
-    <button id="startBtn">Start rear camera</button>
-    <button id="captureBtn" disabled>Capture photo</button>
-    <button id="stopBtn" class="secondary" disabled>Stop camera</button>
+
+    <button id="startBtn">
+      Start rear camera
+    </button>
+
+    <button id="captureBtn" disabled>
+      Capture photo
+    </button>
+
+    <button id="stopBtn" class="secondary" disabled>
+      Stop camera
+    </button>
+
   </div>
 
   <div class="status" id="cameraStatus" role="status">
     Allow camera access when your browser asks.
   </div>
+
 </section>
+
+
+<!-- PROGRESS -->
 
 <section class="card">
 
   <div class="progressrow">
+
     <h2>3. Capture progress</h2>
+
     <strong id="countText">0 / 20</strong>
+
   </div>
 
   <div class="bar">
@@ -300,25 +362,41 @@ button:disabled {
   <div class="rolls" id="rollGrid"></div>
 
   <p class="note">
-    Green numbers have been captured. Photos are kept in this page's
-    memory until you download the ZIPs. Keep this tab open.
+    Maximum image size: 200 KB.
+    Captured photographs remain in browser memory.
+    Keep this tab open until ZIP files are downloaded.
   </p>
 
 </section>
 
+
+<!-- ZIP GENERATION -->
+
 <section class="card">
 
-  <h2>4. Create class-wise ZIP files</h2>
+  <h2>4. Generate PDF & ZIP files</h2>
 
   <div class="grid" style="margin-bottom:12px">
 
     <div>
-      <label for="monthInput">Assessment month</label>
-      <input id="monthInput" type="month" value="2026-11">
+
+      <label for="monthInput">
+        Assessment month
+      </label>
+
+      <input
+        id="monthInput"
+        type="month"
+        value="2026-11">
+
     </div>
 
     <div>
-      <label for="batchInput">Batch number</label>
+
+      <label for="batchInput">
+        Batch number
+      </label>
+
       <select id="batchInput">
         <option value="001">Batch 001</option>
         <option value="002">Batch 002</option>
@@ -326,6 +404,7 @@ button:disabled {
         <option value="004">Batch 004</option>
         <option value="005">Batch 005</option>
       </select>
+
     </div>
 
   </div>
@@ -335,12 +414,12 @@ button:disabled {
   <div class="status" id="zipStatus" role="status"></div>
 
   <p class="note">
-    Each ZIP contains only the captured JPGs for that class.
-    ZIP generation uses JSZip from a CDN, so an internet connection
-    is required for this step.
+    Each JPG will be converted into an individual PDF.
+    The PDFs will be packaged into a class-wise ZIP.
   </p>
 
 </section>
+
 
 <p class="note">
   School code: 18180000001 · Section: A · Medium code: 01
@@ -348,23 +427,39 @@ button:disabled {
 
 </main>
 
+
+<!-- EXTERNAL LIBRARIES -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+
 
 <script>
 
 (() => {
 
+  // CONFIGURATION
+
   const SCHOOL = '18180000001';
   const SECTION = 'A';
   const MEDIUM = '01';
 
-  const classes = ['2', '6', '8'];
+  const MAX_IMAGE_BYTES = 200 * 1024;
+
+  const MIN_IMAGE_SIDE = 900;
+
+  const CLASSES = ['2', '6', '8'];
+
+
+  // STORAGE
 
   const photos = {
     '2': new Map(),
     '6': new Map(),
     '8': new Map()
   };
+
 
   const $ = id => document.getElementById(id);
 
@@ -373,19 +468,43 @@ button:disabled {
   const video = $('video');
 
   let stream = null;
+  let processing = false;
+
+
+  // HELPERS
 
   const pad = n => String(n).padStart(2, '0');
 
-  // Individual image filename
-  const imageName = (cls, roll) =>
-    `${SCHOOL}_${cls}_${SECTION}_${MEDIUM}_${pad(roll)}.jpg`;
 
-  // ZIP filename
-  const zipName = cls =>
-    `PRAGATI_${$('monthInput').value || 'YYYY-MM'}_C${cls}_${SCHOOL}_Batch${$('batchInput').value}.zip`;
+  // IMAGE FILENAME
+
+  function imageName(cls, roll) {
+
+    return `${SCHOOL}_${cls}_${SECTION}_${MEDIUM}_${pad(roll)}.jpg`;
+
+  }
 
 
-  // Populate roll numbers
+  // PDF FILENAME
+
+  function pdfName(cls, roll) {
+
+    return imageName(cls, roll).replace('.jpg', '.pdf');
+
+  }
+
+
+  // ZIP FILENAME
+
+  function zipName(cls) {
+
+    return `PRAGATI_${$('monthInput').value || 'YYYY-MM'}_C${cls}_${SCHOOL}_Batch${$('batchInput').value}.zip`;
+
+  }
+
+
+  // POPULATE ROLL NUMBERS
+
   function fillRolls() {
 
     const cls = classSelect.value;
@@ -394,29 +513,40 @@ button:disabled {
 
     for (let n = 1; n <= 20; n++) {
 
-      const o = document.createElement('option');
+      const option = document.createElement('option');
 
-      o.value = n;
-      o.textContent = `Roll ${n}${photos[cls].has(n) ? ' ✓' : ''}`;
+      option.value = n;
 
-      rollSelect.append(o);
+      option.textContent =
+        `Roll ${n}${photos[cls].has(n) ? ' ✓' : ''}`;
+
+      rollSelect.append(option);
+
     }
 
     const first = [...Array(20)]
       .map((_, i) => i + 1)
       .find(n => !photos[cls].has(n));
 
-    if (first) rollSelect.value = first;
+    if (first) {
+
+      rollSelect.value = first;
+
+    }
 
     update();
+
   }
 
 
-  // Update progress and interface
+  // UPDATE INTERFACE
+
   function update() {
 
     const cls = classSelect.value;
+
     const roll = Number(rollSelect.value || 1);
+
     const done = photos[cls].size;
 
     $('filenamePreview').textContent =
@@ -425,7 +555,11 @@ button:disabled {
 
     $('countText').textContent = `${done} / 20`;
 
-    $('progressBar').style.width = (done / 20 * 100) + '%';
+    $('progressBar').style.width =
+      (done / 20 * 100) + '%';
+
+
+    // ROLL GRID
 
     $('rollGrid').innerHTML = '';
 
@@ -433,23 +567,32 @@ button:disabled {
 
       const d = document.createElement('div');
 
-      d.className = 'roll' + (photos[cls].has(n) ? ' done' : '');
+      d.className =
+        'roll' + (photos[cls].has(n) ? ' done' : '');
+
       d.textContent = pad(n);
 
       $('rollGrid').append(d);
+
     }
 
-    $('captureBtn').disabled =
-      !stream || photos[cls].has(roll);
 
-    // ZIP download buttons
+    $('captureBtn').disabled =
+      !stream ||
+      processing ||
+      photos[cls].has(roll);
+
+
+    // ZIP BUTTONS
+
     $('zipRows').innerHTML = '';
 
-    classes.forEach(c => {
+    CLASSES.forEach(c => {
 
       const count = photos[c].size;
 
       const row = document.createElement('div');
+
       row.className = 'ziprow';
 
       const info = document.createElement('div');
@@ -462,7 +605,9 @@ button:disabled {
       const btn = document.createElement('button');
 
       btn.className = 'secondary';
-      btn.textContent = 'Download ZIP';
+
+      btn.textContent = 'Generate PDF ZIP';
+
       btn.disabled = count === 0;
 
       btn.addEventListener('click', () => makeZip(c));
@@ -477,10 +622,12 @@ button:disabled {
 
 
   classSelect.addEventListener('change', fillRolls);
+
   rollSelect.addEventListener('change', update);
 
 
-  // Start camera
+  // START CAMERA
+
   $('startBtn').addEventListener('click', async () => {
 
     try {
@@ -488,7 +635,7 @@ button:disabled {
       if (!navigator.mediaDevices?.getUserMedia) {
 
         throw new Error(
-          'Camera access is unavailable. Open this page over HTTPS or localhost in a supported browser.'
+          'Camera access requires HTTPS or localhost.'
         );
 
       }
@@ -514,13 +661,15 @@ button:disabled {
       await video.play();
 
       $('captureBtn').disabled = false;
+
       $('stopBtn').disabled = false;
+
       $('startBtn').disabled = true;
 
       $('cameraStatus').className = 'status good';
 
       $('cameraStatus').textContent =
-        'Rear camera is ready. Keep the entire sheet and all four corner squares in frame.';
+        'Rear camera ready. Keep all four corner squares visible.';
 
       update();
 
@@ -536,7 +685,8 @@ button:disabled {
   });
 
 
-  // Stop camera
+  // STOP CAMERA
+
   $('stopBtn').addEventListener('click', stopCamera);
 
   function stopCamera() {
@@ -556,7 +706,9 @@ button:disabled {
     $('cameraPlaceholder').classList.remove('hidden');
 
     $('captureBtn').disabled = true;
+
     $('stopBtn').disabled = true;
+
     $('startBtn').disabled = false;
 
     update();
@@ -564,13 +716,135 @@ button:disabled {
   }
 
 
-  // Capture photograph
+  // CANVAS TO JPEG
+
+  function canvasToJpeg(canvas, quality) {
+
+    return new Promise(resolve => {
+
+      canvas.toBlob(
+        resolve,
+        'image/jpeg',
+        quality
+      );
+
+    });
+
+  }
+
+
+  // IMAGE COMPRESSION
+  // Strict maximum 200 KB
+
+  async function compressToLimit(sourceCanvas) {
+
+    let width = sourceCanvas.width;
+
+    let height = sourceCanvas.height;
+
+    const maxInitialSide = 1800;
+
+    // Resize initially if required
+
+    if (Math.max(width, height) > maxInitialSide) {
+
+      const scale =
+        maxInitialSide / Math.max(width, height);
+
+      width = Math.round(width * scale);
+
+      height = Math.round(height * scale);
+
+    }
+
+    const canvas = document.createElement('canvas');
+
+    const ctx = canvas.getContext('2d', {
+      alpha: false
+    });
+
+    const qualities = [
+      0.86,
+      0.78,
+      0.70,
+      0.62,
+      0.54,
+      0.46,
+      0.38,
+      0.32
+    ];
+
+
+    while (Math.max(width, height) >= MIN_IMAGE_SIDE) {
+
+      canvas.width = width;
+
+      canvas.height = height;
+
+      ctx.fillStyle = '#ffffff';
+
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.drawImage(
+        sourceCanvas,
+        0,
+        0,
+        width,
+        height
+      );
+
+
+      for (const quality of qualities) {
+
+        const blob = await canvasToJpeg(
+          canvas,
+          quality
+        );
+
+        if (
+          blob &&
+          blob.size <= MAX_IMAGE_BYTES
+        ) {
+
+          return {
+            blob,
+            width,
+            height,
+            quality
+          };
+
+        }
+
+      }
+
+
+      // Reduce dimensions by 12%
+
+      width = Math.floor(width * 0.88);
+
+      height = Math.floor(height * 0.88);
+
+    }
+
+    return null;
+
+  }
+
+
+  // CAPTURE PHOTOGRAPH
+
   $('captureBtn').addEventListener('click', async () => {
 
     const cls = classSelect.value;
+
     const roll = Number(rollSelect.value);
 
-    if (!stream || photos[cls].has(roll)) return;
+    if (
+      !stream ||
+      processing ||
+      photos[cls].has(roll)
+    ) return;
+
 
     if (!video.videoWidth) {
 
@@ -581,124 +855,321 @@ button:disabled {
 
     }
 
-    const canvas = document.createElement('canvas');
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    canvas.getContext('2d').drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-    const blob = await new Promise(resolve =>
-      canvas.toBlob(resolve, 'image/jpeg', 0.96)
-    );
-
-    if (!blob) {
-
-      $('cameraStatus').textContent =
-        'Could not create the photo. Please try again.';
-
-      return;
-
-    }
-
-    photos[cls].set(roll, blob);
-
-    $('cameraStatus').className = 'status good';
-
-    $('cameraStatus').textContent =
-      `Captured ${imageName(cls, roll)} · ${(blob.size / 1024 / 1024).toFixed(2)} MB`;
-
-    const next = [...Array(20)]
-      .map((_, i) => i + 1)
-      .find(n => !photos[cls].has(n));
-
-    fillRolls();
-
-    if (next) rollSelect.value = next;
+    processing = true;
 
     update();
+
+    $('cameraStatus').className = 'status';
+
+    $('cameraStatus').textContent =
+      'Compressing photograph to maximum 200 KB...';
+
+
+    try {
+
+      // Capture camera frame
+
+      const source = document.createElement('canvas');
+
+      source.width = video.videoWidth;
+
+      source.height = video.videoHeight;
+
+      source.getContext('2d', {
+        alpha: false
+      }).drawImage(
+        video,
+        0,
+        0,
+        source.width,
+        source.height
+      );
+
+
+      // Compress photograph
+
+      const result = await compressToLimit(source);
+
+
+      if (!result) {
+
+        throw new Error(
+          'Could not compress below 200 KB while retaining at least 900 pixels on the longest side. Improve lighting and try again.'
+        );
+
+      }
+
+
+      // Store compressed JPG
+
+      photos[cls].set(roll, result.blob);
+
+
+      $('cameraStatus').className = 'status good';
+
+      $('cameraStatus').textContent =
+        `Captured ${imageName(cls, roll)} · ` +
+        `${(result.blob.size / 1024).toFixed(1)} KB · ` +
+        `${result.width} × ${result.height}px`;
+
+
+      // Select next available roll
+
+      const next = [...Array(20)]
+        .map((_, i) => i + 1)
+        .find(n => !photos[cls].has(n));
+
+
+      fillRolls();
+
+      if (next) {
+
+        rollSelect.value = next;
+
+      }
+
+    } catch (e) {
+
+      $('cameraStatus').className = 'status error';
+
+      $('cameraStatus').textContent =
+        e.message || 'Image compression failed.';
+
+    } finally {
+
+      processing = false;
+
+      update();
+
+    }
 
   });
 
 
-  // Generate class-wise ZIP
+  // CONVERT IMAGE TO PDF
+
+  async function createPDF(blob) {
+
+    const { jsPDF } = window.jspdf;
+
+    // Convert JPG to Data URL
+
+    const dataURL = await new Promise((resolve, reject) => {
+
+      const reader = new FileReader();
+
+      reader.onload = () => resolve(reader.result);
+
+      reader.onerror = reject;
+
+      reader.readAsDataURL(blob);
+
+    });
+
+
+    // Read image dimensions
+
+    const img = new Image();
+
+    await new Promise((resolve, reject) => {
+
+      img.onload = resolve;
+
+      img.onerror = reject;
+
+      img.src = dataURL;
+
+    });
+
+
+    const width = img.naturalWidth;
+
+    const height = img.naturalHeight;
+
+
+    // PDF dimensions in points
+    // Preserve original aspect ratio
+
+    const pdfWidth = width * 0.75;
+
+    const pdfHeight = height * 0.75;
+
+
+    const pdf = new jsPDF({
+
+      orientation: width > height
+        ? 'landscape'
+        : 'portrait',
+
+      unit: 'pt',
+
+      format: [pdfWidth, pdfHeight],
+
+      compress: true
+
+    });
+
+
+    // Place image across entire PDF page
+
+    pdf.addImage(
+
+      dataURL,
+
+      'JPEG',
+
+      0,
+
+      0,
+
+      pdfWidth,
+
+      pdfHeight,
+
+      undefined,
+
+      'FAST'
+
+    );
+
+
+    return pdf.output('blob');
+
+  }
+
+
+  // CREATE CLASS-WISE PDF ZIP
+
   async function makeZip(cls) {
 
     const status = $('zipStatus');
 
-    if (typeof JSZip === 'undefined') {
+
+    if (
+      typeof JSZip === 'undefined' ||
+      typeof window.jspdf === 'undefined'
+    ) {
 
       status.className = 'status error';
 
       status.textContent =
-        'ZIP library could not load. Check your internet connection and reload the page.';
+        'PDF/ZIP libraries could not load. Check your internet connection.';
 
       return;
 
     }
+
 
     try {
 
       status.className = 'status';
 
-      status.textContent = `Preparing Class ${cls} ZIP…`;
+      status.textContent =
+        `Preparing Class ${cls} PDFs...`;
+
 
       const zip = new JSZip();
 
-      [...photos[cls].entries()]
-        .sort((a, b) => a[0] - b[0])
-        .forEach(([roll, blob]) => {
+      const entries = [...photos[cls].entries()]
+        .sort((a, b) => a[0] - b[0]);
 
-          zip.file(imageName(cls, roll), blob);
 
-        });
+      // Convert every JPG into an individual PDF
+
+      for (let i = 0; i < entries.length; i++) {
+
+        const [roll, blob] = entries[i];
+
+
+        status.textContent =
+          `Converting Class ${cls}: ${i + 1}/${entries.length}`;
+
+
+        const pdfBlob = await createPDF(blob);
+
+
+        // PDF filename
+
+        const filename = pdfName(cls, roll);
+
+
+        // Add PDF to ZIP
+
+        zip.file(filename, pdfBlob);
+
+      }
+
+
+      // Generate ZIP
+
+      status.textContent =
+        `Creating Class ${cls} ZIP archive...`;
+
 
       const content = await zip.generateAsync({
 
         type: 'blob',
+
+        // JPEG images are already compressed.
+        // PDFs are stored without additional ZIP compression.
+
         compression: 'STORE'
 
       });
+
+
+      // Download ZIP
 
       const url = URL.createObjectURL(content);
 
       const a = document.createElement('a');
 
       a.href = url;
+
       a.download = zipName(cls);
 
-      document.body.append(a);
+      document.body.appendChild(a);
 
       a.click();
 
       a.remove();
 
-      setTimeout(() => URL.revokeObjectURL(url), 30000);
+
+      setTimeout(() => {
+
+        URL.revokeObjectURL(url);
+
+      }, 30000);
+
 
       status.className = 'status good';
 
       status.textContent =
-        `Downloaded ${zipName(cls)} (${photos[cls].size} JPG files).`;
+        `Successfully generated ${zipName(cls)} containing ${entries.length} PDF files. ` +
+        `ZIP size: ${(content.size / 1024 / 1024).toFixed(2)} MB`;
 
-    } catch (e) {
+
+    } catch (error) {
+
+      console.error(error);
 
       status.className = 'status error';
 
-      status.textContent = 'ZIP creation failed: ' + e.message;
+      status.textContent =
+        'PDF/ZIP generation failed: ' + error.message;
 
     }
 
   }
 
 
-  // Initialise
+  // INITIALISE
+
   fillRolls();
+
+
+  // STOP CAMERA WHEN LEAVING PAGE
 
   window.addEventListener('beforeunload', () => {
 
