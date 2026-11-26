@@ -34,6 +34,7 @@ body {
 
 h1 { font-size:23px; margin:5px 0; }
 h2 { font-size:15px; margin:0 0 14px; }
+h3 { font-size:14px; margin:0 0 12px; }
 
 .subtitle {
     color:var(--muted);
@@ -108,7 +109,24 @@ button:disabled {
 .status.error { color:var(--red); }
 .status.loading { color:var(--yellow); }
 
-.class-config {
+.notice {
+    background:#1b241e;
+    border:1px solid #34483a;
+    border-radius:8px;
+    padding:11px;
+    font-size:12px;
+    color:#b7c9bd;
+    line-height:1.6;
+}
+
+.class-card {
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:12px;
+    margin-top:12px;
+}
+
+.section-row {
     display:grid;
     grid-template-columns:35px 1fr 1fr 1fr;
     gap:8px;
@@ -117,20 +135,22 @@ button:disabled {
     border-bottom:1px solid var(--border);
 }
 
-.class-config:last-child { border-bottom:none; }
-
-.class-config input {
-    margin:0;
-    min-width:0;
-    padding:9px;
+.section-row:last-child {
+    border-bottom:none;
 }
 
-.class-config input[type=checkbox] {
+.section-row input {
+    margin:0;
+    min-width:0;
+    padding:9px 5px;
+}
+
+.section-row input[type=checkbox] {
     width:18px;
     height:18px;
 }
 
-.class-label {
+.section-name {
     font-size:13px;
 }
 
@@ -168,16 +188,6 @@ video {
     grid-template-columns:1fr 1fr;
     gap:10px;
     margin-top:12px;
-}
-
-.notice {
-    background:#1b241e;
-    border:1px solid #34483a;
-    border-radius:8px;
-    padding:11px;
-    font-size:12px;
-    color:#b7c9bd;
-    line-height:1.6;
 }
 
 .student-list {
@@ -239,11 +249,13 @@ video {
     transition:width .2s;
 }
 
+.hidden { display:none !important; }
+
 @media(max-width:420px) {
     body { padding:11px; }
     .panel { padding:13px; }
-    .class-config { gap:5px; }
-    .class-config input { padding:8px 5px; }
+    .section-row { gap:5px; }
+    .section-row input { font-size:12px; }
 }
 </style>
 </head>
@@ -258,7 +270,6 @@ video {
 <!-- LIBRARY STATUS -->
 <div class="panel">
     <h2>Library status</h2>
-
     <div id="jszipStatus" class="status loading">JSZip: Waiting...</div>
     <div id="jspdfStatus" class="status loading">jsPDF: Waiting...</div>
 
@@ -268,11 +279,13 @@ video {
     </button>
 </div>
 
-<!-- SCHOOL DETAILS -->
-<div class="panel">
-    <h2>1. School details</h2>
 
-    <label for="udise">UDISE code</label>
+<!-- STEP 1: UDISE -->
+<div class="panel" id="schoolStep">
+    <h2>1. School identification</h2>
+
+    <label for="udise">Enter UDISE code</label>
+
     <input
         type="text"
         id="udise"
@@ -281,65 +294,63 @@ video {
         placeholder="18XXXXXXXXX"
     >
 
-    <label for="section">Section</label>
-    <input type="text" id="section" value="A" maxlength="10">
-
-    <label for="medium">Medium code</label>
-    <input type="text" id="medium" value="01" maxlength="5">
+    <button id="continueButton" class="primary">
+        Continue
+    </button>
 
     <div id="schoolStatus" class="status">
-        Enter your school's UDISE code.
+        Enter your school's 11-digit UDISE code.
     </div>
 </div>
 
-<!-- CLASS CONFIGURATION -->
-<div class="panel">
-    <h2>2. Configure classes and roll ranges</h2>
+
+<!-- STEP 2: CONFIGURATION -->
+<div class="panel hidden" id="configStep">
+
+    <h2>2. Class and section configuration</h2>
 
     <div class="notice">
-        Enable the classes applicable to your school.
-        Set the starting and ending roll numbers for each class.
-        Only the configured roll numbers will appear in the camera section.
+        Select the sections available in your school.
+        Enter the starting and ending roll numbers separately
+        for each selected section.
     </div>
 
-    <div style="display:grid;grid-template-columns:35px 1fr 1fr 1fr;
-                gap:8px;margin-top:16px;">
-        <div></div>
-        <div class="range-heading">CLASS</div>
-        <div class="range-heading">START ROLL</div>
-        <div class="range-heading">END ROLL</div>
-    </div>
-
-    <div id="classConfig"></div>
+    <div id="classConfiguration"></div>
 
     <button id="saveConfig" class="primary" style="margin-top:15px">
         Save configuration
     </button>
 
     <div id="configStatus" class="status">
-        Configure your classes first.
+        Configure your classes and sections.
     </div>
+
 </div>
 
-<!-- CAMERA -->
-<div class="panel">
+
+<!-- STEP 3: CAMERA -->
+<div class="panel hidden" id="cameraStep">
+
     <h2>3. Capture OMR sheets</h2>
 
     <label for="classSelect">Select class</label>
-    <select id="classSelect" disabled>
-        <option value="">Configure classes first</option>
-    </select>
+    <select id="classSelect"></select>
+
+    <label for="sectionSelect">Select section</label>
+    <select id="sectionSelect"></select>
 
     <label for="rollSelect">Select roll number</label>
-    <select id="rollSelect" disabled></select>
+    <select id="rollSelect"></select>
 
     <div class="camera">
+
         <video id="video" autoplay playsinline muted
                style="display:none"></video>
 
         <div id="cameraPlaceholder" class="camera-placeholder">
             Camera is not started.
         </div>
+
     </div>
 
     <div class="grid">
@@ -357,10 +368,13 @@ video {
     </div>
 
     <div id="message" class="status"></div>
+
 </div>
 
+
 <!-- CAPTURED PHOTOS -->
-<div class="panel">
+<div class="panel hidden" id="capturedStep">
+
     <h2>4. Captured photographs</h2>
 
     <div id="captureSummary" class="info">
@@ -369,16 +383,19 @@ video {
 
     <div id="studentList" class="student-list"
          style="margin-top:12px"></div>
+
 </div>
 
+
 <!-- EXPORT -->
-<div class="panel">
+<div class="panel hidden" id="exportStep">
+
     <h2>5. Generate ZIP files</h2>
 
     <div class="notice">
-        Each photograph is converted into an individual PDF.
-        The ZIP contains PDFs only.
-        Each JPG is compressed to a maximum of 400 KB before conversion.
+        Each photograph will be converted into an individual PDF.
+        ZIP files contain PDFs only.
+        Each JPG is compressed to a maximum of 400 KB.
     </div>
 
     <div id="zipRows" style="margin-top:12px"></div>
@@ -390,7 +407,9 @@ video {
     <div id="exportStatus" class="status">
         Ready to export.
     </div>
+
 </div>
+
 
 <div class="info" style="text-align:center;margin:20px 0">
     Do not refresh or close this page before downloading your ZIP files.
@@ -404,7 +423,9 @@ video {
 
 <!-- LIBRARY LOADER -->
 <script>
+
 const librarySources = {
+
     jszip: [
         "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
         "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
@@ -416,18 +437,22 @@ const librarySources = {
         "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",
         "https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"
     ]
+
 };
 
 let librariesLoading = false;
 let librariesReady = false;
 
 function updateLibraryStatus(id, message, type) {
+
     const el = document.getElementById(id);
+
     el.textContent = message;
     el.className = "status " + type;
 }
 
 function loadScript(url) {
+
     return new Promise((resolve, reject) => {
 
         const script = document.createElement("script");
@@ -452,6 +477,7 @@ function loadScript(url) {
         };
 
         document.head.appendChild(script);
+
     });
 }
 
@@ -471,10 +497,15 @@ async function loadOneLibrary(name, sources, check, statusId) {
         );
 
         try {
+
             await loadScript(sources[i]);
 
             if (check()) {
-                updateLibraryStatus(statusId, name + ": Loaded successfully", "ok");
+                updateLibraryStatus(
+                    statusId,
+                    name + ": Loaded successfully",
+                    "ok"
+                );
                 return true;
             }
 
@@ -483,6 +514,7 @@ async function loadOneLibrary(name, sources, check, statusId) {
         } catch (error) {
             console.warn(name, sources[i], error);
         }
+
     }
 
     updateLibraryStatus(
@@ -502,6 +534,7 @@ async function loadLibraries() {
     librariesReady = false;
 
     const button = document.getElementById("retryLibraries");
+
     button.disabled = true;
     button.textContent = "Loading...";
 
@@ -527,6 +560,7 @@ async function loadLibraries() {
     librariesLoading = false;
 
     button.disabled = false;
+
     button.textContent = librariesReady
         ? "Libraries loaded"
         : "Retry library loading";
@@ -535,9 +569,11 @@ async function loadLibraries() {
         librariesReady
         ? "Libraries ready."
         : "Library loading failed. Retry before exporting.";
+
 }
 
 window.omrLibrariesReady = loadLibraries();
+
 </script>
 
 
@@ -547,284 +583,336 @@ window.omrLibrariesReady = loadLibraries();
 
 "use strict";
 
+const CLASSES = [2, 5, 8];
+const SECTIONS = ["A", "B", "C", "D", "E"];
+
 const MAX_IMAGE_SIZE = 400 * 1024;
 const MAX_ZIP_SIZE = 100 * 1024 * 1024;
 const MAX_IMAGES_PER_ZIP = 250;
 const MAX_ROLL = 500;
 
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
+const $ = id => document.getElementById(id);
+
+const video = $("video");
+const canvas = $("canvas");
 const ctx = canvas.getContext("2d");
 
-const udiseInput = document.getElementById("udise");
-const sectionInput = document.getElementById("section");
-const mediumInput = document.getElementById("medium");
-
-const classConfig = document.getElementById("classConfig");
-const classSelect = document.getElementById("classSelect");
-const rollSelect = document.getElementById("rollSelect");
-
-const cameraStatus = document.getElementById("cameraStatus");
-const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-
-const captureButton = document.getElementById("captureButton");
-const startCameraButton = document.getElementById("startCamera");
-
-const message = document.getElementById("message");
-const studentList = document.getElementById("studentList");
-const captureSummary = document.getElementById("captureSummary");
-const zipRows = document.getElementById("zipRows");
-
-const progressBar = document.getElementById("progressBar");
-const exportStatus = document.getElementById("exportStatus");
-
+let udise = "";
 let configurations = {};
 let captured = {};
+
 let cameraStream = null;
 let isExporting = false;
 
 
 /* --------------------------------
-   CLASS CONFIGURATION
+   STEP 1: SCHOOL IDENTIFICATION
 --------------------------------- */
 
-function createClassConfiguration() {
+$("continueButton").addEventListener("click", () => {
 
-    classConfig.innerHTML = "";
+    const code = $("udise").value.trim();
 
-    for (let cls = 1; cls <= 12; cls++) {
+    if (!/^18\d{9}$/.test(code)) {
 
-        const row = document.createElement("div");
-        row.className = "class-config";
+        $("schoolStatus").textContent =
+            "Invalid UDISE code. Enter 11 digits beginning with 18.";
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = "enable_" + cls;
-
-        const label = document.createElement("div");
-        label.className = "class-label";
-        label.textContent = "Class " + cls;
-
-        const start = document.createElement("input");
-        start.type = "number";
-        start.id = "start_" + cls;
-        start.min = "1";
-        start.max = String(MAX_ROLL);
-        start.value = "1";
-        start.placeholder = "Start";
-
-        const end = document.createElement("input");
-        end.type = "number";
-        end.id = "end_" + cls;
-        end.min = "1";
-        end.max = String(MAX_ROLL);
-        end.value = "100";
-        end.placeholder = "End";
-
-        row.append(checkbox, label, start, end);
-        classConfig.appendChild(row);
+        $("schoolStatus").className = "status error";
+        return;
     }
-}
 
-createClassConfiguration();
+    udise = code;
+
+    $("schoolStatus").textContent = "UDISE code accepted.";
+    $("schoolStatus").className = "status ok";
+
+    $("configStep").classList.remove("hidden");
+
+    $("continueButton").disabled = true;
+    $("udise").readOnly = true;
+
+    window.scrollTo({
+        top: $("configStep").offsetTop - 15,
+        behavior: "smooth"
+    });
+
+});
 
 
 /* --------------------------------
-   CONFIGURATION VALIDATION
+   STEP 2: CONFIGURATION UI
 --------------------------------- */
 
-function validateUDISE() {
+function createConfigurationUI() {
 
-    const code = udiseInput.value.trim();
+    const container = $("classConfiguration");
 
-    return /^18\d{9}$/.test(code);
+    CLASSES.forEach(cls => {
+
+        const card = document.createElement("div");
+        card.className = "class-card";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "Class " + cls;
+
+        card.appendChild(heading);
+
+        const header = document.createElement("div");
+        header.className = "section-row";
+
+        header.innerHTML = `
+            <div></div>
+            <div class="range-heading">SECTION</div>
+            <div class="range-heading">START ROLL</div>
+            <div class="range-heading">END ROLL</div>
+        `;
+
+        card.appendChild(header);
+
+        SECTIONS.forEach(section => {
+
+            const row = document.createElement("div");
+            row.className = "section-row";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.id = `enable_${cls}_${section}`;
+
+            const name = document.createElement("div");
+            name.className = "section-name";
+            name.textContent = section;
+
+            const start = document.createElement("input");
+            start.type = "number";
+            start.id = `start_${cls}_${section}`;
+            start.min = "1";
+            start.max = String(MAX_ROLL);
+            start.value = "1";
+            start.placeholder = "Start";
+
+            const end = document.createElement("input");
+            end.type = "number";
+            end.id = `end_${cls}_${section}`;
+            end.min = "1";
+            end.max = String(MAX_ROLL);
+            end.value = "20";
+            end.placeholder = "End";
+
+            row.append(checkbox, name, start, end);
+
+            card.appendChild(row);
+
+        });
+
+        container.appendChild(card);
+
+    });
+
 }
 
-function getEnabledClasses() {
+createConfigurationUI();
 
-    const result = {};
 
-    for (let cls = 1; cls <= 12; cls++) {
-
-        const enabled =
-            document.getElementById("enable_" + cls).checked;
-
-        if (!enabled) continue;
-
-        const start = Number(
-            document.getElementById("start_" + cls).value
-        );
-
-        const end = Number(
-            document.getElementById("end_" + cls).value
-        );
-
-        if (
-            !Number.isInteger(start) ||
-            !Number.isInteger(end) ||
-            start < 1 ||
-            end < start ||
-            end > MAX_ROLL
-        ) {
-            throw new Error(
-                "Invalid roll range for Class " + cls +
-                ". Use numbers between 1 and " + MAX_ROLL + "."
-            );
-        }
-
-        result[cls] = { start, end };
-    }
-
-    if (Object.keys(result).length === 0) {
-        throw new Error("Enable at least one class.");
-    }
-
-    return result;
-}
+/* --------------------------------
+   SAVE CONFIGURATION
+--------------------------------- */
 
 function saveConfiguration() {
 
-    const status = document.getElementById("configStatus");
+    const newConfig = {};
 
     try {
 
-        if (!validateUDISE()) {
-            throw new Error(
-                "Enter a valid 11-digit UDISE code starting with 18."
-            );
+        CLASSES.forEach(cls => {
+
+            const sections = {};
+
+            SECTIONS.forEach(section => {
+
+                const enabled =
+                    $(`enable_${cls}_${section}`).checked;
+
+                if (!enabled) return;
+
+                const start = Number(
+                    $(`start_${cls}_${section}`).value
+                );
+
+                const end = Number(
+                    $(`end_${cls}_${section}`).value
+                );
+
+                if (
+                    !Number.isInteger(start) ||
+                    !Number.isInteger(end) ||
+                    start < 1 ||
+                    end < start ||
+                    end > MAX_ROLL
+                ) {
+                    throw new Error(
+                        `Invalid roll range: Class ${cls}, Section ${section}.`
+                    );
+                }
+
+                sections[section] = { start, end };
+
+            });
+
+            if (Object.keys(sections).length > 0) {
+                newConfig[cls] = sections;
+            }
+
+        });
+
+        if (Object.keys(newConfig).length === 0) {
+            throw new Error("Select at least one class and section.");
         }
 
-        const section = sectionInput.value.trim();
-        const medium = mediumInput.value.trim();
+        // Prevent changing a range that excludes existing captures.
+        Object.keys(captured).forEach(key => {
 
-        if (!section || !medium) {
-            throw new Error("Section and medium code cannot be empty.");
-        }
+            const [cls, section] = key.split("_");
+            const existing = captured[key];
 
-        const newConfigurations = getEnabledClasses();
+            const newRange = newConfig[cls]?.[section];
 
-        // Prevent accidental loss of already captured photographs.
-        for (const cls of Object.keys(captured)) {
-
-            if (!newConfigurations[cls] && captured[cls].size > 0) {
+            if (!newRange && existing.size > 0) {
                 throw new Error(
-                    "Class " + cls +
-                    " already has captured photographs. Remove them before disabling this class."
+                    `Class ${cls}, Section ${section} already contains captures.`
                 );
             }
 
-            if (newConfigurations[cls] && captured[cls]) {
+            if (newRange) {
 
-                const range = newConfigurations[cls];
+                for (const roll of existing.keys()) {
 
-                for (const roll of captured[cls].keys()) {
-                    if (roll < range.start || roll > range.end) {
+                    if (roll < newRange.start || roll > newRange.end) {
                         throw new Error(
-                            "Class " + cls +
-                            " contains captured rolls outside the new range. Remove those photographs first."
+                            `Captured roll ${roll} is outside the new range for Class ${cls}, Section ${section}.`
                         );
                     }
+
                 }
             }
-        }
 
-        configurations = newConfigurations;
+        });
 
-        for (const cls of Object.keys(configurations)) {
-            if (!captured[cls]) {
-                captured[cls] = new Map();
-            }
-        }
+        configurations = newConfig;
 
-        status.textContent =
-            "Configuration saved. " +
-            Object.keys(configurations).length +
-            " class(es) enabled.";
+        Object.keys(configurations).forEach(cls => {
 
-        status.className = "status ok";
+            Object.keys(configurations[cls]).forEach(section => {
 
-        updateSchoolStatus();
+                const key = `${cls}_${section}`;
+
+                if (!captured[key]) {
+                    captured[key] = new Map();
+                }
+
+            });
+
+        });
+
+        $("configStatus").textContent =
+            "Configuration saved successfully.";
+
+        $("configStatus").className = "status ok";
+
+        $("cameraStep").classList.remove("hidden");
+        $("capturedStep").classList.remove("hidden");
+        $("exportStep").classList.remove("hidden");
+
         populateClassSelect();
         renderCaptured();
         renderZipRows();
 
+        window.scrollTo({
+            top: $("cameraStep").offsetTop - 15,
+            behavior: "smooth"
+        });
+
     } catch (error) {
 
-        status.textContent = error.message;
-        status.className = "status error";
+        $("configStatus").textContent = error.message;
+        $("configStatus").className = "status error";
+
     }
+
 }
 
-document.getElementById("saveConfig")
-    .addEventListener("click", saveConfiguration);
-
-function updateSchoolStatus() {
-
-    const el = document.getElementById("schoolStatus");
-
-    if (validateUDISE()) {
-        el.textContent = "UDISE code looks valid.";
-        el.className = "status ok";
-    } else {
-        el.textContent = "Enter an 11-digit UDISE code starting with 18.";
-        el.className = "status error";
-    }
-}
-
-udiseInput.addEventListener("input", updateSchoolStatus);
+$("saveConfig").addEventListener("click", saveConfiguration);
 
 
 /* --------------------------------
-   CLASS AND ROLL SELECTORS
+   CLASS / SECTION / ROLL SELECTORS
 --------------------------------- */
 
 function populateClassSelect() {
 
-    classSelect.innerHTML = "";
+    const select = $("classSelect");
 
-    const classes = Object.keys(configurations)
+    select.innerHTML = "";
+
+    Object.keys(configurations)
         .map(Number)
-        .sort((a, b) => a - b);
+        .sort((a, b) => a - b)
+        .forEach(cls => {
 
-    if (!classes.length) {
+            const option = document.createElement("option");
 
-        classSelect.disabled = true;
-        rollSelect.disabled = true;
+            option.value = cls;
+            option.textContent = "Class " + cls;
 
-        classSelect.innerHTML =
-            '<option value="">Configure classes first</option>';
+            select.appendChild(option);
 
-        rollSelect.innerHTML = "";
+        });
 
-        return;
-    }
+    populateSectionSelect();
 
-    classSelect.disabled = false;
+}
 
-    classes.forEach(cls => {
+function populateSectionSelect() {
+
+    const cls = $("classSelect").value;
+    const select = $("sectionSelect");
+
+    select.innerHTML = "";
+
+    Object.keys(configurations[cls] || {}).forEach(section => {
 
         const option = document.createElement("option");
-        option.value = cls;
-        option.textContent = "Class " + cls;
 
-        classSelect.appendChild(option);
+        option.value = section;
+        option.textContent = "Section " + section;
+
+        select.appendChild(option);
+
     });
 
     populateRollSelect();
+
+}
+
+function getCurrentKey() {
+
+    return `${$("classSelect").value}_${$("sectionSelect").value}`;
 }
 
 function populateRollSelect() {
 
-    const cls = classSelect.value;
+    const cls = $("classSelect").value;
+    const section = $("sectionSelect").value;
 
-    rollSelect.innerHTML = "";
+    const select = $("rollSelect");
 
-    if (!cls || !configurations[cls]) {
-        rollSelect.disabled = true;
-        return;
-    }
+    select.innerHTML = "";
 
-    const range = configurations[cls];
+    const range = configurations[cls]?.[section];
+
+    if (!range) return;
+
+    const records = captured[getCurrentKey()];
 
     for (let roll = range.start; roll <= range.end; roll++) {
 
@@ -833,26 +921,29 @@ function populateRollSelect() {
         option.value = roll;
         option.textContent = "Roll " + roll;
 
-        if (captured[cls] && captured[cls].has(roll)) {
+        if (records?.has(roll)) {
             option.textContent += " (Captured)";
             option.disabled = true;
         }
 
-        rollSelect.appendChild(option);
+        select.appendChild(option);
+
     }
 
-    const firstAvailable = [...rollSelect.options]
-        .find(option => !option.disabled);
+    const next = [...select.options].find(option => !option.disabled);
 
-    if (firstAvailable) {
-        rollSelect.value = firstAvailable.value;
-        rollSelect.disabled = false;
-    } else {
-        rollSelect.disabled = true;
+    if (next) {
+        select.value = next.value;
     }
+
 }
 
-classSelect.addEventListener("change", () => {
+$("classSelect").addEventListener("change", () => {
+    populateSectionSelect();
+    renderCaptured();
+});
+
+$("sectionSelect").addEventListener("change", () => {
     populateRollSelect();
     renderCaptured();
 });
@@ -864,13 +955,12 @@ classSelect.addEventListener("change", () => {
 
 async function startCamera() {
 
-    if (!navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia) {
+    if (!navigator.mediaDevices?.getUserMedia) {
 
-        cameraStatus.textContent =
+        $("cameraStatus").textContent =
             "Camera requires HTTPS or localhost.";
 
-        cameraStatus.className = "status error";
+        $("cameraStatus").className = "status error";
         return;
     }
 
@@ -880,8 +970,8 @@ async function startCamera() {
             cameraStream.getTracks().forEach(track => track.stop());
         }
 
-        cameraStatus.textContent = "Starting camera...";
-        cameraStatus.className = "status loading";
+        $("cameraStatus").textContent = "Starting camera...";
+        $("cameraStatus").className = "status loading";
 
         cameraStream = await navigator.mediaDevices.getUserMedia({
 
@@ -899,27 +989,27 @@ async function startCamera() {
         await video.play();
 
         video.style.display = "block";
-        cameraPlaceholder.style.display = "none";
+        $("cameraPlaceholder").style.display = "none";
 
-        captureButton.disabled = false;
+        $("captureButton").disabled = false;
 
-        cameraStatus.textContent = "Camera is ready.";
-        cameraStatus.className = "status ok";
+        $("cameraStatus").textContent = "Camera is ready.";
+        $("cameraStatus").className = "status ok";
 
-        startCameraButton.textContent = "Restart camera";
+        $("startCamera").textContent = "Restart camera";
 
     } catch (error) {
 
         console.error(error);
 
-        cameraStatus.textContent =
-            "Camera error: " + error.message;
+        $("cameraStatus").textContent = error.message;
+        $("cameraStatus").className = "status error";
 
-        cameraStatus.className = "status error";
     }
+
 }
 
-startCameraButton.addEventListener("click", startCamera);
+$("startCamera").addEventListener("click", startCamera);
 
 
 /* --------------------------------
@@ -936,7 +1026,9 @@ function canvasToBlob(source, quality) {
             else reject(new Error("Image conversion failed."));
 
         }, "image/jpeg", quality);
+
     });
+
 }
 
 async function compressImage(sourceCanvas) {
@@ -953,6 +1045,7 @@ async function compressImage(sourceCanvas) {
 
         width = Math.round(width * ratio);
         height = Math.round(height * ratio);
+
     }
 
     const workCanvas = document.createElement("canvas");
@@ -979,17 +1072,18 @@ async function compressImage(sourceCanvas) {
             if (blob.size <= MAX_IMAGE_SIZE) {
                 return blob;
             }
+
         }
 
         if (Math.max(width, height) <= MIN_DIMENSION) {
-            throw new Error(
-                "Could not compress image below 400 KB."
-            );
+            throw new Error("Could not compress image below 400 KB.");
         }
 
         width = Math.round(width * 0.88);
         height = Math.round(height * 0.88);
+
     }
+
 }
 
 
@@ -997,19 +1091,12 @@ async function compressImage(sourceCanvas) {
    FILE NAMING
 --------------------------------- */
 
-function getBaseFileName(cls, roll) {
-
-    const udise = udiseInput.value.trim();
-    const section = sectionInput.value.trim();
-    const medium = mediumInput.value.trim();
+function getBaseFileName(cls, section, roll) {
 
     const paddedRoll = String(roll).padStart(3, "0");
 
-    return udise + "_C" +
-           cls + "_" +
-           section + "_" +
-           medium + "_" +
-           paddedRoll;
+    return `${udise}_C${cls}_${section}_01_${paddedRoll}`;
+
 }
 
 
@@ -1017,97 +1104,91 @@ function getBaseFileName(cls, roll) {
    CAPTURE
 --------------------------------- */
 
-captureButton.addEventListener("click", async () => {
+$("captureButton").addEventListener("click", async () => {
 
-    const cls = classSelect.value;
-    const roll = Number(rollSelect.value);
+    const cls = $("classSelect").value;
+    const section = $("sectionSelect").value;
+    const roll = Number($("rollSelect").value);
 
-    if (!cls || !configurations[cls]) {
-        alert("Configure your classes first.");
-        return;
-    }
+    const key = getCurrentKey();
 
     if (!cameraStream || !video.videoWidth) {
         alert("Please start the camera first.");
         return;
     }
 
-    if (captured[cls].has(roll)) {
-        alert("This roll number has already been captured.");
+    if (!roll) {
+        alert("No available roll number.");
         return;
     }
 
-    captureButton.disabled = true;
+    if (captured[key].has(roll)) {
+        alert("This roll has already been captured.");
+        return;
+    }
 
-    message.textContent = "Capturing and compressing...";
-    message.className = "status loading";
+    $("captureButton").disabled = true;
+
+    $("message").textContent = "Capturing and compressing...";
+    $("message").className = "status loading";
 
     try {
 
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        ctx.drawImage(
-            video, 0, 0, canvas.width, canvas.height
-        );
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         const blob = await compressImage(canvas);
 
-        captured[cls].set(roll, blob);
+        captured[key].set(roll, blob);
 
-        message.textContent =
-            "Captured successfully. " +
-            (blob.size / 1024).toFixed(1) + " KB";
+        $("message").textContent =
+            `Captured successfully. ${(blob.size / 1024).toFixed(1)} KB`;
 
-        message.className = "status ok";
+        $("message").className = "status ok";
 
         populateRollSelect();
         renderCaptured();
         renderZipRows();
 
-        // Automatically select the next available roll.
-        const nextAvailable = [...rollSelect.options]
-            .find(option => !option.disabled);
-
-        if (nextAvailable) {
-            rollSelect.value = nextAvailable.value;
-        }
-
     } catch (error) {
 
         console.error(error);
 
-        message.textContent = error.message;
-        message.className = "status error";
+        $("message").textContent = error.message;
+        $("message").className = "status error";
 
     } finally {
 
-        captureButton.disabled = false;
+        $("captureButton").disabled = false;
+
     }
+
 });
 
 
 /* --------------------------------
-   CAPTURE LIST
+   CAPTURED PHOTOS LIST
 --------------------------------- */
 
 function renderCaptured() {
 
-    studentList.innerHTML = "";
+    const cls = $("classSelect").value;
+    const section = $("sectionSelect").value;
 
-    const cls = classSelect.value;
+    const key = `${cls}_${section}`;
 
-    if (!cls || !captured[cls]) {
-        captureSummary.textContent = "No photographs captured yet.";
-        return;
-    }
+    const records = captured[key];
 
-    const records = captured[cls];
+    const list = $("studentList");
 
-    if (!records.size) {
+    list.innerHTML = "";
 
-        studentList.innerHTML =
-            '<div class="info">No photographs captured for this class.</div>';
+    if (!records || records.size === 0) {
+
+        list.innerHTML =
+            '<div class="info">No photographs captured for this section.</div>';
 
     } else {
 
@@ -1121,17 +1202,19 @@ function renderCaptured() {
                 const details = document.createElement("div");
 
                 const title = document.createElement("strong");
-                title.textContent = "Roll " + roll;
+                title.textContent = `Roll ${roll}`;
 
                 const small = document.createElement("small");
+
                 small.textContent =
-                    getBaseFileName(cls, roll) +
+                    getBaseFileName(cls, section, roll) +
                     ".jpg · " +
                     (blob.size / 1024).toFixed(1) + " KB";
 
                 details.append(title, small);
 
                 const remove = document.createElement("button");
+
                 remove.className = "danger small";
                 remove.textContent = "Remove";
 
@@ -1144,12 +1227,16 @@ function renderCaptured() {
                         populateRollSelect();
                         renderCaptured();
                         renderZipRows();
+
                     }
+
                 });
 
                 row.append(details, remove);
-                studentList.appendChild(row);
+                list.appendChild(row);
+
             });
+
     }
 
     let total = 0;
@@ -1158,9 +1245,9 @@ function renderCaptured() {
         total += map.size;
     });
 
-    captureSummary.textContent =
-        "Current class: " + records.size +
-        " captured. Total across school: " + total + ".";
+    $("captureSummary").textContent =
+        `Current section: ${records?.size || 0} captured. Total across school: ${total}.`;
+
 }
 
 
@@ -1170,36 +1257,50 @@ function renderCaptured() {
 
 function renderZipRows() {
 
-    zipRows.innerHTML = "";
+    const container = $("zipRows");
+
+    container.innerHTML = "";
 
     Object.keys(configurations)
         .map(Number)
         .sort((a, b) => a - b)
         .forEach(cls => {
 
-            const count = captured[cls]?.size || 0;
+            let count = 0;
+
+            Object.keys(configurations[cls]).forEach(section => {
+
+                const key = `${cls}_${section}`;
+
+                count += captured[key]?.size || 0;
+
+            });
 
             const row = document.createElement("div");
             row.className = "zip-row";
 
             const title = document.createElement("div");
             title.className = "zip-row-title";
-            title.textContent = "Class " + cls;
+            title.textContent = `Class ${cls}`;
 
             const info = document.createElement("div");
             info.className = "zip-row-info";
-            info.textContent = count + " photograph(s) ready";
+            info.textContent = `${count} photograph(s) ready`;
 
             const button = document.createElement("button");
+
             button.className = "primary";
-            button.textContent = "Generate Class " + cls + " ZIP";
+            button.textContent = `Generate Class ${cls} ZIP`;
             button.disabled = count === 0 || isExporting;
 
             button.addEventListener("click", () => makeZip(cls));
 
             row.append(title, info, button);
-            zipRows.appendChild(row);
+
+            container.appendChild(row);
+
         });
+
 }
 
 
@@ -1214,12 +1315,15 @@ async function blobToDataURL(blob) {
         const reader = new FileReader();
 
         reader.onload = () => resolve(reader.result);
+
         reader.onerror = () => reject(
             new Error("Unable to read image.")
         );
 
         reader.readAsDataURL(blob);
+
     });
+
 }
 
 async function imageToPDF(imageBlob) {
@@ -1233,11 +1337,13 @@ async function imageToPDF(imageBlob) {
     await new Promise((resolve, reject) => {
 
         image.onload = resolve;
+
         image.onerror = () => reject(
             new Error("Could not load captured image.")
         );
 
         image.src = dataURL;
+
     });
 
     const imageWidth = image.naturalWidth;
@@ -1247,6 +1353,7 @@ async function imageToPDF(imageBlob) {
     const pageHeight = pageWidth * imageHeight / imageWidth;
 
     const pdf = new jsPDF({
+
         orientation: pageWidth > pageHeight
             ? "landscape"
             : "portrait",
@@ -1254,6 +1361,7 @@ async function imageToPDF(imageBlob) {
         unit: "mm",
         format: [pageWidth, pageHeight],
         compress: true
+
     });
 
     pdf.addImage(
@@ -1268,6 +1376,7 @@ async function imageToPDF(imageBlob) {
     );
 
     return pdf.output("blob");
+
 }
 
 
@@ -1287,19 +1396,43 @@ async function makeZip(cls) {
         !window.jspdf ||
         !window.jspdf.jsPDF) {
 
-        alert(
-            "PDF/ZIP libraries could not load. " +
-            "Check your internet connection."
-        );
-
+        alert("PDF/ZIP libraries could not load. Check your internet connection.");
         return;
+
     }
 
-    const records = [...captured[cls].entries()]
-        .sort((a, b) => a[0] - b[0]);
+    const records = [];
+
+    Object.keys(configurations[cls]).forEach(section => {
+
+        const key = `${cls}_${section}`;
+
+        if (!captured[key]) return;
+
+        [...captured[key].entries()].forEach(([roll, blob]) => {
+
+            records.push({
+                section,
+                roll,
+                blob
+            });
+
+        });
+
+    });
+
+    records.sort((a, b) => {
+
+        if (a.section !== b.section) {
+            return a.section.localeCompare(b.section);
+        }
+
+        return a.roll - b.roll;
+
+    });
 
     if (!records.length) {
-        alert("No photographs available.");
+        alert("No photographs available for this class.");
         return;
     }
 
@@ -1311,7 +1444,7 @@ async function makeZip(cls) {
     isExporting = true;
     renderZipRows();
 
-    progressBar.style.width = "0%";
+    $("progressBar").style.width = "0%";
 
     const zip = new window.JSZip();
 
@@ -1321,13 +1454,12 @@ async function makeZip(cls) {
 
         for (let i = 0; i < records.length; i++) {
 
-            const [roll, imageBlob] = records[i];
+            const item = records[i];
 
-            exportStatus.textContent =
-                "Converting roll " + roll +
-                " (" + (i + 1) + "/" + records.length + ") to PDF...";
+            $("exportStatus").textContent =
+                `Converting Section ${item.section}, Roll ${item.roll} (${i + 1}/${records.length})...`;
 
-            const pdfBlob = await imageToPDF(imageBlob);
+            const pdfBlob = await imageToPDF(item.blob);
 
             totalPDFSize += pdfBlob.size;
 
@@ -1335,15 +1467,17 @@ async function makeZip(cls) {
                 throw new Error("PDF files exceed the 100 MB limit.");
             }
 
-            const filename = getBaseFileName(cls, roll) + ".pdf";
+            const filename =
+                getBaseFileName(cls, item.section, item.roll) + ".pdf";
 
             zip.file(filename, pdfBlob);
 
-            progressBar.style.width =
+            $("progressBar").style.width =
                 Math.round(((i + 1) / records.length) * 80) + "%";
+
         }
 
-        exportStatus.textContent = "Creating ZIP file...";
+        $("exportStatus").textContent = "Creating ZIP file...";
 
         const zipBlob = await zip.generateAsync({
 
@@ -1353,8 +1487,9 @@ async function makeZip(cls) {
 
         }, metadata => {
 
-            progressBar.style.width =
+            $("progressBar").style.width =
                 (80 + metadata.percent * 0.2).toFixed(0) + "%";
+
         });
 
         if (zipBlob.size > MAX_ZIP_SIZE) {
@@ -1367,10 +1502,7 @@ async function makeZip(cls) {
         const month = String(now.getMonth() + 1).padStart(2, "0");
 
         const zipName =
-            "PRAGATI_" + year + "-" + month +
-            "_C" + cls +
-            "_" + udiseInput.value.trim() +
-            "_Batch001.zip";
+            `PRAGATI_${year}-${month}_C${cls}_${udise}_Batch001.zip`;
 
         const url = URL.createObjectURL(zipBlob);
 
@@ -1385,17 +1517,17 @@ async function makeZip(cls) {
 
         setTimeout(() => URL.revokeObjectURL(url), 60000);
 
-        progressBar.style.width = "100%";
+        $("progressBar").style.width = "100%";
 
-        exportStatus.textContent =
-            "Successfully generated " + zipName +
-            " (" + (zipBlob.size / 1024 / 1024).toFixed(2) + " MB)";
+        $("exportStatus").textContent =
+            `Successfully generated ${zipName} (${(zipBlob.size / 1024 / 1024).toFixed(2)} MB)`;
 
     } catch (error) {
 
         console.error(error);
 
-        exportStatus.textContent = "Export failed: " + error.message;
+        $("exportStatus").textContent =
+            "Export failed: " + error.message;
 
         alert("Export failed: " + error.message);
 
@@ -1403,7 +1535,9 @@ async function makeZip(cls) {
 
         isExporting = false;
         renderZipRows();
+
     }
+
 }
 
 
@@ -1416,6 +1550,7 @@ window.addEventListener("beforeunload", () => {
     if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
     }
+
 });
 
 })();
