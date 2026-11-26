@@ -2,586 +2,386 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Universal OMR Camera</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMR Camera</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
 :root {
-    --bg:#0b100e;
-    --panel:#121a16;
-    --border:#29372f;
-    --text:#e7eee9;
-    --muted:#8c9b91;
-    --green:#70d69a;
-    --red:#ff7777;
-    --yellow:#f1c66d;
+    --bg: #101311;
+    --panel: #191e1a;
+    --border: #303a32;
+    --text: #e8eee9;
+    --muted: #9ba99e;
+    --green: #8ed6a1;
+    --danger: #f18b8b;
 }
 
-* { box-sizing:border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
-    margin:0;
-    padding:16px;
-    background:var(--bg);
-    color:var(--text);
-    font-family:Arial,sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
 }
 
 .container {
-    max-width:680px;
-    margin:auto;
+    max-width: 760px;
+    margin: auto;
 }
 
-h1 { font-size:23px; margin:5px 0; }
-h2 { font-size:15px; margin:0 0 14px; }
-h3 { font-size:14px; margin:0 0 12px; }
+h1 {
+    font-size: 23px;
+    margin: 8px 0;
+}
 
-.subtitle {
-    color:var(--muted);
-    font-size:13px;
-    margin-bottom:20px;
+h2 {
+    font-size: 17px;
+    margin: 0 0 15px;
+}
+
+p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 .panel {
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:16px;
-    margin-bottom:15px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 16px;
 }
 
 label {
-    display:block;
-    font-size:12px;
-    color:var(--muted);
-    margin-bottom:7px;
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 7px;
 }
 
-input, select, button {
-    width:100%;
-    padding:12px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    background:#0c130f;
-    color:var(--text);
-    font-size:14px;
+input, select {
+    width: 100%;
+    padding: 12px;
+    background: #101511;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 15px;
+    outline: none;
 }
 
-input { margin-bottom:12px; }
+input:focus, select:focus {
+    border-color: var(--green);
+}
 
 button {
-    cursor:pointer;
-    font-weight:600;
+    border: 0;
+    border-radius: 7px;
+    padding: 12px 16px;
+    background: var(--green);
+    color: #102015;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 button:disabled {
-    opacity:.4;
-    cursor:not-allowed;
+    opacity: .4;
+    cursor: not-allowed;
 }
 
-.primary {
-    background:#1e7545;
-    border-color:#1e7545;
-    color:white;
+.secondary {
+    background: #303b33;
+    color: var(--text);
 }
-
-.secondary { background:#202c25; }
 
 .danger {
-    background:#492323;
-    border-color:#633131;
-    color:#ffb4b4;
+    background: #472929;
+    color: #ffb5b5;
 }
 
-.small {
-    width:auto;
-    padding:7px 10px;
-    font-size:12px;
+.small-btn {
+    padding: 8px 11px;
+    font-size: 12px;
 }
 
-.info, .status {
-    font-size:12px;
-    color:var(--muted);
-    line-height:1.7;
-}
-
-.status.ok { color:var(--green); }
-.status.error { color:var(--red); }
-.status.loading { color:var(--yellow); }
-
-.notice {
-    background:#1b241e;
-    border:1px solid #34483a;
-    border-radius:8px;
-    padding:11px;
-    font-size:12px;
-    color:#b7c9bd;
-    line-height:1.6;
+.hidden {
+    display: none !important;
 }
 
 .class-card {
-    border:1px solid var(--border);
-    border-radius:9px;
-    padding:12px;
-    margin-top:12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 14px;
+    margin-top: 13px;
+}
+
+.class-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.class-heading strong {
+    font-size: 15px;
 }
 
 .section-row {
-    display:grid;
-    grid-template-columns:35px 1fr 1fr 1fr;
-    gap:8px;
-    align-items:center;
-    padding:9px 0;
-    border-bottom:1px solid var(--border);
+    background: #111712;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
 }
 
-.section-row:last-child {
-    border-bottom:none;
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: bold;
 }
 
-.section-row input {
-    margin:0;
-    min-width:0;
-    padding:9px 5px;
+.range-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
 
-.section-row input[type=checkbox] {
-    width:18px;
-    height:18px;
+.add-section {
+    margin-top: 11px;
+    width: 100%;
+    background: transparent;
+    border: 1px dashed #526456;
+    color: var(--green);
 }
 
-.section-name {
-    font-size:13px;
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
 }
 
-.range-heading {
-    font-size:10px;
-    color:var(--muted);
-    text-align:center;
-}
-
-.camera {
-    background:#000;
-    border-radius:9px;
-    overflow:hidden;
-    min-height:180px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.actions button {
+    flex: 1;
 }
 
 video {
-    width:100%;
-    max-height:440px;
-    object-fit:contain;
+    width: 100%;
+    max-height: 440px;
+    object-fit: contain;
+    background: #000;
+    border-radius: 9px;
+    margin-top: 10px;
 }
 
-.camera-placeholder {
-    color:#77847b;
-    font-size:13px;
-    padding:35px;
-    text-align:center;
+.status {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.5;
 }
 
-.grid {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:12px;
+.status.error {
+    color: var(--danger);
 }
 
-.student-list {
-    display:flex;
-    flex-direction:column;
-    gap:8px;
+.status.success {
+    color: var(--green);
 }
 
-.student {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    padding:10px;
-    background:#0c130f;
-    border:1px solid var(--border);
-    border-radius:8px;
-    font-size:13px;
+.captured-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
 }
 
-.student small {
-    display:block;
-    color:var(--muted);
-    margin-top:4px;
-    word-break:break-all;
+.captured-item:last-child {
+    border-bottom: 0;
 }
 
-.zip-row {
-    padding:13px 0;
-    border-bottom:1px solid var(--border);
-}
-
-.zip-row:last-child { border-bottom:none; }
-
-.zip-row-title {
-    font-size:14px;
-    font-weight:bold;
-    margin-bottom:5px;
-}
-
-.zip-row-info {
-    font-size:12px;
-    color:var(--muted);
-    margin-bottom:10px;
-}
-
-.progress-track {
-    height:7px;
-    background:#26332b;
-    border-radius:10px;
-    overflow:hidden;
-    margin-top:12px;
+.progress {
+    height: 6px;
+    background: #303a32;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 12px;
 }
 
 .progress-bar {
-    height:100%;
-    width:0%;
-    background:var(--green);
-    transition:width .2s;
+    height: 100%;
+    width: 0%;
+    background: var(--green);
+    transition: width .2s;
 }
 
-.hidden { display:none !important; }
+.note {
+    padding: 11px;
+    background: #222b24;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin-top: 12px;
+}
 
-@media(max-width:420px) {
-    body { padding:11px; }
-    .panel { padding:13px; }
-    .section-row { gap:5px; }
-    .section-row input { font-size:12px; }
+@media(max-width: 480px) {
+    body {
+        padding: 13px;
+    }
+
+    .panel {
+        padding: 14px;
+    }
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<h1>Universal OMR Camera</h1>
-<div class="subtitle">School-wise OMR capture and ZIP generator</div>
-
-<!-- LIBRARY STATUS -->
-<div class="panel">
-    <h2>Library status</h2>
-    <div id="jszipStatus" class="status loading">JSZip: Waiting...</div>
-    <div id="jspdfStatus" class="status loading">jsPDF: Waiting...</div>
-
-    <button id="retryLibraries" class="secondary small"
-            style="margin-top:10px" onclick="loadLibraries()">
-        Retry library loading
-    </button>
-</div>
-
+<header>
+    <h1>OMR Camera</h1>
+    <p>Capture, organise and export OMR answer sheets.</p>
+</header>
 
 <!-- STEP 1: UDISE -->
-<div class="panel" id="schoolStep">
-    <h2>1. School identification</h2>
+<div class="panel" id="udisePanel">
+    <h2>School details</h2>
 
-    <label for="udise">Enter UDISE code</label>
-
+    <label for="udiseInput">UDISE Code</label>
     <input
+        id="udiseInput"
         type="text"
-        id="udise"
         inputmode="numeric"
         maxlength="11"
         placeholder="18XXXXXXXXX"
     >
 
-    <button id="continueButton" class="primary">
-        Continue
-    </button>
-
-    <div id="schoolStatus" class="status">
-        Enter your school's 11-digit UDISE code.
+    <div class="actions">
+        <button onclick="continueToConfiguration()">Continue</button>
     </div>
+
+    <div id="udiseError" class="status error"></div>
 </div>
 
 
 <!-- STEP 2: CONFIGURATION -->
-<div class="panel hidden" id="configStep">
+<div id="configurationPanel" class="hidden">
 
-    <h2>2. Class and section configuration</h2>
+    <div class="panel">
+        <h2>Section configuration</h2>
+        <p>
+            Select the sections available in your school and enter
+            the roll-number range for each section.
+        </p>
 
-    <div class="notice">
-        Select the sections available in your school.
-        Enter the starting and ending roll numbers separately
-        for each selected section.
-    </div>
+        <div id="classConfigurations"></div>
 
-    <div id="classConfiguration"></div>
+        <div class="actions">
+            <button onclick="saveConfiguration()">Save configuration</button>
+        </div>
 
-    <button id="saveConfig" class="primary" style="margin-top:15px">
-        Save configuration
-    </button>
-
-    <div id="configStatus" class="status">
-        Configure your classes and sections.
+        <div id="configStatus" class="status"></div>
     </div>
 
 </div>
 
 
 <!-- STEP 3: CAMERA -->
-<div class="panel hidden" id="cameraStep">
+<div id="cameraPanel" class="hidden">
 
-    <h2>3. Capture OMR sheets</h2>
+    <div class="panel">
+        <h2>Capture answer sheets</h2>
 
-    <label for="classSelect">Select class</label>
-    <select id="classSelect"></select>
+        <div class="range-grid">
+            <div>
+                <label for="classSelect">Class</label>
+                <select id="classSelect" onchange="populateSectionSelect()"></select>
+            </div>
 
-    <label for="sectionSelect">Select section</label>
-    <select id="sectionSelect"></select>
-
-    <label for="rollSelect">Select roll number</label>
-    <select id="rollSelect"></select>
-
-    <div class="camera">
-
-        <video id="video" autoplay playsinline muted
-               style="display:none"></video>
-
-        <div id="cameraPlaceholder" class="camera-placeholder">
-            Camera is not started.
+            <div>
+                <label for="sectionSelect">Section</label>
+                <select id="sectionSelect" onchange="populateRollSelect()"></select>
+            </div>
         </div>
 
+        <div style="margin-top:12px">
+            <label for="rollSelect">Roll number</label>
+            <select id="rollSelect"></select>
+        </div>
+
+        <video id="video" autoplay playsinline></video>
+
+        <div class="actions">
+            <button class="secondary" onclick="startCamera()">Start camera</button>
+            <button id="captureBtn" onclick="captureImage()" disabled>Capture</button>
+        </div>
+
+        <div id="cameraStatus" class="status"></div>
+
+        <div class="note">
+            Keep the answer sheet properly aligned and ensure sufficient lighting.
+            Captured images are stored temporarily in this browser.
+            Do not refresh or close the page before exporting your ZIP files.
+        </div>
     </div>
 
-    <div class="grid">
-        <button id="startCamera" class="secondary">
-            Start camera
-        </button>
 
-        <button id="captureButton" class="primary" disabled>
-            Capture photo
-        </button>
+    <!-- CAPTURED FILES -->
+    <div class="panel">
+        <h2>Captured files</h2>
+
+        <div id="captureSummary" class="status">
+            No images captured yet.
+        </div>
+
+        <div id="capturedList"></div>
     </div>
 
-    <div id="cameraStatus" class="status">
-        Camera is stopped.
-    </div>
 
-    <div id="message" class="status"></div>
+    <!-- EXPORT -->
+    <div class="panel">
+        <h2>Export ZIP files</h2>
 
-</div>
+        <p>
+            Separate ZIP files will be generated for Classes 2, 5 and 8.
+            Each ZIP will contain individual PDF files.
+        </p>
 
+        <button id="exportBtn" onclick="exportZIPs()">Generate ZIP files</button>
 
-<!-- CAPTURED PHOTOS -->
-<div class="panel hidden" id="capturedStep">
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
 
-    <h2>4. Captured photographs</h2>
-
-    <div id="captureSummary" class="info">
-        No photographs captured yet.
-    </div>
-
-    <div id="studentList" class="student-list"
-         style="margin-top:12px"></div>
-
-</div>
-
-
-<!-- EXPORT -->
-<div class="panel hidden" id="exportStep">
-
-    <h2>5. Generate ZIP files</h2>
-
-    <div class="notice">
-        Each photograph will be converted into an individual PDF.
-        ZIP files contain PDFs only.
-        Each JPG is compressed to a maximum of 400 KB.
-    </div>
-
-    <div id="zipRows" style="margin-top:12px"></div>
-
-    <div class="progress-track">
-        <div id="progressBar" class="progress-bar"></div>
-    </div>
-
-    <div id="exportStatus" class="status">
-        Ready to export.
+        <div id="exportStatus" class="status"></div>
     </div>
 
 </div>
 
-
-<div class="info" style="text-align:center;margin:20px 0">
-    Do not refresh or close this page before downloading your ZIP files.
-    Captured photographs are stored temporarily in browser memory.
 </div>
 
-</div>
 
-<canvas id="canvas" style="display:none"></canvas>
-
-
-<!-- LIBRARY LOADER -->
 <script>
-
-const librarySources = {
-
-    jszip: [
-        "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
-        "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
-        "https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"
-    ],
-
-    jspdf: [
-        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js",
-        "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",
-        "https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"
-    ]
-
-};
-
-let librariesLoading = false;
-let librariesReady = false;
-
-function updateLibraryStatus(id, message, type) {
-
-    const el = document.getElementById(id);
-
-    el.textContent = message;
-    el.className = "status " + type;
-}
-
-function loadScript(url) {
-
-    return new Promise((resolve, reject) => {
-
-        const script = document.createElement("script");
-
-        const timeout = setTimeout(() => {
-            script.remove();
-            reject(new Error("Loading timed out"));
-        }, 15000);
-
-        script.src = url;
-        script.async = true;
-
-        script.onload = () => {
-            clearTimeout(timeout);
-            resolve();
-        };
-
-        script.onerror = () => {
-            clearTimeout(timeout);
-            script.remove();
-            reject(new Error("Network or CDN error"));
-        };
-
-        document.head.appendChild(script);
-
-    });
-}
-
-async function loadOneLibrary(name, sources, check, statusId) {
-
-    if (check()) {
-        updateLibraryStatus(statusId, name + ": Loaded", "ok");
-        return true;
-    }
-
-    for (let i = 0; i < sources.length; i++) {
-
-        updateLibraryStatus(
-            statusId,
-            name + ": Trying source " + (i + 1) + "/" + sources.length,
-            "loading"
-        );
-
-        try {
-
-            await loadScript(sources[i]);
-
-            if (check()) {
-                updateLibraryStatus(
-                    statusId,
-                    name + ": Loaded successfully",
-                    "ok"
-                );
-                return true;
-            }
-
-            throw new Error("Library variable not found");
-
-        } catch (error) {
-            console.warn(name, sources[i], error);
-        }
-
-    }
-
-    updateLibraryStatus(
-        statusId,
-        name + ": Failed. Check internet connection.",
-        "error"
-    );
-
-    return false;
-}
-
-async function loadLibraries() {
-
-    if (librariesLoading) return;
-
-    librariesLoading = true;
-    librariesReady = false;
-
-    const button = document.getElementById("retryLibraries");
-
-    button.disabled = true;
-    button.textContent = "Loading...";
-
-    const results = await Promise.all([
-
-        loadOneLibrary(
-            "JSZip",
-            librarySources.jszip,
-            () => typeof window.JSZip !== "undefined",
-            "jszipStatus"
-        ),
-
-        loadOneLibrary(
-            "jsPDF",
-            librarySources.jspdf,
-            () => !!(window.jspdf && window.jspdf.jsPDF),
-            "jspdfStatus"
-        )
-
-    ]);
-
-    librariesReady = results.every(Boolean);
-    librariesLoading = false;
-
-    button.disabled = false;
-
-    button.textContent = librariesReady
-        ? "Libraries loaded"
-        : "Retry library loading";
-
-    document.getElementById("exportStatus").textContent =
-        librariesReady
-        ? "Libraries ready."
-        : "Library loading failed. Retry before exporting.";
-
-}
-
-window.omrLibrariesReady = loadLibraries();
-
-</script>
-
-
-<!-- MAIN APPLICATION -->
-<script>
-(() => {
-
-"use strict";
+/* =========================================
+   SETTINGS
+========================================= */
 
 const CLASSES = [2, 5, 8];
 const SECTIONS = ["A", "B", "C", "D", "E"];
@@ -589,655 +389,590 @@ const SECTIONS = ["A", "B", "C", "D", "E"];
 const MAX_IMAGE_SIZE = 400 * 1024;
 const MAX_ZIP_SIZE = 100 * 1024 * 1024;
 const MAX_IMAGES_PER_ZIP = 250;
-const MAX_ROLL = 500;
 
-const $ = id => document.getElementById(id);
-
-const video = $("video");
-const canvas = $("canvas");
-const ctx = canvas.getContext("2d");
+const MEDIUM_CODE = "01";
 
 let udise = "";
-let configurations = {};
+let configuration = {};
 let captured = {};
 
 let cameraStream = null;
-let isExporting = false;
 
 
-/* --------------------------------
-   STEP 1: SCHOOL IDENTIFICATION
---------------------------------- */
+/* =========================================
+   LIBRARY LOADING
+========================================= */
 
-$("continueButton").addEventListener("click", () => {
+const libraryStatus = document.createElement("div");
+libraryStatus.className = "status";
+libraryStatus.style.display = "none";
 
-    const code = $("udise").value.trim();
+let librariesReady = loadLibraries();
 
-    if (!/^18\d{9}$/.test(code)) {
+async function loadScript(url) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
 
-        $("schoolStatus").textContent =
-            "Invalid UDISE code. Enter 11 digits beginning with 18.";
+async function loadLibraries() {
 
-        $("schoolStatus").className = "status error";
+    const status = document.getElementById("exportStatus");
+
+    if (status) {
+        status.textContent = "Checking PDF and ZIP libraries...";
+    }
+
+    if (!window.jspdf) {
+        const pdfSources = [
+            "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js",
+            "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"
+        ];
+
+        for (const url of pdfSources) {
+            try {
+                await loadScript(url);
+                if (window.jspdf) break;
+            } catch (e) {}
+        }
+    }
+
+    if (!window.JSZip) {
+        const zipSources = [
+            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+            "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"
+        ];
+
+        for (const url of zipSources) {
+            try {
+                await loadScript(url);
+                if (window.JSZip) break;
+            } catch (e) {}
+        }
+    }
+
+    const ready = !!(window.jspdf && window.JSZip);
+
+    if (status) {
+        status.textContent = ready
+            ? "PDF and ZIP libraries are ready."
+            : "PDF/ZIP libraries could not load. Check your internet connection.";
+        status.className = ready ? "status success" : "status error";
+    }
+
+    return ready;
+}
+
+
+/* =========================================
+   UDISE
+========================================= */
+
+function continueToConfiguration() {
+
+    const value = document.getElementById("udiseInput").value.trim();
+    const error = document.getElementById("udiseError");
+
+    if (!/^18\d{9}$/.test(value)) {
+        error.textContent = "Enter a valid 11-digit UDISE code beginning with 18.";
         return;
     }
 
-    udise = code;
+    udise = value;
 
-    $("schoolStatus").textContent = "UDISE code accepted.";
-    $("schoolStatus").className = "status ok";
+    error.textContent = "";
 
-    $("configStep").classList.remove("hidden");
+    document.getElementById("udisePanel").classList.add("hidden");
+    document.getElementById("configurationPanel").classList.remove("hidden");
 
-    $("continueButton").disabled = true;
-    $("udise").readOnly = true;
-
-    window.scrollTo({
-        top: $("configStep").offsetTop - 15,
-        behavior: "smooth"
-    });
-
-});
+    buildConfiguration();
+}
 
 
-/* --------------------------------
-   STEP 2: CONFIGURATION UI
---------------------------------- */
+/* =========================================
+   SECTION CONFIGURATION
+========================================= */
 
-function createConfigurationUI() {
+function buildConfiguration() {
 
-    const container = $("classConfiguration");
+    const container = document.getElementById("classConfigurations");
+    container.innerHTML = "";
 
     CLASSES.forEach(cls => {
 
         const card = document.createElement("div");
         card.className = "class-card";
+        card.id = `classCard${cls}`;
 
-        const heading = document.createElement("h3");
-        heading.textContent = "Class " + cls;
+        card.innerHTML = `
+            <div class="class-heading">
+                <strong>Class ${cls}</strong>
+            </div>
 
-        card.appendChild(heading);
+            <div class="sections-container" id="sections${cls}"></div>
 
-        const header = document.createElement("div");
-        header.className = "section-row";
-
-        header.innerHTML = `
-            <div></div>
-            <div class="range-heading">SECTION</div>
-            <div class="range-heading">START ROLL</div>
-            <div class="range-heading">END ROLL</div>
+            <button
+                type="button"
+                class="add-section small-btn"
+                id="addSection${cls}"
+                onclick="addSection(${cls})"
+            >+ Add Section</button>
         `;
-
-        card.appendChild(header);
-
-        SECTIONS.forEach(section => {
-
-            const row = document.createElement("div");
-            row.className = "section-row";
-
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.id = `enable_${cls}_${section}`;
-
-            const name = document.createElement("div");
-            name.className = "section-name";
-            name.textContent = section;
-
-            const start = document.createElement("input");
-            start.type = "number";
-            start.id = `start_${cls}_${section}`;
-            start.min = "1";
-            start.max = String(MAX_ROLL);
-            start.value = "1";
-            start.placeholder = "Start";
-
-            const end = document.createElement("input");
-            end.type = "number";
-            end.id = `end_${cls}_${section}`;
-            end.min = "1";
-            end.max = String(MAX_ROLL);
-            end.value = "20";
-            end.placeholder = "End";
-
-            row.append(checkbox, name, start, end);
-
-            card.appendChild(row);
-
-        });
 
         container.appendChild(card);
 
+        // Initially add only Section A.
+        addSection(cls, "A");
     });
-
 }
 
-createConfigurationUI();
+
+function addSection(cls, requestedSection = null) {
+
+    const container = document.getElementById(`sections${cls}`);
+
+    const existing = [...container.querySelectorAll(".section-row")]
+        .map(row => row.dataset.section);
+
+    let section = requestedSection;
+
+    if (!section) {
+        section = SECTIONS.find(s => !existing.includes(s));
+    }
+
+    if (!section || existing.includes(section)) return;
+
+    const row = document.createElement("div");
+    row.className = "section-row";
+    row.dataset.section = section;
+
+    row.innerHTML = `
+        <div class="section-title">
+            <span>Section ${section}</span>
+            ${section === "A" ? "" : `
+                <button
+                    type="button"
+                    class="danger small-btn"
+                    onclick="removeSection(${cls}, '${section}')"
+                >Remove</button>
+            `}
+        </div>
+
+        <div class="range-grid">
+            <div>
+                <label>Starting roll</label>
+                <input
+                    type="number"
+                    class="start-roll"
+                    min="1"
+                    max="999"
+                    value="1"
+                >
+            </div>
+
+            <div>
+                <label>Ending roll</label>
+                <input
+                    type="number"
+                    class="end-roll"
+                    min="1"
+                    max="999"
+                    value="40"
+                >
+            </div>
+        </div>
+    `;
+
+    container.appendChild(row);
+
+    updateAddSectionButton(cls);
+}
 
 
-/* --------------------------------
-   SAVE CONFIGURATION
---------------------------------- */
+function removeSection(cls, section) {
+
+    const key = `${cls}_${section}`;
+
+    if (captured[key] && captured[key].size > 0) {
+        alert("This section already contains captured images. Remove those images before removing the section.");
+        return;
+    }
+
+    const row = document.querySelector(
+        `#sections${cls} .section-row[data-section="${section}"]`
+    );
+
+    if (row) row.remove();
+
+    updateAddSectionButton(cls);
+}
+
+
+function updateAddSectionButton(cls) {
+
+    const container = document.getElementById(`sections${cls}`);
+
+    const existing = [...container.querySelectorAll(".section-row")]
+        .map(row => row.dataset.section);
+
+    const button = document.getElementById(`addSection${cls}`);
+
+    const available = SECTIONS.some(s => !existing.includes(s));
+
+    button.disabled = !available;
+
+    button.textContent = available
+        ? "+ Add Section"
+        : "All sections added";
+}
+
 
 function saveConfiguration() {
 
     const newConfig = {};
+    let error = "";
 
-    try {
+    CLASSES.forEach(cls => {
 
-        CLASSES.forEach(cls => {
+        newConfig[cls] = {};
 
-            const sections = {};
+        const rows = document.querySelectorAll(
+            `#sections${cls} .section-row`
+        );
 
-            SECTIONS.forEach(section => {
+        rows.forEach(row => {
 
-                const enabled =
-                    $(`enable_${cls}_${section}`).checked;
+            const section = row.dataset.section;
 
-                if (!enabled) return;
+            const start = Number(row.querySelector(".start-roll").value);
+            const end = Number(row.querySelector(".end-roll").value);
 
-                const start = Number(
-                    $(`start_${cls}_${section}`).value
-                );
-
-                const end = Number(
-                    $(`end_${cls}_${section}`).value
-                );
-
-                if (
-                    !Number.isInteger(start) ||
-                    !Number.isInteger(end) ||
-                    start < 1 ||
-                    end < start ||
-                    end > MAX_ROLL
-                ) {
-                    throw new Error(
-                        `Invalid roll range: Class ${cls}, Section ${section}.`
-                    );
-                }
-
-                sections[section] = { start, end };
-
-            });
-
-            if (Object.keys(sections).length > 0) {
-                newConfig[cls] = sections;
+            if (
+                !Number.isInteger(start) ||
+                !Number.isInteger(end) ||
+                start < 1 ||
+                end > 999 ||
+                start > end
+            ) {
+                error = `Check the roll-number range for Class ${cls}, Section ${section}.`;
+                return;
             }
 
+            newConfig[cls][section] = {
+                start,
+                end
+            };
         });
-
-        if (Object.keys(newConfig).length === 0) {
-            throw new Error("Select at least one class and section.");
-        }
-
-        // Prevent changing a range that excludes existing captures.
-        Object.keys(captured).forEach(key => {
-
-            const [cls, section] = key.split("_");
-            const existing = captured[key];
-
-            const newRange = newConfig[cls]?.[section];
-
-            if (!newRange && existing.size > 0) {
-                throw new Error(
-                    `Class ${cls}, Section ${section} already contains captures.`
-                );
-            }
-
-            if (newRange) {
-
-                for (const roll of existing.keys()) {
-
-                    if (roll < newRange.start || roll > newRange.end) {
-                        throw new Error(
-                            `Captured roll ${roll} is outside the new range for Class ${cls}, Section ${section}.`
-                        );
-                    }
-
-                }
-            }
-
-        });
-
-        configurations = newConfig;
-
-        Object.keys(configurations).forEach(cls => {
-
-            Object.keys(configurations[cls]).forEach(section => {
-
-                const key = `${cls}_${section}`;
-
-                if (!captured[key]) {
-                    captured[key] = new Map();
-                }
-
-            });
-
-        });
-
-        $("configStatus").textContent =
-            "Configuration saved successfully.";
-
-        $("configStatus").className = "status ok";
-
-        $("cameraStep").classList.remove("hidden");
-        $("capturedStep").classList.remove("hidden");
-        $("exportStep").classList.remove("hidden");
-
-        populateClassSelect();
-        renderCaptured();
-        renderZipRows();
-
-        window.scrollTo({
-            top: $("cameraStep").offsetTop - 15,
-            behavior: "smooth"
-        });
-
-    } catch (error) {
-
-        $("configStatus").textContent = error.message;
-        $("configStatus").className = "status error";
-
-    }
-
-}
-
-$("saveConfig").addEventListener("click", saveConfiguration);
-
-
-/* --------------------------------
-   CLASS / SECTION / ROLL SELECTORS
---------------------------------- */
-
-function populateClassSelect() {
-
-    const select = $("classSelect");
-
-    select.innerHTML = "";
-
-    Object.keys(configurations)
-        .map(Number)
-        .sort((a, b) => a - b)
-        .forEach(cls => {
-
-            const option = document.createElement("option");
-
-            option.value = cls;
-            option.textContent = "Class " + cls;
-
-            select.appendChild(option);
-
-        });
-
-    populateSectionSelect();
-
-}
-
-function populateSectionSelect() {
-
-    const cls = $("classSelect").value;
-    const select = $("sectionSelect");
-
-    select.innerHTML = "";
-
-    Object.keys(configurations[cls] || {}).forEach(section => {
-
-        const option = document.createElement("option");
-
-        option.value = section;
-        option.textContent = "Section " + section;
-
-        select.appendChild(option);
-
     });
 
-    populateRollSelect();
-
-}
-
-function getCurrentKey() {
-
-    return `${$("classSelect").value}_${$("sectionSelect").value}`;
-}
-
-function populateRollSelect() {
-
-    const cls = $("classSelect").value;
-    const section = $("sectionSelect").value;
-
-    const select = $("rollSelect");
-
-    select.innerHTML = "";
-
-    const range = configurations[cls]?.[section];
-
-    if (!range) return;
-
-    const records = captured[getCurrentKey()];
-
-    for (let roll = range.start; roll <= range.end; roll++) {
-
-        const option = document.createElement("option");
-
-        option.value = roll;
-        option.textContent = "Roll " + roll;
-
-        if (records?.has(roll)) {
-            option.textContent += " (Captured)";
-            option.disabled = true;
-        }
-
-        select.appendChild(option);
-
-    }
-
-    const next = [...select.options].find(option => !option.disabled);
-
-    if (next) {
-        select.value = next.value;
-    }
-
-}
-
-$("classSelect").addEventListener("change", () => {
-    populateSectionSelect();
-    renderCaptured();
-});
-
-$("sectionSelect").addEventListener("change", () => {
-    populateRollSelect();
-    renderCaptured();
-});
-
-
-/* --------------------------------
-   CAMERA
---------------------------------- */
-
-async function startCamera() {
-
-    if (!navigator.mediaDevices?.getUserMedia) {
-
-        $("cameraStatus").textContent =
-            "Camera requires HTTPS or localhost.";
-
-        $("cameraStatus").className = "status error";
+    if (error) {
+        document.getElementById("configStatus").textContent = error;
+        document.getElementById("configStatus").className = "status error";
         return;
     }
 
+    // Do not allow removing a section that contains captured files.
+    for (const key of Object.keys(captured)) {
+
+        if (!captured[key] || captured[key].size === 0) continue;
+
+        const [cls, section] = key.split("_");
+
+        if (!newConfig[cls] || !newConfig[cls][section]) {
+            document.getElementById("configStatus").textContent =
+                `Cannot remove Class ${cls}, Section ${section}: captured images still exist.`;
+
+            document.getElementById("configStatus").className = "status error";
+            return;
+        }
+    }
+
+    configuration = newConfig;
+
+    // Create storage for each configured section.
+    CLASSES.forEach(cls => {
+        Object.keys(configuration[cls]).forEach(section => {
+            const key = `${cls}_${section}`;
+
+            if (!captured[key]) {
+                captured[key] = new Map();
+            }
+        });
+    });
+
+    document.getElementById("configurationPanel").classList.add("hidden");
+    document.getElementById("cameraPanel").classList.remove("hidden");
+
+    populateClassSelect();
+
+    document.getElementById("configStatus").textContent =
+        "Configuration saved successfully.";
+
+    document.getElementById("configStatus").className = "status success";
+
+    renderCaptured();
+}
+
+
+/* =========================================
+   SELECTORS
+========================================= */
+
+function populateClassSelect() {
+
+    const select = document.getElementById("classSelect");
+
+    select.innerHTML = "";
+
+    CLASSES.forEach(cls => {
+
+        if (Object.keys(configuration[cls] || {}).length === 0) return;
+
+        const option = document.createElement("option");
+        option.value = cls;
+        option.textContent = `Class ${cls}`;
+
+        select.appendChild(option);
+    });
+
+    populateSectionSelect();
+}
+
+
+function populateSectionSelect() {
+
+    const cls = document.getElementById("classSelect").value;
+    const select = document.getElementById("sectionSelect");
+
+    select.innerHTML = "";
+
+    if (!cls || !configuration[cls]) return;
+
+    Object.keys(configuration[cls]).forEach(section => {
+
+        const option = document.createElement("option");
+        option.value = section;
+        option.textContent = `Section ${section}`;
+
+        select.appendChild(option);
+    });
+
+    populateRollSelect();
+}
+
+
+function populateRollSelect() {
+
+    const cls = document.getElementById("classSelect").value;
+    const section = document.getElementById("sectionSelect").value;
+
+    const select = document.getElementById("rollSelect");
+    select.innerHTML = "";
+
+    if (!cls || !section || !configuration[cls]?.[section]) return;
+
+    const range = configuration[cls][section];
+    const key = `${cls}_${section}`;
+
+    for (let roll = range.start; roll <= range.end; roll++) {
+
+        if (captured[key]?.has(roll)) continue;
+
+        const option = document.createElement("option");
+        option.value = roll;
+        option.textContent = String(roll).padStart(3, "0");
+
+        select.appendChild(option);
+    }
+
+    if (select.options.length === 0) {
+        const option = document.createElement("option");
+        option.textContent = "All rolls captured";
+        option.value = "";
+        select.appendChild(option);
+    }
+
+    renderCaptured();
+}
+
+
+/* =========================================
+   CAMERA
+========================================= */
+
+async function startCamera() {
+
+    const status = document.getElementById("cameraStatus");
+    const video = document.getElementById("video");
+
     try {
+
+        if (!navigator.mediaDevices?.getUserMedia) {
+            throw new Error("Camera access is not supported. Use HTTPS or localhost.");
+        }
 
         if (cameraStream) {
             cameraStream.getTracks().forEach(track => track.stop());
         }
 
-        $("cameraStatus").textContent = "Starting camera...";
-        $("cameraStatus").className = "status loading";
-
         cameraStream = await navigator.mediaDevices.getUserMedia({
-
-            audio: false,
-
             video: {
                 facingMode: { ideal: "environment" },
                 width: { ideal: 1920 },
                 height: { ideal: 1080 }
-            }
-
+            },
+            audio: false
         });
 
         video.srcObject = cameraStream;
+
         await video.play();
 
-        video.style.display = "block";
-        $("cameraPlaceholder").style.display = "none";
+        document.getElementById("captureBtn").disabled = false;
 
-        $("captureButton").disabled = false;
-
-        $("cameraStatus").textContent = "Camera is ready.";
-        $("cameraStatus").className = "status ok";
-
-        $("startCamera").textContent = "Restart camera";
+        status.textContent = "Camera is ready.";
+        status.className = "status success";
 
     } catch (error) {
 
-        console.error(error);
-
-        $("cameraStatus").textContent = error.message;
-        $("cameraStatus").className = "status error";
-
+        status.textContent = error.message || "Unable to access camera.";
+        status.className = "status error";
     }
-
 }
 
-$("startCamera").addEventListener("click", startCamera);
 
-
-/* --------------------------------
+/* =========================================
    IMAGE COMPRESSION
---------------------------------- */
+========================================= */
 
-function canvasToBlob(source, quality) {
+function canvasToBlob(canvas, quality) {
 
-    return new Promise((resolve, reject) => {
-
-        source.toBlob(blob => {
-
-            if (blob) resolve(blob);
-            else reject(new Error("Image conversion failed."));
-
-        }, "image/jpeg", quality);
-
+    return new Promise(resolve => {
+        canvas.toBlob(resolve, "image/jpeg", quality);
     });
-
 }
+
 
 async function compressImage(sourceCanvas) {
 
     let width = sourceCanvas.width;
     let height = sourceCanvas.height;
 
-    const MAX_DIMENSION = 1800;
-    const MIN_DIMENSION = 900;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
-    if (Math.max(width, height) > MAX_DIMENSION) {
-
-        const ratio = MAX_DIMENSION / Math.max(width, height);
-
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
-
-    }
-
-    const workCanvas = document.createElement("canvas");
-    const workContext = workCanvas.getContext("2d");
+    const qualities = [0.86, 0.78, 0.70, 0.62, 0.54, 0.46, 0.38, 0.32];
 
     while (true) {
 
-        workCanvas.width = width;
-        workCanvas.height = height;
+        canvas.width = width;
+        canvas.height = height;
 
-        workContext.drawImage(
-            sourceCanvas, 0, 0, width, height
-        );
-
-        const qualities = [
-            0.86, 0.78, 0.70, 0.62,
-            0.54, 0.46, 0.38, 0.32
-        ];
+        ctx.drawImage(sourceCanvas, 0, 0, width, height);
 
         for (const quality of qualities) {
 
-            const blob = await canvasToBlob(workCanvas, quality);
+            const blob = await canvasToBlob(canvas, quality);
 
-            if (blob.size <= MAX_IMAGE_SIZE) {
+            if (blob && blob.size <= MAX_IMAGE_SIZE) {
                 return blob;
             }
-
         }
 
-        if (Math.max(width, height) <= MIN_DIMENSION) {
+        if (Math.max(width, height) <= 900) {
             throw new Error("Could not compress image below 400 KB.");
         }
 
         width = Math.round(width * 0.88);
         height = Math.round(height * 0.88);
-
     }
-
 }
 
 
-/* --------------------------------
-   FILE NAMING
---------------------------------- */
-
-function getBaseFileName(cls, section, roll) {
-
-    const paddedRoll = String(roll).padStart(3, "0");
-
-    return `${udise}_C${cls}_${section}_01_${paddedRoll}`;
-
-}
-
-
-/* --------------------------------
+/* =========================================
    CAPTURE
---------------------------------- */
+========================================= */
 
-$("captureButton").addEventListener("click", async () => {
+async function captureImage() {
 
-    const cls = $("classSelect").value;
-    const section = $("sectionSelect").value;
-    const roll = Number($("rollSelect").value);
+    const video = document.getElementById("video");
 
-    const key = getCurrentKey();
+    const cls = document.getElementById("classSelect").value;
+    const section = document.getElementById("sectionSelect").value;
+    const roll = Number(document.getElementById("rollSelect").value);
 
-    if (!cameraStream || !video.videoWidth) {
-        alert("Please start the camera first.");
+    const status = document.getElementById("cameraStatus");
+    const button = document.getElementById("captureBtn");
+
+    if (!video.videoWidth || !video.videoHeight) {
+        status.textContent = "Camera is not ready.";
+        status.className = "status error";
         return;
     }
 
     if (!roll) {
-        alert("No available roll number.");
+        status.textContent = "No remaining roll numbers in this section.";
+        status.className = "status error";
         return;
     }
 
-    if (captured[key].has(roll)) {
-        alert("This roll has already been captured.");
+    const key = `${cls}_${section}`;
+
+    if (captured[key]?.has(roll)) {
+        status.textContent = "This roll number has already been captured.";
+        status.className = "status error";
         return;
     }
 
-    $("captureButton").disabled = true;
-
-    $("message").textContent = "Capturing and compressing...";
-    $("message").className = "status loading";
+    button.disabled = true;
+    status.textContent = "Processing image...";
 
     try {
+
+        const canvas = document.createElement("canvas");
 
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0);
 
         const blob = await compressImage(canvas);
 
         captured[key].set(roll, blob);
 
-        $("message").textContent =
-            `Captured successfully. ${(blob.size / 1024).toFixed(1)} KB`;
+        status.textContent =
+            `Captured Class ${cls}, Section ${section}, Roll ${String(roll).padStart(3, "0")} (${(blob.size / 1024).toFixed(1)} KB).`;
 
-        $("message").className = "status ok";
+        status.className = "status success";
 
         populateRollSelect();
         renderCaptured();
-        renderZipRows();
 
     } catch (error) {
 
-        console.error(error);
-
-        $("message").textContent = error.message;
-        $("message").className = "status error";
+        status.textContent = error.message || "Image capture failed.";
+        status.className = "status error";
 
     } finally {
 
-        $("captureButton").disabled = false;
-
+        button.disabled = false;
     }
+}
 
-});
 
-
-/* --------------------------------
-   CAPTURED PHOTOS LIST
---------------------------------- */
+/* =========================================
+   CAPTURED FILE LIST
+========================================= */
 
 function renderCaptured() {
 
-    const cls = $("classSelect").value;
-    const section = $("sectionSelect").value;
-
-    const key = `${cls}_${section}`;
-
-    const records = captured[key];
-
-    const list = $("studentList");
-
-    list.innerHTML = "";
-
-    if (!records || records.size === 0) {
-
-        list.innerHTML =
-            '<div class="info">No photographs captured for this section.</div>';
-
-    } else {
-
-        [...records.entries()]
-            .sort((a, b) => a[0] - b[0])
-            .forEach(([roll, blob]) => {
-
-                const row = document.createElement("div");
-                row.className = "student";
-
-                const details = document.createElement("div");
-
-                const title = document.createElement("strong");
-                title.textContent = `Roll ${roll}`;
-
-                const small = document.createElement("small");
-
-                small.textContent =
-                    getBaseFileName(cls, section, roll) +
-                    ".jpg · " +
-                    (blob.size / 1024).toFixed(1) + " KB";
-
-                details.append(title, small);
-
-                const remove = document.createElement("button");
-
-                remove.className = "danger small";
-                remove.textContent = "Remove";
-
-                remove.addEventListener("click", () => {
-
-                    if (confirm("Remove this photograph?")) {
-
-                        records.delete(roll);
-
-                        populateRollSelect();
-                        renderCaptured();
-                        renderZipRows();
-
-                    }
-
-                });
-
-                row.append(details, remove);
-                list.appendChild(row);
-
-            });
-
-    }
+    const cls = document.getElementById("classSelect")?.value;
+    const section = document.getElementById("sectionSelect")?.value;
 
     let total = 0;
 
@@ -1245,123 +980,89 @@ function renderCaptured() {
         total += map.size;
     });
 
-    $("captureSummary").textContent =
-        `Current section: ${records?.size || 0} captured. Total across school: ${total}.`;
+    document.getElementById("captureSummary").textContent =
+        `${total} image(s) captured in total.`;
 
+    const list = document.getElementById("capturedList");
+    list.innerHTML = "";
+
+    if (!cls || !section) return;
+
+    const key = `${cls}_${section}`;
+    const records = captured[key];
+
+    if (!records || records.size === 0) {
+        list.innerHTML = `<p>No images captured for this section.</p>`;
+        return;
+    }
+
+    [...records.keys()].sort((a, b) => a - b).forEach(roll => {
+
+        const item = document.createElement("div");
+        item.className = "captured-item";
+
+        item.innerHTML = `
+            <span>Roll ${String(roll).padStart(3, "0")}</span>
+            <button class="danger small-btn"
+                onclick="deleteCapture(${cls}, '${section}', ${roll})">
+                Delete
+            </button>
+        `;
+
+        list.appendChild(item);
+    });
 }
 
 
-/* --------------------------------
-   ZIP ROWS
---------------------------------- */
+function deleteCapture(cls, section, roll) {
 
-function renderZipRows() {
+    if (!confirm(`Delete captured image for Roll ${String(roll).padStart(3, "0")}?`)) {
+        return;
+    }
 
-    const container = $("zipRows");
+    const key = `${cls}_${section}`;
 
-    container.innerHTML = "";
+    captured[key].delete(roll);
 
-    Object.keys(configurations)
-        .map(Number)
-        .sort((a, b) => a - b)
-        .forEach(cls => {
-
-            let count = 0;
-
-            Object.keys(configurations[cls]).forEach(section => {
-
-                const key = `${cls}_${section}`;
-
-                count += captured[key]?.size || 0;
-
-            });
-
-            const row = document.createElement("div");
-            row.className = "zip-row";
-
-            const title = document.createElement("div");
-            title.className = "zip-row-title";
-            title.textContent = `Class ${cls}`;
-
-            const info = document.createElement("div");
-            info.className = "zip-row-info";
-            info.textContent = `${count} photograph(s) ready`;
-
-            const button = document.createElement("button");
-
-            button.className = "primary";
-            button.textContent = `Generate Class ${cls} ZIP`;
-            button.disabled = count === 0 || isExporting;
-
-            button.addEventListener("click", () => makeZip(cls));
-
-            row.append(title, info, button);
-
-            container.appendChild(row);
-
-        });
-
+    populateRollSelect();
+    renderCaptured();
 }
 
 
-/* --------------------------------
+/* =========================================
    PDF GENERATION
---------------------------------- */
+========================================= */
 
-async function blobToDataURL(blob) {
+async function createPDF(blob) {
 
-    return new Promise((resolve, reject) => {
+    const { jsPDF } = window.jspdf;
+
+    const dataURL = await new Promise((resolve, reject) => {
 
         const reader = new FileReader();
 
         reader.onload = () => resolve(reader.result);
-
-        reader.onerror = () => reject(
-            new Error("Unable to read image.")
-        );
+        reader.onerror = reject;
 
         reader.readAsDataURL(blob);
-
     });
-
-}
-
-async function imageToPDF(imageBlob) {
-
-    const jsPDF = window.jspdf.jsPDF;
-
-    const dataURL = await blobToDataURL(imageBlob);
 
     const image = new Image();
 
     await new Promise((resolve, reject) => {
-
         image.onload = resolve;
-
-        image.onerror = () => reject(
-            new Error("Could not load captured image.")
-        );
-
+        image.onerror = reject;
         image.src = dataURL;
-
     });
 
-    const imageWidth = image.naturalWidth;
-    const imageHeight = image.naturalHeight;
-
     const pageWidth = 210;
-    const pageHeight = pageWidth * imageHeight / imageWidth;
+    const pageHeight = pageWidth * image.height / image.width;
 
     const pdf = new jsPDF({
-
-        orientation: pageWidth > pageHeight
-            ? "landscape"
-            : "portrait",
-
+        orientation: pageHeight > pageWidth ? "portrait" : "landscape",
         unit: "mm",
         format: [pageWidth, pageHeight],
         compress: true
-
     });
 
     pdf.addImage(
@@ -1376,184 +1077,192 @@ async function imageToPDF(imageBlob) {
     );
 
     return pdf.output("blob");
-
 }
 
 
-/* --------------------------------
-   ZIP GENERATION
---------------------------------- */
+/* =========================================
+   ZIP EXPORT
+========================================= */
 
-async function makeZip(cls) {
+async function exportZIPs() {
 
-    if (isExporting) return;
+    const button = document.getElementById("exportBtn");
+    const status = document.getElementById("exportStatus");
+    const progress = document.getElementById("progressBar");
 
-    if (window.omrLibrariesReady) {
-        await window.omrLibrariesReady;
-    }
-
-    if (!window.JSZip ||
-        !window.jspdf ||
-        !window.jspdf.jsPDF) {
-
-        alert("PDF/ZIP libraries could not load. Check your internet connection.");
-        return;
-
-    }
-
-    const records = [];
-
-    Object.keys(configurations[cls]).forEach(section => {
-
-        const key = `${cls}_${section}`;
-
-        if (!captured[key]) return;
-
-        [...captured[key].entries()].forEach(([roll, blob]) => {
-
-            records.push({
-                section,
-                roll,
-                blob
-            });
-
-        });
-
-    });
-
-    records.sort((a, b) => {
-
-        if (a.section !== b.section) {
-            return a.section.localeCompare(b.section);
-        }
-
-        return a.roll - b.roll;
-
-    });
-
-    if (!records.length) {
-        alert("No photographs available for this class.");
-        return;
-    }
-
-    if (records.length > MAX_IMAGES_PER_ZIP) {
-        alert("Maximum 250 photographs allowed in one ZIP.");
-        return;
-    }
-
-    isExporting = true;
-    renderZipRows();
-
-    $("progressBar").style.width = "0%";
-
-    const zip = new window.JSZip();
-
-    let totalPDFSize = 0;
+    button.disabled = true;
+    progress.style.width = "0%";
 
     try {
 
-        for (let i = 0; i < records.length; i++) {
+        status.textContent = "Loading PDF and ZIP libraries...";
 
-            const item = records[i];
+        let ready = await librariesReady;
 
-            $("exportStatus").textContent =
-                `Converting Section ${item.section}, Roll ${item.roll} (${i + 1}/${records.length})...`;
-
-            const pdfBlob = await imageToPDF(item.blob);
-
-            totalPDFSize += pdfBlob.size;
-
-            if (totalPDFSize > MAX_ZIP_SIZE) {
-                throw new Error("PDF files exceed the 100 MB limit.");
-            }
-
-            const filename =
-                getBaseFileName(cls, item.section, item.roll) + ".pdf";
-
-            zip.file(filename, pdfBlob);
-
-            $("progressBar").style.width =
-                Math.round(((i + 1) / records.length) * 80) + "%";
-
+        if (!ready) {
+            status.textContent = "Retrying library loading...";
+            librariesReady = loadLibraries();
+            ready = await librariesReady;
         }
 
-        $("exportStatus").textContent = "Creating ZIP file...";
+        if (!ready) {
+            throw new Error("PDF/ZIP libraries could not load. Check your internet connection and retry.");
+        }
 
-        const zipBlob = await zip.generateAsync({
+        let totalImages = 0;
 
-            type: "blob",
-            compression: "STORE",
-            streamFiles: true
+        CLASSES.forEach(cls => {
 
-        }, metadata => {
+            Object.keys(configuration[cls] || {}).forEach(section => {
 
-            $("progressBar").style.width =
-                (80 + metadata.percent * 0.2).toFixed(0) + "%";
-
+                totalImages += captured[`${cls}_${section}`]?.size || 0;
+            });
         });
 
-        if (zipBlob.size > MAX_ZIP_SIZE) {
-            throw new Error("ZIP exceeds the 100 MB limit.");
+        if (totalImages === 0) {
+            throw new Error("No images have been captured yet.");
         }
+
+        let processed = 0;
 
         const now = new Date();
 
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, "0");
 
-        const zipName =
-            `PRAGATI_${year}-${month}_C${cls}_${udise}_Batch001.zip`;
+        for (const cls of CLASSES) {
 
-        const url = URL.createObjectURL(zipBlob);
+            const zip = new JSZip();
+            let classCount = 0;
+            let totalPDFSize = 0;
 
-        const link = document.createElement("a");
+            for (const section of Object.keys(configuration[cls] || {})) {
 
-        link.href = url;
-        link.download = zipName;
+                const key = `${cls}_${section}`;
+                const records = captured[key];
 
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+                if (!records || records.size === 0) continue;
 
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
+                const rolls = [...records.keys()].sort((a, b) => a - b);
 
-        $("progressBar").style.width = "100%";
+                for (const roll of rolls) {
 
-        $("exportStatus").textContent =
-            `Successfully generated ${zipName} (${(zipBlob.size / 1024 / 1024).toFixed(2)} MB)`;
+                    const imageBlob = records.get(roll);
+
+                    const pdfBlob = await createPDF(imageBlob);
+
+                    const filename =
+                        `${udise}_C${cls}_${section}_${MEDIUM_CODE}_${String(roll).padStart(3, "0")}.pdf`;
+
+                    zip.file(filename, pdfBlob);
+
+                    totalPDFSize += pdfBlob.size;
+                    classCount++;
+                    processed++;
+
+                    progress.style.width =
+                        `${Math.round(processed / totalImages * 100)}%`;
+
+                    status.textContent =
+                        `Class ${cls}: processing ${processed} of ${totalImages} image(s)...`;
+
+                    if (classCount > MAX_IMAGES_PER_ZIP) {
+                        throw new Error(`Class ${cls} exceeds the limit of ${MAX_IMAGES_PER_ZIP} images per ZIP.`);
+                    }
+
+                    if (totalPDFSize > MAX_ZIP_SIZE) {
+                        throw new Error(`Class ${cls} exceeds the 100 MB ZIP size limit.`);
+                    }
+                }
+            }
+
+            if (classCount === 0) continue;
+
+            status.textContent = `Generating ZIP for Class ${cls}...`;
+
+            const zipBlob = await zip.generateAsync({
+                type: "blob",
+                compression: "DEFLATE",
+                compressionOptions: {
+                    level: 4
+                }
+            });
+
+            if (zipBlob.size > MAX_ZIP_SIZE) {
+                throw new Error(`Class ${cls} ZIP exceeds the 100 MB limit.`);
+            }
+
+            const zipFilename =
+                `PRAGATI_${year}-${month}_C${cls}_${udise}_Batch001.zip`;
+
+            downloadBlob(zipBlob, zipFilename);
+
+            // Give the browser time to initiate each download.
+            await new Promise(resolve => setTimeout(resolve, 700));
+        }
+
+        status.textContent = "All available class ZIP files generated successfully.";
+        status.className = "status success";
+
+        progress.style.width = "100%";
 
     } catch (error) {
 
-        console.error(error);
-
-        $("exportStatus").textContent =
-            "Export failed: " + error.message;
-
-        alert("Export failed: " + error.message);
+        status.textContent = error.message || "Export failed.";
+        status.className = "status error";
 
     } finally {
 
-        isExporting = false;
-        renderZipRows();
-
+        button.disabled = false;
     }
-
 }
 
 
-/* --------------------------------
-   CLEANUP
---------------------------------- */
+/* =========================================
+   DOWNLOAD
+========================================= */
 
-window.addEventListener("beforeunload", () => {
+function downloadBlob(blob, filename) {
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+
+/* =========================================
+   CLEANUP
+========================================= */
+
+window.addEventListener("beforeunload", event => {
+
+    let total = 0;
+
+    Object.values(captured).forEach(map => {
+        total += map.size;
+    });
+
+    if (total > 0) {
+        event.preventDefault();
+        event.returnValue = "";
+    }
+});
+
+window.addEventListener("pagehide", () => {
 
     if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
     }
-
 });
 
-})();
 </script>
 
 </body>
