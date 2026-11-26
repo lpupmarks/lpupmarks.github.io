@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101614">
+<title>OMR Camera</title>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #101614;
+  --panel: #19221e;
+  --line: #2b3932;
+  --text: #edf4ef;
+  --muted: #9eafa5;
+  --accent: #b9f36b;
+  --danger: #ff8b8b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 system-ui, sans-serif;
+}
+
+main {
+  width: min(760px, 100%);
+  margin: auto;
+  padding: 22px 16px 48px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+h1 { font-size: 27px; margin: 4px 0; }
+h2 { font-size: 17px; margin: 0 0 12px; }
+p { margin: 6px 0; color: var(--muted); }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 17px;
+  margin: 14px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+select, input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #101814;
+  color: var(--text);
+  font: inherit;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 15px;
+  font: 600 14px system-ui;
+  cursor: pointer;
+  background: var(--accent);
+  color: #15200e;
+}
+
+button.secondary {
+  background: #29372f;
+  color: var(--text);
+  border: 1px solid #3b4a41;
+}
+
+button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.camera {
+  background: #070b09;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  margin-top: 12px;
+}
+
+.camera video {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+
+.placeholder {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.status {
+  font-size: 13px;
+  margin-top: 10px;
+  min-height: 20px;
+  color: var(--muted);
+}
+
+.status.error { color: var(--danger); }
+.status.good { color: var(--accent); }
+
+.progressrow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.bar {
+  height: 7px;
+  background: #29372f;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width .2s;
+}
+
+.rolls {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.roll {
+  padding: 7px 0;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.roll.done {
+  background: #293c26;
+  color: var(--accent);
+  border-color: #526d3c;
+}
+
+.ziprow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ziprow:last-child { border: 0; }
+
+.ziprow small {
+  display: block;
+  color: var(--muted);
+}
+
+.filename {
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  margin-top: 8px;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.hidden { display: none !important; }
+
+@media(max-width:430px) {
+  main { padding: 18px 12px 36px; }
+  .card { padding: 14px; }
+  .rolls { grid-template-columns: repeat(5, 1fr); }
+  .ziprow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main>
+
+<header class="top">
+  <div>
+    <div class="eyebrow">School assessment · OMR</div>
+    <h1>OMR Camera</h1>
+    <p>Capture, name and organise OMR photographs.</p>
+  </div>
+</header>
+
+<section class="card">
+  <h2>1. Select student</h2>
+
+  <div class="grid">
+    <div>
+      <label for="classSelect">Class</label>
+      <select id="classSelect">
+        <option value="2">Class 2</option>
+        <option value="6">Class 6</option>
+        <option value="8">Class 8</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="rollSelect">Roll number</label>
+      <select id="rollSelect"></select>
+    </div>
+  </div>
+
+  <div class="filename" id="filenamePreview"></div>
+</section>
+
+<section class="card">
+  <h2>2. Camera</h2>
+
+  <div class="camera" id="cameraBox">
+    <div class="placeholder" id="cameraPlaceholder">
+      Start the camera to see the live preview.
+    </div>
+
+    <video id="video" autoplay playsinline muted class="hidden"></video>
+  </div>
+
+  <div class="actions">
+    <button id="startBtn">Start rear camera</button>
+    <button id="captureBtn" disabled>Capture photo</button>
+    <button id="stopBtn" class="secondary" disabled>Stop camera</button>
+  </div>
+
+  <div class="status" id="cameraStatus" role="status">
+    Allow camera access when your browser asks.
+  </div>
+</section>
+
+<section class="card">
+
+  <div class="progressrow">
+    <h2>3. Capture progress</h2>
+    <strong id="countText">0 / 20</strong>
+  </div>
+
+  <div class="bar">
+    <span id="progressBar"></span>
+  </div>
+
+  <div class="rolls" id="rollGrid"></div>
+
+  <p class="note">
+    Green numbers have been captured. Photos are kept in this page's
+    memory until you download the ZIPs. Keep this tab open.
+  </p>
+
+</section>
+
+<section class="card">
+
+  <h2>4. Create class-wise ZIP files</h2>
+
+  <div class="grid" style="margin-bottom:12px">
+
+    <div>
+      <label for="monthInput">Assessment month</label>
+      <input id="monthInput" type="month" value="2026-11">
+    </div>
+
+    <div>
+      <label for="batchInput">Batch number</label>
+      <select id="batchInput">
+        <option value="001">Batch 001</option>
+        <option value="002">Batch 002</option>
+        <option value="003">Batch 003</option>
+        <option value="004">Batch 004</option>
+        <option value="005">Batch 005</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div id="zipRows"></div>
+
+  <div class="status" id="zipStatus" role="status"></div>
+
+  <p class="note">
+    Each ZIP contains only the captured JPGs for that class.
+    ZIP generation uses JSZip from a CDN, so an internet connection
+    is required for this step.
+  </p>
+
+</section>
+
+<p class="note">
+  School code: 18180000001 · Section: A · Medium code: 01
+</p>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+
+(() => {
+
+  const SCHOOL = '18180000001';
+  const SECTION = 'A';
+  const MEDIUM = '01';
+
+  const classes = ['2', '6', '8'];
+
+  const photos = {
+    '2': new Map(),
+    '6': new Map(),
+    '8': new Map()
+  };
+
+  const $ = id => document.getElementById(id);
+
+  const classSelect = $('classSelect');
+  const rollSelect = $('rollSelect');
+  const video = $('video');
+
+  let stream = null;
+
+  const pad = n => String(n).padStart(2, '0');
+
+  // Individual image filename
+  const imageName = (cls, roll) =>
+    `${SCHOOL}_${cls}_${SECTION}_${MEDIUM}_${pad(roll)}.jpg`;
+
+  // ZIP filename
+  const zipName = cls =>
+    `PRAGATI_${$('monthInput').value || 'YYYY-MM'}_C${cls}_${SCHOOL}_Batch${$('batchInput').value}.zip`;
+
+
+  // Populate roll numbers
+  function fillRolls() {
+
+    const cls = classSelect.value;
+
+    rollSelect.innerHTML = '';
+
+    for (let n = 1; n <= 20; n++) {
+
+      const o = document.createElement('option');
+
+      o.value = n;
+      o.textContent = `Roll ${n}${photos[cls].has(n) ? ' ✓' : ''}`;
+
+      rollSelect.append(o);
+    }
+
+    const first = [...Array(20)]
+      .map((_, i) => i + 1)
+      .find(n => !photos[cls].has(n));
+
+    if (first) rollSelect.value = first;
+
+    update();
+  }
+
+
+  // Update progress and interface
+  function update() {
+
+    const cls = classSelect.value;
+    const roll = Number(rollSelect.value || 1);
+    const done = photos[cls].size;
+
+    $('filenamePreview').textContent =
+      'Filename: ' + imageName(cls, roll) +
+      (photos[cls].has(roll) ? ' · Already captured' : '');
+
+    $('countText').textContent = `${done} / 20`;
+
+    $('progressBar').style.width = (done / 20 * 100) + '%';
+
+    $('rollGrid').innerHTML = '';
+
+    for (let n = 1; n <= 20; n++) {
+
+      const d = document.createElement('div');
+
+      d.className = 'roll' + (photos[cls].has(n) ? ' done' : '');
+      d.textContent = pad(n);
+
+      $('rollGrid').append(d);
+    }
+
+    $('captureBtn').disabled =
+      !stream || photos[cls].has(roll);
+
+    // ZIP download buttons
+    $('zipRows').innerHTML = '';
+
+    classes.forEach(c => {
+
+      const count = photos[c].size;
+
+      const row = document.createElement('div');
+      row.className = 'ziprow';
+
+      const info = document.createElement('div');
+
+      info.innerHTML = `
+        <strong>Class ${c}</strong>
+        <small>${count} photo${count === 1 ? '' : 's'} captured</small>
+      `;
+
+      const btn = document.createElement('button');
+
+      btn.className = 'secondary';
+      btn.textContent = 'Download ZIP';
+      btn.disabled = count === 0;
+
+      btn.addEventListener('click', () => makeZip(c));
+
+      row.append(info, btn);
+
+      $('zipRows').append(row);
+
+    });
+
+  }
+
+
+  classSelect.addEventListener('change', fillRolls);
+  rollSelect.addEventListener('change', update);
+
+
+  // Start camera
+  $('startBtn').addEventListener('click', async () => {
+
+    try {
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+
+        throw new Error(
+          'Camera access is unavailable. Open this page over HTTPS or localhost in a supported browser.'
+        );
+
+      }
+
+      stream = await navigator.mediaDevices.getUserMedia({
+
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 2560 },
+          height: { ideal: 1920 }
+        },
+
+        audio: false
+
+      });
+
+      video.srcObject = stream;
+
+      video.classList.remove('hidden');
+
+      $('cameraPlaceholder').classList.add('hidden');
+
+      await video.play();
+
+      $('captureBtn').disabled = false;
+      $('stopBtn').disabled = false;
+      $('startBtn').disabled = true;
+
+      $('cameraStatus').className = 'status good';
+
+      $('cameraStatus').textContent =
+        'Rear camera is ready. Keep the entire sheet and all four corner squares in frame.';
+
+      update();
+
+    } catch (e) {
+
+      $('cameraStatus').className = 'status error';
+
+      $('cameraStatus').textContent =
+        e.message || 'Could not start camera.';
+
+    }
+
+  });
+
+
+  // Stop camera
+  $('stopBtn').addEventListener('click', stopCamera);
+
+  function stopCamera() {
+
+    if (stream) {
+
+      stream.getTracks().forEach(t => t.stop());
+
+      stream = null;
+
+    }
+
+    video.srcObject = null;
+
+    video.classList.add('hidden');
+
+    $('cameraPlaceholder').classList.remove('hidden');
+
+    $('captureBtn').disabled = true;
+    $('stopBtn').disabled = true;
+    $('startBtn').disabled = false;
+
+    update();
+
+  }
+
+
+  // Capture photograph
+  $('captureBtn').addEventListener('click', async () => {
+
+    const cls = classSelect.value;
+    const roll = Number(rollSelect.value);
+
+    if (!stream || photos[cls].has(roll)) return;
+
+    if (!video.videoWidth) {
+
+      $('cameraStatus').textContent =
+        'Camera is not ready yet. Try again.';
+
+      return;
+
+    }
+
+    const canvas = document.createElement('canvas');
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    canvas.getContext('2d').drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.96)
+    );
+
+    if (!blob) {
+
+      $('cameraStatus').textContent =
+        'Could not create the photo. Please try again.';
+
+      return;
+
+    }
+
+    photos[cls].set(roll, blob);
+
+    $('cameraStatus').className = 'status good';
+
+    $('cameraStatus').textContent =
+      `Captured ${imageName(cls, roll)} · ${(blob.size / 1024 / 1024).toFixed(2)} MB`;
+
+    const next = [...Array(20)]
+      .map((_, i) => i + 1)
+      .find(n => !photos[cls].has(n));
+
+    fillRolls();
+
+    if (next) rollSelect.value = next;
+
+    update();
+
+  });
+
+
+  // Generate class-wise ZIP
+  async function makeZip(cls) {
+
+    const status = $('zipStatus');
+
+    if (typeof JSZip === 'undefined') {
+
+      status.className = 'status error';
+
+      status.textContent =
+        'ZIP library could not load. Check your internet connection and reload the page.';
+
+      return;
+
+    }
+
+    try {
+
+      status.className = 'status';
+
+      status.textContent = `Preparing Class ${cls} ZIP…`;
+
+      const zip = new JSZip();
+
+      [...photos[cls].entries()]
+        .sort((a, b) => a[0] - b[0])
+        .forEach(([roll, blob]) => {
+
+          zip.file(imageName(cls, roll), blob);
+
+        });
+
+      const content = await zip.generateAsync({
+
+        type: 'blob',
+        compression: 'STORE'
+
+      });
+
+      const url = URL.createObjectURL(content);
+
+      const a = document.createElement('a');
+
+      a.href = url;
+      a.download = zipName(cls);
+
+      document.body.append(a);
+
+      a.click();
+
+      a.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+
+      status.className = 'status good';
+
+      status.textContent =
+        `Downloaded ${zipName(cls)} (${photos[cls].size} JPG files).`;
+
+    } catch (e) {
+
+      status.className = 'status error';
+
+      status.textContent = 'ZIP creation failed: ' + e.message;
+
+    }
+
+  }
+
+
+  // Initialise
+  fillRolls();
+
+  window.addEventListener('beforeunload', () => {
+
+    if (stream) {
+
+      stream.getTracks().forEach(t => t.stop());
+
+    }
+
+  });
+
+})();
+
+</script>
+
+</body>
+</html>
